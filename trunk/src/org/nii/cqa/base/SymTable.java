@@ -29,10 +29,12 @@ public class SymTable {
 	// returns the symbol's id.
 	// if the symbol already exists, returns its current id
 	// the matching is case-sensitive
-	public static int addSymbol(String sym) {
+	public static int addSymbol(String sym, SymType type) {
 		if (!symIdMap.containsKey(sym)) {
 			int id = counter++;
 			symIdMap.put(sym, id);
+			idSymMap.put(id, sym);
+			idTypeMap.put(id, type);
 			return id;
 		}
 		
