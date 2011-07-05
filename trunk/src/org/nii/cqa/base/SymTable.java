@@ -12,22 +12,13 @@ import java.util.Map;
 
 public class SymTable { 
 	// Private attributes
-	private Map<String, Integer> symIdMap; // sym -> id
-	private Map<Integer, String> idSymMap; // id -> sym
-	private Map<Integer, SymType> idTypeMap; // id -> type
-	private int counter; // counter for id
-	
-	public SymTable() {
-		// initialization
-		counter = 0;
-		
-		symIdMap = new HashMap<String, Integer>();
-		idSymMap = new HashMap<Integer, String>();
-		idTypeMap = new HashMap<Integer, SymType>();
-	}
+	private static final Map<String, Integer> symIdMap = new HashMap<String, Integer>(); // sym -> id
+	private static final Map<Integer, String> idSymMap = new HashMap<Integer, String>(); // id -> sym
+	private static final Map<Integer, SymType> idTypeMap = new HashMap<Integer, SymType>(); // id -> type
+	private static int counter  = 0; // counter for id
 	
 	// Reset the symbol tablle
-	public void reset() {
+	public static void reset() {
 		counter = 0;
 		symIdMap.clear();
 		idSymMap.clear();
@@ -38,7 +29,7 @@ public class SymTable {
 	// returns the symbol's id.
 	// if the symbol already exists, returns its current id
 	// the matching is case-sensitive
-	public int addSymbol(String sym) {
+	public static int addSymbol(String sym) {
 		if (!symIdMap.containsKey(sym)) {
 			int id = counter++;
 			symIdMap.put(sym, id);
@@ -51,14 +42,14 @@ public class SymTable {
 	
 	// Finds the symbol to the corresponding id
 	// if the id does not exist, returns null
-	public String getSym(int symId) {
+	public static String getSym(int symId) {
 		return idSymMap.get(symId);
 	}
 	
 	
 	// Finds the id of a symbol
 	// return -1 if there is no matching
-	public int getID(String symStr) {
+	public static int getID(String symStr) {
 		Integer i = symIdMap.get(symStr);
 
 		return (i == null)? -1: i;
@@ -66,7 +57,7 @@ public class SymTable {
 	
 	// Finds the type of a symbol
 	// returns INVALID is there is no matching
-	public SymType getTypeSym(String symStr) {
+	public static SymType getTypeSym(String symStr) {
 		// First find the id
 		int id = getID(symStr);
 		
@@ -75,26 +66,26 @@ public class SymTable {
 	
 	// Finds the type of an identifier
 	// returns INVALID if there is no matching
-	public SymType getTypeID(int id) {
+	public static SymType getTypeID(int id) {
 		SymType type = idTypeMap.get(id);
 		
 		return (type == null)? SymType.INVALID : type;
 	}
 	
 	// Checks if the table contains a symbol
-	public boolean hasSym(String symStr) {
+	public static boolean hasSym(String symStr) {
 		return symIdMap.containsKey(symStr);
 	}
 	
 	// Checks if the table contains an identifier
-	public boolean hasID(int id) {
+	public static boolean hasID(int id) {
 		return idSymMap.containsKey(id);
 	}
 	
 	// Remove a symbol
 	// Returns true if the symbol exists and is removed
 	// Returns false otherwise
-	public boolean removeSym(String symStr) {
+	public static boolean removeSym(String symStr) {
 		return false;
 	}
 }
