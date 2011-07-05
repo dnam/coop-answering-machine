@@ -4,23 +4,37 @@
  */
 package org.nii.cqa;
 
-import org.nii.cqa.base.Literal;
-import org.nii.cqa.base.SymTable;
-import org.nii.cqa.base.SymType;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+import org.nii.cqa.parser.Parser;
 
 public class CQA {
 
 	/**
 	 * @param args
+	 * @throws IOException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		//just checking SymTable[remove]
-		int id = SymTable.addSymbol("researches", SymType.PREDICATE);
+		//int id = SymTable.addSymbol("researches", SymType.PREDICATE);
 		
 		//just checking Literal[remove]
-		Literal l = new Literal();
-		l.setId(id);
-		System.out.println(l.getId() + " " + l.toString());
+		//Literal l = new Literal();
+		//l.setId(id);
+		//System.out.println(l.getId() + " " + l.toString());
+		
+		
+		
+		InputStreamReader input = new InputStreamReader(System.in);
+		BufferedReader reader = new BufferedReader(input);
+		String q = reader.readLine();
+		Parser p = new Parser();
+		p.parseString(q);
+		
+		
+		
 		
 	}
 
