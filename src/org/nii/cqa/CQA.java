@@ -6,6 +6,7 @@ package org.nii.cqa;
 
 import org.nii.cqa.base.Literal;
 import org.nii.cqa.base.SymTable;
+import org.nii.cqa.base.SymType;
 
 public class CQA {
 
@@ -14,12 +15,11 @@ public class CQA {
 	 */
 	public static void main(String[] args) {
 		//just checking SymTable[remove]
-		SymTable.addSymbol("Researches");
-		SymTable.addSymbol("Study");
+		int id = SymTable.addSymbol("researches", SymType.PREDICATE);
 		
 		//just checking Literal[remove]
 		Literal l = new Literal();
-		
+		l.setId(id);
 		System.out.println(l.getId() + " " + l.toString());
 		
 	}
