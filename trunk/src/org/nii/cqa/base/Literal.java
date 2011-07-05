@@ -17,11 +17,11 @@ public class Literal {
 	public Literal() {
 	}
 	
-	public Literal(int i, Boolean n, Vector v) {
-		id = i;
-		neg = n;
-		params = v;
-	}
+//	public Literal(int i, Boolean n, Vector<Integer> v) {
+//		id = i;
+//		neg = n;
+//		params = v;
+//	}
 
 	//methods
 	public void setId(int id) {
@@ -34,23 +34,27 @@ public class Literal {
 
 
 
-	public void setNegative(Boolean neg) {
+	public void setNegative(boolean neg) {
 		this.neg = neg;
 	}
 
-	public Boolean isNegative() {
+	public boolean isNegative() {
 		return neg;
 	}
 
 
 
-
-	public void setParams(Vector<Integer> params) {
-		this.params = params;
+	public void setParam(int value) {
+		this.params.add(value);
+	}
+	public void setParamAt(int i, int value) {
+		this.params.add(i, value);
 	}
 
-	public Vector<Integer> getParams() {
-		return params;
+	
+	public int getParamAt(int i) {
+
+		return this.params.elementAt(i);
 	}
 
 
@@ -66,10 +70,7 @@ public class Literal {
 		return this.params.size();
 	}
 	
-	public int paramAt(int i) {
-
-		return this.params.elementAt(i);
-	}
+	
 
 	public void toTPTP(String q) {
 		// to convert to TPTP format

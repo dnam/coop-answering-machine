@@ -9,10 +9,6 @@ public class Query {
 		this.query = query;
 	}
 
-	public Vector <Literal> getQuery() {
-		return query;
-	}
-	
 	
 
 }
