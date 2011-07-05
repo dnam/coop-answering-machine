@@ -17,11 +17,6 @@ public class Literal {
 	public Literal() {
 	}
 	
-//	public Literal(int i, Boolean n, Vector<Integer> v) {
-//		id = i;
-//		neg = n;
-//		params = v;
-//	}
 
 	//methods
 	public void setId(int id) {
