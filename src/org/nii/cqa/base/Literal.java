@@ -61,6 +61,15 @@ public class Literal {
 		return SymTable.getSym(this.id);
 	}
 
+	public int countParams() {
+
+		return this.params.size();
+	}
+	
+	public int paramAt(int i) {
+
+		return this.params.elementAt(i);
+	}
 
 	public void toTPTP(String q) {
 		// to convert to TPTP format
