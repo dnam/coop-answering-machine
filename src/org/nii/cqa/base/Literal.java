@@ -12,7 +12,18 @@ public class Literal {
 	private int id;
 	private Boolean neg;
 	private Vector<Integer> params = new Vector<Integer>();
+	
+	//constructors
+	public Literal() {
+	}
+	
+	public Literal(int i, Boolean n, Vector v) {
+		id = i;
+		neg = n;
+		params = v;
+	}
 
+	//methods
 	public void setId(int id) {
 		this.id = id;
 	}
