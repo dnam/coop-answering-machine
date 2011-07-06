@@ -6,7 +6,7 @@ package org.nii.cqa.base;
 
 import java.util.Vector;
 
-public class Query implements Comparable {
+public class Query implements Comparable<Query> {
 	private Vector<Literal> query;
 
 	public Query() {
@@ -23,19 +23,10 @@ public class Query implements Comparable {
 		return "this query has " + query.size() + " literals";
 	}
 
-	/*
-	 * Returns 0 if the two queries are equal
-	 */
+	@Override
 	public int compareTo(Query otherQuery) {
 		// TODO Auto-generated method stub
 		return 0;
-	}
-
-	@Override
-	public int compareTo(Object o) {
-		if (o instanceof Query)
-			return compareTo((Query) o);
-		return 1;
 	}
 
 }
