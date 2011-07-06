@@ -8,7 +8,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import org.nii.cqa.parser.Parser;
+
 
 public class CQA {
 
@@ -30,8 +30,6 @@ public class CQA {
 		InputStreamReader input = new InputStreamReader(System.in);
 		BufferedReader reader = new BufferedReader(input);
 		String q = reader.readLine();
-		Parser p = new Parser();
-		p.parseString(q);
 		
 		
 		
