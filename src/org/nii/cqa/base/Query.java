@@ -5,7 +5,7 @@ import java.util.Vector;
 public class Query {
 	private Vector <Literal> query;
 
-	public void setQuery(Vector <Literal> query) {
+	public void add(Vector <Literal> query) {
 		this.query = query;
 	}
 
