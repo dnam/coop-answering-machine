@@ -109,7 +109,7 @@ public class QueryParser extends java_cup.runtime.lr_parser {
 	
 	public static void main(String args[]) throws Exception {
 		QueryParser p;
-		p = new QueryParser(new FileReader("D:\\Documents\\NII\\parser\\working\\test.txt"));
+		p = new QueryParser(new FileReader("../CQA/lib/test.txt"));
 		
 		Query q = (Query) p.parse().value;
 		System.out.println("Result: " + q);
