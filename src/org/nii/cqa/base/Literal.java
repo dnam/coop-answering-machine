@@ -1,5 +1,5 @@
 /**
- * Author: Maheen Bakhtyar
+ * @author Maheen Bakhtyar
  * Description: Stores the unique ID, literal being negative or not and the parameters of the literal.  
  * Contains methods to access literal details and fetching the name of the literal from the symbol table based on the ID. 
  */
@@ -11,23 +11,21 @@ import java.util.Vector;
 public class Literal {
 	private int id;
 	private Boolean neg;
-	private Vector<Integer> params = new Vector<Integer>();
-	
-	//constructors
-	public Literal() {
-	}
-	
+	private Vector<Integer> params;
 
-	//methods
-	public void setId(int id) {
+	// constructors
+	public Literal() {
+		params = new Vector<Integer>();
+	}
+
+	// methods
+	public void setID(int id) {
 		this.id = id;
 	}
 
-	public int getId() {
+	public int getID() {
 		return id;
 	}
-
-
 
 	public void setNegative(boolean neg) {
 		this.neg = neg;
@@ -37,24 +35,20 @@ public class Literal {
 		return neg;
 	}
 
-
-
-	public void setParam(int value) {
-		this.params.add(value);
+	public void setMultiParams(Vector<Integer> params) {
+		this.params.addAll(params);
 	}
+
 	public void setParamAt(int i, int value) {
 		this.params.add(i, value);
 	}
 
-	
 	public int getParamAt(int i) {
 
 		return this.params.elementAt(i);
 	}
 
-
-
-	//returns the corresponding String name of the literal
+	// returns the corresponding String name of the literal
 	public String toString() {
 
 		return SymTable.getSym(this.id);
@@ -64,8 +58,6 @@ public class Literal {
 
 		return this.params.size();
 	}
-	
-	
 
 	public void toTPTP(String q) {
 		// to convert to TPTP format

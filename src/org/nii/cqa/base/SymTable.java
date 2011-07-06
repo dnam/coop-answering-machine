@@ -1,8 +1,8 @@
 /**
- * Author: Nam Dang
  * Description: Stores the mapping of symbols (predicate, constant, variable) to a unique integer
  * as identifier. This symbol table should be made global with respect to a given knowledge base (KB)
  * and a query Q(X).
+ * @author: Nam Dang
  */
 
 package org.nii.cqa.base;

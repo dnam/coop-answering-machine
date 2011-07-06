@@ -1,0 +1,59 @@
+package org.nii.cqa.parser;
+
+import org.nii.cqa.base.*;
+import java.util.*;
+import java.io.*;
+
+parser code {:
+	public QueryParser (java.io.Reader input) {
+		super(new QueryScanner(input));
+	}
+	
+	public static void main(String args[]) throws Exception {
+		QueryParser p;
+		p = new QueryParser(new FileReader("D:\\Documents\\NII\\parser\\working\\test.txt"));
+		
+		Query q = (Query) p.parse().value;
+		System.out.println("Result: " + q);
+	}
+:}
+
+terminal COMMA, AND, NEG, LPAREN, RPAREN;
+terminal String NONVAR, VARIABLE;
+
+non terminal Vector<Integer> tuple, closedTuple;
+non terminal Literal basic_literal, literal;
+non terminal Query query;
+
+precedence left AND;
+precedence left NEG;
+
+query ::= literal:l 
+			{: Query q = new Query(); q.add(l); RESULT=q; :}
+		| query:q AND literal:l
+			{: q.add(l); RESULT=q; :}
+		;
+		
+literal ::= basic_literal:l
+			{: RESULT=l; :}
+		| NEG basic_literal:negLit
+			{: negLit.setNegative(true); RESULT=negLit; :}
+		;
+		
+basic_literal ::= NONVAR:pred closedTuple:t
+			{: Literal l = new Literal(); l.setID(SymTable.addSymbol(pred, SymType.PREDICATE)); l.setNegative(false); l.setMultiParams(t); RESULT=l; :}
+		;
+
+closedTuple ::= LPAREN tuple:t RPAREN
+				{: RESULT=t; :}
+			;
+
+tuple ::= NONVAR:str 
+			{: Vector<Integer> tup = new Vector<Integer>(); tup.add(SymTable.addSymbol(str, SymType.CONSTANT)); RESULT=tup; :}
+		| VARIABLE:str 
+			{: Vector<Integer> tup = new Vector<Integer>(); tup.add(SymTable.addSymbol(str, SymType.VARIABLE)); RESULT=tup; :}
+		| tuple:t COMMA NONVAR:str 
+			{: t.add(SymTable.addSymbol(str, SymType.CONSTANT));RESULT=t; :}
+		| tuple:t COMMA VARIABLE:str 
+			{: t.add(SymTable.addSymbol(str, SymType.VARIABLE));RESULT=t; :}
+		;	
