@@ -1,4 +1,4 @@
-package org.nii.cqa.parser;
+package org.nii.cqa.parser.JavaCup;
 
 import java_cup.runtime.*;
 
