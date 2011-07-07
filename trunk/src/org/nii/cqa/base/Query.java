@@ -28,6 +28,8 @@ public class Query implements Comparable<Query> {
 		
 		int rank = 0;
 
+		this.printQ();
+		otherQ.printQ();
 //		System.out.println(this.query.get(0).getParamAt(0));
 //		System.out.println(this.query.get(0).getID());
 		
@@ -38,13 +40,12 @@ public class Query implements Comparable<Query> {
 		}
 		else if(this.query.size() < otherQ.query.size())
 		{
-			System.out.println("this is lower");
+			System.out.println("first query is lower");
 			rank = -1;
 		}
 		else if(this.query.size() > otherQ.query.size())
 		{
-			System.out.println("this is higher");
-			this.printQ();
+			System.out.println("first query is higher");
 			rank = 1;
 		}
 
@@ -54,12 +55,14 @@ public class Query implements Comparable<Query> {
 	
 	public void printQ()
 	{
+		System.out.println("Query:");
 		for(int i = 0; i<query.size(); i++)
 		{
 			// query.get(i).getID() = Single Literal ID
 			// query.get(i).getAllParams() = All parameters of that single literal
 			System.out.println("literal " + query.get(i).getID()+ "(" + query.get(i).getAllParams() + ")");
 		}
+		System.out.println("---------------------------------------");
 	}
 
 	// @author: Nam Dang
