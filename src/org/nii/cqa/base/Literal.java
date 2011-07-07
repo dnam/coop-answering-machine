@@ -44,7 +44,7 @@ public class Literal {
 	}
 	public Vector<Integer> getAllParams() {
 
-		return this.params;
+		return (Vector<Integer>) this.params.clone();
 	}
 
 	public int getParamAt(int i) {
