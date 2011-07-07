@@ -42,6 +42,10 @@ public class Literal {
 	public void setParamAt(int i, int value) {
 		this.params.add(i, value);
 	}
+	public Vector<Integer> getAllParams() {
+
+		return this.params;
+	}
 
 	public int getParamAt(int i) {
 
