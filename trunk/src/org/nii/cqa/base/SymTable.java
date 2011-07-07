@@ -11,10 +11,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SymTable { 
-	// Private attributes
+	// each type's id is seperated by GAP
+	// predicate: 0-99,999, variable: 100,000-199,999, constant: 200,000~
+	private static final int GAP = 100000; 
 	private static final Map<String, Integer> symIdMap = new HashMap<String, Integer>(); // sym -> id
 	private static final Map<Integer, String> idSymMap = new HashMap<Integer, String>(); // id -> sym
-	private static final Map<Integer, SymType> idTypeMap = new HashMap<Integer, SymType>(); // id -> type
 	private static int counter  = 0; // counter for id
 	
 	// Reset the symbol tablle
@@ -22,7 +23,6 @@ public class SymTable {
 		counter = 0;
 		symIdMap.clear();
 		idSymMap.clear();
-		idTypeMap.clear();
 	}
 	
 	// Adds a new symbol to the map
@@ -32,9 +32,13 @@ public class SymTable {
 	public static int addSymbol(String sym, SymType type) {
 		if (!symIdMap.containsKey(sym)) {
 			int id = counter++;
+			if (type == SymType.VARIABLE)
+				id += GAP;
+			else if (type == SymType.CONSTANT)
+				id += GAP*2;
+			
 			symIdMap.put(sym, id);
 			idSymMap.put(id, sym);
-			idTypeMap.put(id, type);
 			return id;
 		}
 		
@@ -67,11 +71,15 @@ public class SymTable {
 	}
 	
 	// Finds the type of an identifier
-	// returns INVALID if there is no matching
+	// we do not check if the id exists or not
+	// @return SymType
 	public static SymType getTypeID(int id) {
-		SymType type = idTypeMap.get(id);
+		if (id/GAP == 0)
+			return SymType.PREDICATE;
+		if (id/GAP == 1)
+			return SymType.VARIABLE;
 		
-		return (type == null)? SymType.INVALID : type;
+		return SymType.CONSTANT;
 	}
 	
 	// Checks if the table contains a symbol
