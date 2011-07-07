@@ -106,6 +106,8 @@ public class Literal implements Comparable<Literal> {
 	public boolean isEquivalent(Literal other, Map<Integer, Integer> theta) {
 		if (this.id != other.id)
 			return false;
+		if (this.neg != other.neg)
+			return false;
 		
 		if (theta == null)
 			throw new NullPointerException("theta cannot be null");
