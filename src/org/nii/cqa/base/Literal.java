@@ -47,8 +47,8 @@ public class Literal implements Comparable<Literal> {
 	/**
 	 * @return Vector<Integer> a copy of the integer vectors in the literal
 	 */
+	@SuppressWarnings("unchecked")
 	public Vector<Integer> getAllParams() {
-
 		return (Vector<Integer>) this.params.clone();
 	}
 
@@ -82,6 +82,7 @@ public class Literal implements Comparable<Literal> {
 	
 	
 	/**
+	 * @author Nam Dang
 	 * @param other the other literal to compare with
 	 * @param theta store the substitution rule for the query
 	 * 			q1 (which this object belongs to) and q2 (which
@@ -89,6 +90,17 @@ public class Literal implements Comparable<Literal> {
 	 * 		such that (q1)(theta) = q2
 	 * Note that NEW SUBSTITUTION RULES will be added to THETA
 	 * if we detect new substitution.
+	 * Example:
+	 * 
+	 * Map<Integer, Integer> theta = new HashMap<..,..>();
+	 * lq1-i: literal of query 1 at index i
+	 * lq2-i: literal of query 2 at index i
+	 * theta: replacement for subquery of q1 to subquery of q2
+	 * for (each i)
+	 * 	if (!lq1-i.isEquivalent(lq2-i, theta))
+	 *     return false;
+	 * return true;
+	 * 
 	 * @return true if the two literals are equivalent
 	 */
 	public boolean isEquivalent(Literal other, Map<Integer, Integer> theta) {
@@ -115,10 +127,18 @@ public class Literal implements Comparable<Literal> {
 			if (type1 == SymType.CONSTANT)
 				return false; // const vs. vars, or const vs. const
 			
-			// Var vs. var. Check substitution rule.		
-			//TODO: implements it here
+			// Var vs. var. Check substitution rule that var1 -> someVar
+			// if someVar != var2 (elem2) -> return false
+			// if someVar == var2 -> continue to the next element
+			// if no rule yet -> add rule var1->var2, continue
+			Integer someVar = theta.get(elem1);
+			if (someVar == null) { // no rules yet
+				theta.put(elem1, elem2);
+			}
+			else if (someVar != elem2)
+				return false;
 		}
 		
-		return false;
+		return true;
 	}
 }
