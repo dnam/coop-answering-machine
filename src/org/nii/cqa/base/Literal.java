@@ -124,8 +124,11 @@ public class Literal implements Comparable<Literal> {
 			if (type1 != type2) // different types 
 				return false;
 			
-			if (type1 == SymType.CONSTANT)
-				return false; // const vs. vars, or const vs. const
+			if (type1 == SymType.CONSTANT) {
+				if (elem1 != elem2) // constant mis
+					return false;
+				continue; // matched constant
+			}
 			
 			// Var vs. var. Check substitution rule that var1 -> someVar
 			// if someVar != var2 (elem2) -> return false
