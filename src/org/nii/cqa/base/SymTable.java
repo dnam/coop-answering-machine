@@ -16,11 +16,15 @@ public class SymTable {
 	private static final int GAP = 100000; 
 	private static final Map<String, Integer> symIdMap = new HashMap<String, Integer>(); // sym -> id
 	private static final Map<Integer, String> idSymMap = new HashMap<Integer, String>(); // id -> sym
-	private static int counter  = 0; // counter for id
+	private static int predCounter = 0;
+	private static int varCounter  = GAP; // counter for id
+	private static int constCounnter = GAP*2;
 	
 	// Reset the symbol tablle
 	public static void reset() {
-		counter = 0;
+		predCounter = 0;
+		varCounter = GAP;
+		constCounnter = GAP * 2;
 		symIdMap.clear();
 		idSymMap.clear();
 	}
@@ -31,11 +35,13 @@ public class SymTable {
 	// the matching is case-sensitive
 	public static int addSymbol(String sym, SymType type) {
 		if (!symIdMap.containsKey(sym)) {
-			int id = counter++;
+			int id;
 			if (type == SymType.VARIABLE)
-				id += GAP;
+				id = varCounter++;
 			else if (type == SymType.CONSTANT)
-				id += GAP*2;
+				id = constCounnter++;
+			else
+				id = predCounter++;
 			
 			symIdMap.put(sym, id);
 			idSymMap.put(id, sym);
