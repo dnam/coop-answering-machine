@@ -72,7 +72,6 @@ public class Query implements Comparable<Query> {
 
 			if (!eqFlag) 														// checks when Queries are not equivalent
 			{
-				rank = 2; 
 				rank = l1.exactCompareTo(l2);
 			}
 		} else if (this.sortedLiterals.size() < otherQ.sortedLiterals.size()) // checks if # of literals in q1 < q2
