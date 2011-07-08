@@ -164,6 +164,14 @@ public class Literal implements Comparable<Literal> {
 			// if no rule yet -> add rule var1->var2, continue
 			Integer someVar = theta.get(elem1);
 			if (someVar == null) { // no rules yet
+				// check the oposite direction: if there is any rule
+				// that someOtherVar -> someVar
+				// avoid case: [X/Y, U/Y] 
+				// we cannot reverse it into [Y/X, Y/U]
+				if (theta.containsValue(elem2))
+					return false;
+				
+				// Otherwise, we have new rule
 				theta.put(elem1, elem2);
 			}
 			else if (someVar != elem2)
