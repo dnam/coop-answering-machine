@@ -73,11 +73,36 @@ public class Literal implements Comparable<Literal> {
 	}
 
 	/**
-	 * Compares to literal. This is a relaxed comparison
+	 * Compares two literals. This is a relaxed comparison
 	 */
 	@Override
 	public int compareTo(Literal other) {
-		return (this.id - other.id);
+		int thisID = (this.neg)? -this.id : this.id;
+		int otherID = (other.neg)? -other.id : other.id;
+		return (thisID - otherID);
+	}
+	
+	/**
+	 * Compares two literals. Assume that they are not
+	 * equal.
+	 * The OutOfBoundException is in the while() loop is
+	 * NOT a bug. User should ONLY use this to check
+	 * two UNEQUIVALENT literals.
+	 * 
+	 * @param other the other literal to compare against with
+	 * @return positive if this literal is ranked higher
+	 * 		   negative if other is ranked higher
+	 */
+	public int exactCompareTo(Literal other) {
+		int val = compareTo(other);
+		if (val != 0)
+			return val;
+		
+		int i = 0;
+		while (this.params.get(i) == other.params.get(i))
+			i++;
+		
+		return (this.params.get(i) - other.params.get(i));
 	}
 	
 	
