@@ -5,8 +5,12 @@
 package org.nii.cqa;
 
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+
+import org.nii.cqa.base.Query;
+import org.nii.cqa.parser.QueryParser;
 
 
 
@@ -14,9 +18,9 @@ public class CQA {
 
 	/**
 	 * @param args
-	 * @throws IOException 
+	 * @throws Exception 
 	 */
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws Exception {
 		//just checking SymTable[remove]
 		//int id = SymTable.addSymbol("researches", SymType.PREDICATE);
 		
@@ -25,12 +29,15 @@ public class CQA {
 		//l.setId(id);
 		//System.out.println(l.getId() + " " + l.toString());
 		
+		QueryParser p;
+		p = new QueryParser(new FileReader("../CQA/lib/query1.txt"));
 		
+		Query q1 = (Query) p.parse().value;
 		
-		InputStreamReader input = new InputStreamReader(System.in);
-		BufferedReader reader = new BufferedReader(input);
-		String q = reader.readLine();
-		
+		p = new QueryParser(new FileReader("../CQA/lib/query2.txt"));
+		Query q2 = (Query) p.parse().value;
+		System.out.println("Result: " + q1.compareTo(q2));
+
 		
 		
 		
