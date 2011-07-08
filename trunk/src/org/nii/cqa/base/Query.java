@@ -47,8 +47,8 @@ public class Query implements Comparable<Query> {
 		int rank = 0;
 		boolean eqFlag = true;
 
-		this.printQ();
-		otherQ.printQ();
+//		this.printQ();
+//		otherQ.printQ();
 
 		// checks if # of literals same
 		if (this.sortedLiterals.size() == otherQ.sortedLiterals.size()) {
@@ -72,12 +72,12 @@ public class Query implements Comparable<Query> {
 			}
 			
 			// TODO: Remove later. For debgugging
-			System.out.println("Substitution rules: ");
-			Set<Integer> keySet = theta.keySet();
-			for (int i : keySet) {
-				System.out.println("[ " + SymTable.getSym(i) + ", "
-						+ SymTable.getSym(theta.get(i)) + "] ");
-			}
+//			System.out.println("Substitution rules: ");
+//			Set<Integer> keySet = theta.keySet();
+//			for (int i : keySet) {
+//				System.out.println("[ " + SymTable.getSym(i) + ", "
+//						+ SymTable.getSym(theta.get(i)) + "] ");
+//			}
 
 			if (!eqFlag) // checks when Queries are not equivalent
 			{				rank = 2;
@@ -103,6 +103,10 @@ public class Query implements Comparable<Query> {
 
 		return rank;
 	}
+	
+	public boolean equals(Query other) {
+		return (compareTo(other) == 0);
+	}
 
 	/**
 	 * description: prints the query
@@ -124,7 +128,15 @@ public class Query implements Comparable<Query> {
 	 *         just a fake class
 	 */
 	public String toString() {
-		return "this query has " + sortedLiterals.size() + " literals";
+		Iterator<Literal> it = sortedLiterals.iterator();
+		StringBuilder str = new StringBuilder();
+		while (it.hasNext()) {
+			str.append(it.next());
+			if (it.hasNext())
+				str.append("&");
+		}
+
+		return str.toString();
 	}
 
 	/**
