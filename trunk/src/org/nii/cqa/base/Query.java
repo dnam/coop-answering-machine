@@ -119,6 +119,8 @@ public class Query implements Comparable<Query> {
 		System.out.println("---------------------------------------");
 	}
 
+	
+	
 	// @author: Nam Dang
 	// Converts the query into a string. Now is just a fake class
 	public String toString() {
