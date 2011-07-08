@@ -8,8 +8,10 @@ package org.nii.cqa.operators;
 import java.util.Set;
 import org.nii.cqa.base.*;
 
-public class OperatorAI extends Operator {
-	public static Set<Query> run(Set<Query> query) {
+class OperatorAI extends Operator {
+	@Override
+	Set<Query> perform(Query query) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 }

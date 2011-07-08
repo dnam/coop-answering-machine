@@ -1,13 +1,14 @@
 /**
  * @author Nam Dang
  * A class with a static method to perform Dropping Condition operator
+ * This class is only visible to the package Operators
  */
 package org.nii.cqa.operators;
 
 import org.nii.cqa.base.*;
 import java.util.*;
 
-public class OperatorDC extends Operator {
+class OperatorDC extends Operator {
 	
 	
 	/**
@@ -16,7 +17,8 @@ public class OperatorDC extends Operator {
 	 * @param q the query to drop
 	 * @return set of queries
 	 */
-	private static Set<Query> perform(Query query) {
+	@Override
+	Set<Query> perform(Query query) {
 		Set<Query> retSet = new TreeSet<Query>();
 		
 		int n = query.size();
