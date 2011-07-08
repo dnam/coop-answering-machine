@@ -59,8 +59,17 @@ public class Literal implements Comparable<Literal> {
 
 	// returns the corresponding String name of the literal
 	public String toString() {
+		StringBuilder str = new StringBuilder();
+		str.append((neg)? "-" : "" );
+		str.append(SymTable.getSym(id) + "(");
+		for (int i = 0; i < params.size(); i++) {
+			str.append(SymTable.getSym(params.get(i)));
+			if (i + 1 < params.size())
+				str.append(",");
+		}
+		str.append(")");
 
-		return SymTable.getSym(this.id);
+		return str.toString();
 	}
 
 	public int countParams() {
