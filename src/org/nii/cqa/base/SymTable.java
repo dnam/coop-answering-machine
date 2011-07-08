@@ -18,13 +18,13 @@ public class SymTable {
 	private static final Map<Integer, String> idSymMap = new HashMap<Integer, String>(); // id -> sym
 	private static int predCounter = 0;
 	private static int varCounter  = GAP; // counter for id
-	private static int constCounnter = GAP*2;
+	private static int constCounter = GAP*2;
 	
 	// Reset the symbol tablle
 	public static void reset() {
 		predCounter = 0;
 		varCounter = GAP;
-		constCounnter = GAP * 2;
+		constCounter = GAP * 2;
 		symIdMap.clear();
 		idSymMap.clear();
 	}
@@ -39,7 +39,7 @@ public class SymTable {
 			if (type == SymType.VARIABLE)
 				id = varCounter++;
 			else if (type == SymType.CONSTANT)
-				id = constCounnter++;
+				id = constCounter++;
 			else
 				id = predCounter++;
 			
