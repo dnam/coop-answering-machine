@@ -105,7 +105,8 @@ public class Literal implements Comparable<Literal> {
 			return val;
 		
 		int i = 0;
-		while (i < this.params.size() && this.params.get(i) == other.params.get(i))
+		while (i < this.params.size() 
+				&& this.params.get(i).equals(other.params.get(i)))		
 			i++;
 		
 		if (i == this.params.size())
