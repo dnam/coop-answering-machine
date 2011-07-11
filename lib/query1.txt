@@ -1,1 +1,1 @@
-ill(X, cold) & treat(Y, medi) & ill(Y, headache) & friend(X,Y)
+ill(X,headache)&ill(X,headache)&ill(X,headache)&ill(X,headache)&treat(Y,cold)
