@@ -12,10 +12,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import javax.swing.text.Segment;
+
 public class Query {
 	private Vector<Literal> litVector;
-	Map<Integer, Integer> idCountMap;
-	Map<Integer, Vector<Literal>> idLitMap;
+	private Map<Integer, Integer> idCountMap;
+	private Map<Integer, Vector<Literal>> idLitMap;
+	private Vector<Integer> segVector; // segment vector
+	
 
 	public Query() {
 		litVector = new Vector<Literal>();
@@ -30,7 +34,7 @@ public class Query {
 	 * @param literal
 	 * add a literal to the query
 	 */
-	public void add(Literal literal) {
+	public void add(Literal literal) {		
 		litVector.add(literal);
 		Collections.sort(litVector);
 		
@@ -60,6 +64,11 @@ public class Query {
 		return litVector.iterator();
 	}
 
+	private void swap(Vector<Literal> litVector2, int i, int j) {
+		Literal tmp = litVector2.get(i);
+		litVector2.set(i, litVector2.get(j));
+		litVector2.set(j, tmp);
+	}
 	
 	/**
 	 * Returns true if the two queries are equivalent
@@ -74,20 +83,105 @@ public class Query {
 			return true;
 		
 		Query other = (Query) obj;
-		Iterator<Literal> it1 = this.litVector.iterator();
-		Iterator<Literal> it2 = other.litVector.iterator();
-		Literal l1 = null;
-		Literal l2 = null;
+		if (this.segVector == null)
+			this.buildSegment();
+		if (other.segVector == null)
+			other.buildSegment();
+		
+		if (this.segVector == null || other.segVector == null)
+			return false;
+		
+		// First they are of the same size?
+		if (this.litVector.size() != other.litVector.size())
+			return false;
+		
+		// Do they have the same segment vector
+		if (this.segVector.size() != other.segVector.size())
+			return false;
+					
+		// Storing substitution rule THETA
 		Map<Integer, Integer> theta = new HashMap<Integer, Integer>();
 		
-		while (it1.hasNext() && it2.hasNext()) {
-			l1 = it1.next();
-			l2 = it2.next();
-			// checks if two literals are equivalent
-			if (!l1.isEquivalent(l2, theta))
-				return false;
+		// Caching substitution rule and swapping at each step
+		Vector<Map<Integer, Integer>> thetaCache = new Vector<Map<Integer, Integer>>();
+		Vector<Integer> swapCache = new Vector<Integer>();
+		
+		// Initialize the cache vectors
+		for (int i = 0; i < litVector.size(); i++) {
+			thetaCache.add(null);
+			swapCache.add(null);
 		}
 		
+		// Now we check segment by segment		
+		int i = 0, segIdx = 0;
+		boolean fallBack = false;
+		while (segIdx < segVector.size()) {
+			int begin = (segIdx == 0)? 0 : segVector.get(segIdx-1);
+			int end = segVector.get(segIdx);
+			
+			while (i < end && i >= begin) { // iterate within the segment
+				Literal thisLit = this.litVector.get(i);
+				
+				// Check against [other-i... other-(end-1)] for forwarding case
+				// or other-j+1... other-(end-1) for falling back case
+				boolean succeed = false;
+				int beginIdx = (fallBack)? swapCache.get(i) + 1 : begin;
+				
+				// Restore the previous state before the fall back
+				if (fallBack) {
+					swap(other.litVector, i, swapCache.get(i));
+					theta = thetaCache.get(i);
+				}
+				
+				for (int j = beginIdx; j < end; j++) {
+					Literal otherLit = other.litVector.get(j);
+					
+					// copy the current theta into a cache
+					// as the isEquivalent will change theta
+					Map<Integer, Integer> tmpTheta = new HashMap<Integer, Integer>();
+					tmpTheta.putAll(theta);
+					
+					if (thisLit.isEquivalent(otherLit, theta)) {
+						// swapping i <--> j
+						swap(other.litVector, i, j);
+						
+						// Store the swap
+						swapCache.set(i, j); // set the swap of other at i by j
+						
+						// Store the old theta into the cache
+						thetaCache.set(i, tmpTheta);
+						
+						// set the succeed bit
+						succeed = true;
+						break;
+					}
+					
+					// otherwise, try matching with the next literal
+				}
+				
+				if (succeed) { // successful
+					i++;
+					fallBack = false;
+				}
+				else { // failed substitution. Fall back to a previous one
+					thetaCache.set(i, null); // clear the memory for theta cache
+					swapCache.set(i, null); // clear the memory of the swap cache
+					
+					i--;
+					fallBack = true;
+				}
+			}
+			
+			if (i < 0)
+				return false; // TOTAL FAILURE
+			
+			if (i < begin) // fall back to the previous segment
+				segIdx--;
+			
+			if (i >= end)
+				segIdx++;
+		}
+
 		return true;
 	}
 	
@@ -172,6 +266,33 @@ public class Query {
 		
 		return q;
 	}
+	
+	/**
+	 * Builds a vectors containing segments of the query
+	 * a segment = a set of equal literals (defined in Literal.compareTo() 
+	 * segVector stores the index after the end (end + 1) of each segment (we can get the
+	 * beginning by looking at the end of the previous segment)
+	 */
+	public void buildSegment() {
+		if (litVector.size() == 0) // nothing to build
+			return;
+		
+		segVector = new Vector<Integer>();
+
+		int begin = 0, end = 1;
+		while (end < litVector.size()) {
+			// if we get to the next segment
+			if (litVector.get(begin).compareTo(litVector.get(end)) != 0) {
+				segVector.add(end);
+				begin = end;
+			}
+			end++;
+		}
+		
+		segVector.add(end);
+	}
+	
+	
 	/**
 	 * Returns a set of possible constants and variables for
 	 * Anti-instantiation
