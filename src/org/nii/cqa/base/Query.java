@@ -105,10 +105,6 @@ public class Query {
 			this.buildSegment();
 		if (other.segVector == null)
 			other.buildSegment();
-		
-		// Do they have the same segment vector
-		if (this.segVector.size() != other.segVector.size())
-			return false;
 					
 		// Storing substitution rule THETA
 		Map<Integer, Integer> theta = new HashMap<Integer, Integer>();
