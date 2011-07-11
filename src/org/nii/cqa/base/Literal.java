@@ -116,6 +116,11 @@ public class Literal implements Comparable<Literal> {
 			
 			// if they are of the same type
 			if (pType == qType) {
+				// skip if we have a pair of variables
+				if (pType == SymType.VARIABLE)
+					continue;
+				
+				// Constant
 				if (p == q)
 					continue;
 				
@@ -162,7 +167,8 @@ public class Literal implements Comparable<Literal> {
 	 *     return false;
 	 * return true;
 	 * 
-	 * @return true if the two literals are equivalent
+	 * @return 0 or a positive value if the two are equivalent
+	 * 			-1 if not
 	 */
 	public boolean isEquivalent(Literal other, Map<Integer, Integer> theta) {
 		if (this.neg != other.neg || this.id != other.id)
@@ -170,6 +176,7 @@ public class Literal implements Comparable<Literal> {
 		
 		if (theta == null)
 			throw new NullPointerException("theta cannot be null");
+
 		
 		// assertion. for debugging
 		assert this.params.size() == other.params.size();
