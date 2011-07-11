@@ -83,10 +83,6 @@ public class Query {
 			return true;
 		
 		Query other = (Query) obj;
-		if (this.segVector == null)
-			this.buildSegment();
-		if (other.segVector == null)
-			other.buildSegment();
 		
 		if (this.segVector == null || other.segVector == null)
 			return false;
@@ -94,6 +90,21 @@ public class Query {
 		// First they are of the same size?
 		if (this.litVector.size() != other.litVector.size())
 			return false;
+		
+		// Checking predicate fingerprint
+		for (int i = 0; i < litVector.size(); i++) {
+			Literal thisLit = this.litVector.get(i);
+			Literal otherLit = other.litVector.get(i);
+			if (thisLit.isNegative() != otherLit.isNegative())
+				return false;
+			if (thisLit.getID() != otherLit.getID())
+				return false;
+		}
+		
+		if (this.segVector == null)
+			this.buildSegment();
+		if (other.segVector == null)
+			other.buildSegment();
 		
 		// Do they have the same segment vector
 		if (this.segVector.size() != other.segVector.size())
