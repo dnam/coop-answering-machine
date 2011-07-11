@@ -37,17 +37,26 @@ public class CQA {
 		p = new QueryParser(new FileReader("../CQA/lib/query1.txt"));
 		
 		Query q1 = (Query) p.parse().value;
-		
-		p = new QueryParser(new FileReader("../CQA/lib/query2.txt"));
-		Query q2 = (Query) p.parse().value;
-		System.out.println("Result: " + q1.equals(q2));
+				
+//		p = new QueryParser(new FileReader("../CQA/lib/query2.txt"));
+//		Query q2 = (Query) p.parse().value;
+//		System.out.println("Result: " + q1.equals(q2));
 
-//		Set<Query> inSet = new HashSet<Query>();
-//		inSet.add(q1);
-//		
+		
+		Set<Query> inSet = new HashSet<Query>();
+		inSet.add(q1);
+		
+		System.out.println("________________");
+		Set<Query> ret = Operator.AI.run(inSet);
+		Iterator<Query> it = ret.iterator();
+		inSet.clear();
+		while(it.hasNext()) {
+			System.out.println("DC: " + it.next());
+		}
+		
+//		ret = Operator.DC.run(ret);
 //		System.out.println("________________");
-//		Set<Query> ret = Operator.DC.run(inSet);
-//		Iterator<Query> it = ret.iterator();
+//		it = ret.iterator();
 //		inSet.clear();
 //		while(it.hasNext()) {
 //			System.out.println("DC: " + it.next());
@@ -61,6 +70,13 @@ public class CQA {
 //			System.out.println("DC: " + it.next());
 //		}
 //		
+//		ret = Operator.DC.run(ret);
+//		System.out.println("________________");
+//		it = ret.iterator();
+//		inSet.clear();
+//		while(it.hasNext()) {
+//			System.out.println("DC: " + it.next());
+//		}
 	}
 
 }

@@ -11,7 +11,7 @@ import java.util.Vector;
 
 public class Literal implements Comparable<Literal> {
 	private int id;
-	private Boolean neg;
+	private boolean neg;
 	private Vector<Integer> params;
 
 	// constructors
@@ -41,7 +41,7 @@ public class Literal implements Comparable<Literal> {
 	}
 
 	public void setParamAt(int i, int value) {
-		this.params.add(i, value);
+		this.params.set(i, value);
 	}
 	
 	/**
@@ -54,7 +54,7 @@ public class Literal implements Comparable<Literal> {
 
 	public int getParamAt(int i) {
 
-		return this.params.elementAt(i);
+		return this.params.get(i);
 	}
 
 	// returns the corresponding String name of the literal
@@ -73,47 +73,73 @@ public class Literal implements Comparable<Literal> {
 	}
 
 	public int countParams() {
-
 		return this.params.size();
 	}
 
 	public void toTPTP(String q) {
 		// to convert to TPTP format
 	}
-
+	
+	public Literal clone() {
+		Literal l = new Literal();
+		l.id = this.id;
+		l.neg = this.neg;
+		l.params.addAll(this.params);
+		
+		return l;
+	}
+	
 	/**
-	 * Compares two literals. This is a relaxed comparison
+	 * Compares two literal
+	 * 
+	 * @param other the other literal to compare against with
+	 * @return positive if this literal is ranked higher
+	 * 		   negative if other is ranked higher
+	 * @see toCompare()
 	 */
 	@Override
 	public int compareTo(Literal other) {
 		int thisID = (this.neg)? -this.id : this.id;
 		int otherID = (other.neg)? -other.id : other.id;
-		return (thisID - otherID);
+		if (thisID != otherID)
+			return (thisID - otherID);		
+		
+		// Now they are of the same predicate
+		int n = this.params.size();
+		for (int i = 0; i < n; i++) {
+			int p = this.params.get(i);
+			int q = other.params.get(i);
+			
+			// Get the type
+			SymType pType = SymTable.getTypeID(p);
+			SymType qType = SymTable.getTypeID(q);
+			
+			// if they are of the same type
+			if (pType == qType) {
+				if (p == q)
+					continue;
+				
+				return (p - q);
+			}
+			
+			// they are of different type
+			if (pType == SymType.VARIABLE) // qType == CONSTANT
+				return -1;
+			else // pType == constant
+				return 1;
+		}
+		
+		return 0;
 	}
 	
-//	/**
-//	 * Compares two literals in a stricter manner than toCompare()
-//	 * 
-//	 * @param other the other literal to compare against with
-//	 * @return positive if this literal is ranked higher
-//	 * 		   negative if other is ranked higher
-//	 * @see toCompare()
-//	 */
-//	public int exactCompareTo(Literal other) {
-//		int val = compareTo(other);
-//		if (val != 0)
-//			return val;
-//		
-//		int i = 0;
-//		while (i < this.params.size() 
-//				&& this.params.get(i).equals(other.params.get(i)))		
-//			i++;
-//		
-//		if (i == this.params.size())
-//			return 0;
-//		
-//		return (this.params.get(i) - other.params.get(i));
-//	}
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Literal))
+			return false;
+		
+		Literal other = (Literal) obj;
+		return (this.compareTo(other) == 0);
+	}
 	
 	
 	/**

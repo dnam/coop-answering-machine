@@ -19,9 +19,10 @@ public class SymTable {
 	private static int predCounter = 0;
 	private static int varCounter  = GAP; // counter for id
 	private static int constCounter = GAP*2;
-	
+	private static int newVarCnt = 0; // for generating new variable
 	// Reset the symbol tablle
 	public static void reset() {
+		newVarCnt = 0;
 		predCounter = 0;
 		varCounter = GAP;
 		constCounter = GAP * 2;
@@ -103,5 +104,21 @@ public class SymTable {
 	// Returns false otherwise
 	public static boolean removeSym(String symStr) {
 		return false;
+	}
+	
+	/**
+	 * returns a newly generated variable's id
+	 * used for AI
+	 */
+	public static int generateVar() {
+		String newVarStr = null;
+	
+		do {
+			newVarStr= "V_" + newVarCnt++;
+			// assume that no overflow occurs
+		}
+		while(symIdMap.containsKey(newVarStr));
+		
+		return addSymbol(newVarStr, SymType.VARIABLE);
 	}
 }
