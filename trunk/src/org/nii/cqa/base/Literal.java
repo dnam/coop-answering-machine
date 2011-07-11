@@ -91,29 +91,29 @@ public class Literal implements Comparable<Literal> {
 		return (thisID - otherID);
 	}
 	
-	/**
-	 * Compares two literals in a stricter manner than toCompare()
-	 * 
-	 * @param other the other literal to compare against with
-	 * @return positive if this literal is ranked higher
-	 * 		   negative if other is ranked higher
-	 * @see toCompare()
-	 */
-	public int exactCompareTo(Literal other) {
-		int val = compareTo(other);
-		if (val != 0)
-			return val;
-		
-		int i = 0;
-		while (i < this.params.size() 
-				&& this.params.get(i).equals(other.params.get(i)))		
-			i++;
-		
-		if (i == this.params.size())
-			return 0;
-		
-		return (this.params.get(i) - other.params.get(i));
-	}
+//	/**
+//	 * Compares two literals in a stricter manner than toCompare()
+//	 * 
+//	 * @param other the other literal to compare against with
+//	 * @return positive if this literal is ranked higher
+//	 * 		   negative if other is ranked higher
+//	 * @see toCompare()
+//	 */
+//	public int exactCompareTo(Literal other) {
+//		int val = compareTo(other);
+//		if (val != 0)
+//			return val;
+//		
+//		int i = 0;
+//		while (i < this.params.size() 
+//				&& this.params.get(i).equals(other.params.get(i)))		
+//			i++;
+//		
+//		if (i == this.params.size())
+//			return 0;
+//		
+//		return (this.params.get(i) - other.params.get(i));
+//	}
 	
 	
 	/**
@@ -139,9 +139,7 @@ public class Literal implements Comparable<Literal> {
 	 * @return true if the two literals are equivalent
 	 */
 	public boolean isEquivalent(Literal other, Map<Integer, Integer> theta) {
-		if (this.id != other.id)
-			return false;
-		if (this.neg != other.neg)
+		if (this.neg != other.neg || this.id != other.id)
 			return false;
 		
 		if (theta == null)
@@ -175,15 +173,15 @@ public class Literal implements Comparable<Literal> {
 			if (someVar == null) { // no rules yet
 				// check the oposite direction: if there is any rule
 				// that someOtherVar -> someVar
-				// avoid case: [X/Y, U/Y] 
-				// we cannot reverse it into [Y/X, Y/U]
+				// avoid case such as: theta[X/Y, U/Y] 
+				// we cannot reverse it into inverse_theta[Y/X, Y/U]
 				if (theta.containsValue(elem2))
 					return false;
 				
 				// Otherwise, we have new rule
 				theta.put(elem1, elem2);
 			}
-			else if (someVar != elem2)
+			else if (someVar.equals(elem2))
 				return false;
 		}
 		

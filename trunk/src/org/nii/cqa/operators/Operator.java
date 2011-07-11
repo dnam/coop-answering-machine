@@ -7,7 +7,7 @@ package org.nii.cqa.operators;
 
 import java.util.Iterator;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.HashSet;
 
 import org.nii.cqa.base.Query;
 
@@ -24,7 +24,7 @@ public abstract class Operator {
 	 */
 	public Set<Query> run(Set<Query> inputSet) {
 		Iterator<Query> it = inputSet.iterator();
-		Set<Query> retSet = new TreeSet<Query>();
+		Set<Query> retSet = new HashSet<Query>();
 		
 		while (it.hasNext()) {
 			retSet.addAll(perform(it.next()));
