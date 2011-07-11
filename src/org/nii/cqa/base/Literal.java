@@ -181,7 +181,7 @@ public class Literal implements Comparable<Literal> {
 				// Otherwise, we have new rule
 				theta.put(elem1, elem2);
 			}
-			else if (someVar.equals(elem2))
+			else if (!someVar.equals(elem2))
 				return false;
 		}
 		
