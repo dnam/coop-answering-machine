@@ -16,7 +16,7 @@ public class SymTable {
 	private static final int GAP = 100000; 
 	private static final Map<String, Integer> symIdMap = new HashMap<String, Integer>(); // sym -> id
 	private static final Map<Integer, String> idSymMap = new HashMap<Integer, String>(); // id -> sym
-	private static int predCounter = 0;
+	private static int predCounter = 1;
 	private static int varCounter  = GAP; // counter for id
 	private static int constCounter = GAP*2;
 	private static int newVarCnt = 0; // for generating new variable
