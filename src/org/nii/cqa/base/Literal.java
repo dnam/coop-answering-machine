@@ -90,7 +90,7 @@ public class Literal implements Comparable<Literal> {
 	}
 	
 	/**
-	 * Compares two literal
+	 * Compares two literal without regards to variable
 	 * 
 	 * @param other the other literal to compare against with
 	 * @return positive if this literal is ranked higher
@@ -116,10 +116,49 @@ public class Literal implements Comparable<Literal> {
 			
 			// if they are of the same type
 			if (pType == qType) {
-//				// skip if we have a pair of variables
-//				if (pType == SymType.VARIABLE)
-//					continue;
-//				
+				// skip if we have a pair of variables
+				if (pType == SymType.VARIABLE)
+					continue;
+
+				// Constant
+				if (p == q)
+					continue;
+				
+				return (p - q);
+			}
+			
+			// they are of different type
+			if (pType == SymType.VARIABLE) // qType == CONSTANT
+				return -1;
+			else // pType == constant
+				return 1;
+		}
+		
+		return 0;
+	}
+	
+	/**
+	 * Takes variables into consideration
+	 * @return 
+	 */
+	public int exactCompareTo(Literal other) {
+		int thisID = (this.neg)? -this.id : this.id;
+		int otherID = (other.neg)? -other.id : other.id;
+		if (thisID != otherID)
+			return (thisID - otherID);		
+		
+		// Now they are of the same predicate
+		int n = this.params.size();
+		for (int i = 0; i < n; i++) {
+			int p = this.params.get(i);
+			int q = other.params.get(i);
+			
+			// Get the type
+			SymType pType = SymTable.getTypeID(p);
+			SymType qType = SymTable.getTypeID(q);
+			
+			// if they are of the same type
+			if (pType == qType) {
 				// Constant
 				if (p == q)
 					continue;
