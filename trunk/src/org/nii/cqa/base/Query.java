@@ -59,15 +59,21 @@ public class Query {
 		}
 	}
 	
+	/**
+	 * @param literal the literal to check against
+	 * @return true if the query has this literal already
+	 * 			false otherwise
+	 */
 	public boolean hasLiteral(Literal literal) {
 		int low = 0;
 		int high = litVector.size() - 1;
 		while (low <= high) {			
 			int mid = (low + high)/2;
 			Literal lMid = litVector.get(mid);
-			if (lMid.compareTo(literal) == 0)
+			int comp = lMid.exactCompareTo(literal);
+			if (comp == 0)
 				return true;
-			else if (lMid.compareTo(literal) > 0)
+			else if (comp > 0)
 				high = mid - 1;
 			else
 				low = mid + 1;
