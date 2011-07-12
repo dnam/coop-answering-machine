@@ -34,7 +34,10 @@ public class Query {
 	 * @param literal
 	 * add a literal to the query
 	 */
-	public void add(Literal literal) {		
+	public void add(Literal literal) {	
+		if (hasLiteral(literal)) // Remove duplicates
+			return;
+		
 		litVector.add(literal);
 		Collections.sort(litVector);
 		
@@ -54,6 +57,23 @@ public class Query {
 			litMapping.add(literal);
 			idLitMap.put(id, litMapping);
 		}
+	}
+	
+	public boolean hasLiteral(Literal literal) {
+		int low = 0;
+		int high = litVector.size() - 1;
+		while (low <= high) {			
+			int mid = (low + high)/2;
+			Literal lMid = litVector.get(mid);
+			if (lMid.compareTo(literal) == 0)
+				return true;
+			else if (lMid.compareTo(literal) > 0)
+				high = mid - 1;
+			else
+				low = mid + 1;
+		}
+		
+		return false;
 	}
 
 	/**
