@@ -137,15 +137,18 @@ public class Literal implements Comparable<Literal> {
 		return 0;
 	}
 	
-	/**
-	 * Takes variables into consideration
-	 * @return 
-	 */
-	public int exactCompareTo(Literal other) {
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Literal))
+			return false;
+		
+		Literal other = (Literal) obj;
+		
 		int thisID = (this.neg)? -this.id : this.id;
 		int otherID = (other.neg)? -other.id : other.id;
 		if (thisID != otherID)
-			return (thisID - otherID);		
+			return false;		
 		
 		// Now they are of the same predicate
 		int n = this.params.size();
@@ -158,31 +161,15 @@ public class Literal implements Comparable<Literal> {
 			SymType qType = SymTable.getTypeID(q);
 			
 			// if they are of the same type
-			if (pType == qType) {
-				// Constant
-				if (p == q)
-					continue;
+			if (pType == qType && (p == q)) {
+				continue;
 				
-				return (p - q);
 			}
-			
-			// they are of different type
-			if (pType == SymType.VARIABLE) // qType == CONSTANT
-				return -1;
-			else // pType == constant
-				return 1;
+			else
+				return false;
 		}
 		
-		return 0;
-	}
-	
-	@Override
-	public boolean equals(Object obj) {
-		if (!(obj instanceof Literal))
-			return false;
-		
-		Literal other = (Literal) obj;
-		return (this.compareTo(other) == 0);
+		return true;
 	}
 	
 	

@@ -35,7 +35,7 @@ public class Query {
 	 * add a literal to the query
 	 */
 	public void add(Literal literal) {	
-		if (hasLiteral(literal)) // Remove duplicates
+		if (litVector.contains(literal)) // Remove duplicates
 			return;
 		
 		litVector.add(literal);
@@ -57,29 +57,6 @@ public class Query {
 			litMapping.add(literal);
 			idLitMap.put(id, litMapping);
 		}
-	}
-	
-	/**
-	 * @param literal the literal to check against
-	 * @return true if the query has this literal already
-	 * 			false otherwise
-	 */
-	public boolean hasLiteral(Literal literal) {
-		int low = 0;
-		int high = litVector.size() - 1;
-		while (low <= high) {			
-			int mid = (low + high)/2;
-			Literal lMid = litVector.get(mid);
-			int comp = lMid.exactCompareTo(literal);
-			if (comp == 0)
-				return true;
-			else if (comp > 0)
-				high = mid - 1;
-			else
-				low = mid + 1;
-		}
-		
-		return false;
 	}
 
 	/**
