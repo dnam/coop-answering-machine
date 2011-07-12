@@ -116,10 +116,10 @@ public class Literal implements Comparable<Literal> {
 			
 			// if they are of the same type
 			if (pType == qType) {
-				// skip if we have a pair of variables
-				if (pType == SymType.VARIABLE)
-					continue;
-				
+//				// skip if we have a pair of variables
+//				if (pType == SymType.VARIABLE)
+//					continue;
+//				
 				// Constant
 				if (p == q)
 					continue;
