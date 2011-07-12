@@ -110,9 +110,6 @@ public class Query {
 		
 		Query other = (Query) obj;
 		
-		if (this.segVector == null || other.segVector == null)
-			return false;
-		
 		// First they are of the same size?
 		if (this.litVector.size() != other.litVector.size())
 			return false;
@@ -131,6 +128,10 @@ public class Query {
 			this.buildSegment();
 		if (other.segVector == null)
 			other.buildSegment();
+		
+		if (this.segVector == null || other.segVector == null) {
+			return false;
+		}
 		
 		// Do they have the same segment vector
 		if (this.segVector.size() != other.segVector.size())
