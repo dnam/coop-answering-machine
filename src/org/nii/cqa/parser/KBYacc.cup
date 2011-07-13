@@ -1,0 +1,99 @@
+package org.nii.cqa.parser;
+
+import org.nii.cqa.base.*;
+import java.util.*;
+import java.io.*;
+
+parser code {:
+	public KBParser (java.io.Reader input) {
+		super(new KBScanner(input));
+	}
+	
+	public static void main(String args[]) throws Exception {
+		KBParser p;
+		p = new KBParser(new FileReader("../CQA/lib/test.txt"));
+		
+		KnowledgeBase q = (KnowledgeBase) p.parse().value;
+		System.out.println("Result: " + q);
+	}
+	
+:}
+
+terminal COMMA, AND, NEG, LPAREN, RPAREN, OR, DOT, IMPLY;
+terminal String NONVAR, VARIABLE;
+
+non terminal Vector<Integer> tuple, closedTuple;
+non terminal Literal basic_literal, literal;
+non terminal Clause clause;
+non terminal Vector<Literal> ruleSide;
+non terminal Rule rule;
+non terminal KnowledgeBase kb;
+
+precedence left AND, OR;
+precedence left NEG;
+precedence left IMPLY;
+
+kb ::= literal:l
+			{: Clause c = new Clause(); c.add(l); 
+				KnowledgeBase k = new KnowledgeBase();
+				k.add(c); RESULT=k; 
+			:}
+		| clause:c
+			{:	KnowledgeBase k = new KnowledgeBase();
+				k.add(c); RESULT=k;
+			:}
+		| rule:r
+			{:	KnowledgeBase k = new KnowledgeBase();
+				k.add(r); RESULT=k;
+			:}
+		| kb:k DOT literal:l
+			{:	 Clause c = new Clause(); c.add(l); k.add(c); RESULT=k; :}
+		| kb:k DOT clause:c
+			{:	k.add(c); RESULT=k; :}
+		| kb:k DOT rule:r
+			{:	k.add(r); RESULT=k; :}
+		;
+		
+clause ::= literal:l1 OR literal:l2
+			{: Clause c = new Clause(); c.add(l1); c.add(l2); RESULT=c; :}
+		| clause:c OR literal: l
+			{: c.add(l); RESULT=c; :}
+		;
+		
+rule ::= ruleSide:r IMPLY ruleSide:l
+			{: Rule rule = new Rule(r, l); RESULT=rule; :}
+		| literal:l IMPLY ruleSide:s
+			{: Rule r = new Rule(null, s); r.addRight(l); RESULT=r; :}
+		| ruleSide:s IMPLY literal:l
+			{: Rule r = new Rule(s, null); r.addLeft(l); RESULT=r; :}
+		;
+		
+ruleSide ::= literal:l1 AND literal:l2
+			{: Vector<Literal> s = new Vector<Literal>(); s.add(l1); s.add(l2); RESULT=s; :}
+		| ruleSide:s AND literal:l
+			{: s.add(l); RESULT=s; :}
+		;	
+		
+literal ::= basic_literal:l
+			{: RESULT=l; :}
+		| NEG basic_literal:negLit
+			{: negLit.setNegative(true); RESULT=negLit; :}
+		;
+		
+basic_literal ::= NONVAR:pred closedTuple:t
+			{: Literal l = new Literal(); l.setID(SymTable.addSymbol(pred, SymType.PREDICATE)); l.setNegative(false); l.setMultiParams(t); RESULT=l; :}
+		;
+
+closedTuple ::= LPAREN tuple:t RPAREN
+				{: RESULT=t; :}
+			;
+
+tuple ::= NONVAR:str 
+			{: Vector<Integer> tup = new Vector<Integer>(); tup.add(SymTable.addSymbol(str, SymType.CONSTANT)); RESULT=tup; :}
+		| VARIABLE:str 
+			{: Vector<Integer> tup = new Vector<Integer>(); tup.add(SymTable.addSymbol(str, SymType.VARIABLE)); RESULT=tup; :}
+		| tuple:t COMMA NONVAR:str 
+			{: t.add(SymTable.addSymbol(str, SymType.CONSTANT));RESULT=t; :}
+		| tuple:t COMMA VARIABLE:str 
+			{: t.add(SymTable.addSymbol(str, SymType.VARIABLE));RESULT=t; :}
+		;	
