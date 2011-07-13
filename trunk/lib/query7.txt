@@ -1,0 +1,1 @@
+teaches(mary, Z) & researcher(X, nii)
