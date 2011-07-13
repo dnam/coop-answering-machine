@@ -19,16 +19,16 @@ import java_cup.runtime.Symbol;
   }
 %}
 %eofval{
-    return symbol(sym.EOF);
+    return symbol(QuerySym.EOF);
 %eofval}
 
 %%
-"," { return symbol(sym.COMMA); }
-"&" { return symbol(sym.AND); }
-"-" { return symbol(sym.NEG); }
-"(" { return symbol(sym.LPAREN); }
-")" { return symbol(sym.RPAREN); }
-[A-Z][a-zA-Z0-9]* { return symbol(sym.VARIABLE, new String(yytext())); }
-[a-z][a-zA-Z0-9]* { return symbol(sym.NONVAR, new String(yytext())); }
-[ \t\r\n\f] { /* ignore white space. */ }
+"," { return symbol(QuerySym.COMMA); }
+"&" { return symbol(QuerySym.AND); }
+"-" { return symbol(QuerySym.NEG); }
+"(" { return symbol(QuerySym.LPAREN); }
+")" { return symbol(QuerySym.RPAREN); }
+[A-Z][a-zA-Z0-9]* { return symbol(QuerySym.VARIABLE, new String(yytext())); }
+[a-z][a-zA-Z0-9]* { return symbol(QuerySym.NONVAR, new String(yytext())); }
+[ \t\n\r\f] { /* ignore white space. */ }
 . { System.err.println("Illegal character: "+yytext()); }
