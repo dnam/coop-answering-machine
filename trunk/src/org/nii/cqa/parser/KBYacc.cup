@@ -62,6 +62,8 @@ clause ::= literal:l1 OR literal:l2
 		
 rule ::= ruleSide:r IMPLY ruleSide:l
 			{: Rule rule = new Rule(r, l); RESULT=rule; :}
+		| literal:l1 IMPLY literal:l2
+			{: Rule rule = new Rule(); rule.addRight(l1); rule.addLeft(l2); RESULT=rule; :}
 		| literal:l IMPLY ruleSide:s
 			{: Rule r = new Rule(null, s); r.addRight(l); RESULT=r; :}
 		| ruleSide:s IMPLY literal:l
