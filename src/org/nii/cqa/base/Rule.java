@@ -16,6 +16,23 @@ public class Rule extends Formula {
 		trackSHRR = -1; // unchecked
 	}
 	
+	public Rule(Vector<Literal> left, Vector<Literal> right) {
+		super(false); // not a clause
+		leftSide = new Vector<Literal>();
+		rightSide = new Vector<Literal>();
+		trackSHRR = -1; // unchecked
+		
+		if (left != null) {
+			for(int i = 0; i < left.size(); i++)
+				addLeft(left.get(i));
+		}
+
+		if (right != null) {
+			for (int i = 0; i < right.size(); i++)
+				addRight(right.get(i));
+		}
+	}
+	
 	public void addLeft(Literal lit) {
 		if (leftSide.contains(lit)) // Remove duplicates
 			return;
