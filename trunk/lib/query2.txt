@@ -1,1 +1,1 @@
-ill(Y, cold) & treat(X, medi) & ill(X, headache) & friend(Y,X)
+specialization(Z) & course(mary,Z)
