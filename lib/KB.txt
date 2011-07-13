@@ -1,0 +1,5 @@
+publish(X, Z) & specialization(Z) -> researcher(Z),   courses(X, Z) -> master(Z),
+researcher(Z) & teaches(X, Z) & works(X, U) -> professor(Z),
+-ill(X, U) & ill(X, Y) -> drug(Y), treat(Y), ill(X, Y) -> drug(Y),
+treat(X) & treat(Y) -> cold(X) & cold(Y), kill(Z),
+ill(X,Y), cold(X) | cold(Z)

@@ -1,1 +1,1 @@
-ill(X,headache)&ill(X,headache)&ill(X,headache)&ill(X,headache)&treat(Y,cold)
+ill(mary,Y) & ill(pete,Y)

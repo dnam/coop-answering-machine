@@ -1,0 +1,1 @@
+publish(mary, Z) & course(mary,Z)
