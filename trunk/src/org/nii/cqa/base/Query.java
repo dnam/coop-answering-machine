@@ -248,7 +248,7 @@ public class Query {
 		while (it.hasNext()) {
 			str.append(it.next());
 			if (it.hasNext())
-				str.append("&");
+				str.append(" & ");
 		}
 
 		return str.toString();
