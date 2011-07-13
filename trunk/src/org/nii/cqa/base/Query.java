@@ -374,4 +374,17 @@ public class Query {
 		
 		return retSet;
 	}
+	
+	/************ Rule Matching ****************/
+	
+	/**
+	 * matches the current query with the left side of
+	 * the given rule.
+	 * returns a set of resulted queries after substitution
+	 */
+	public Set<Query> tryMatch(Rule rule) {
+		// Firts locate the matching
+		
+		return null;
+	}
 }
