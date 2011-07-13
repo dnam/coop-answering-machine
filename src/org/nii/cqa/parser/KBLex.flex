@@ -29,7 +29,6 @@ import java_cup.runtime.Symbol;
 "-" { return symbol(KBSym.NEG); }
 "(" { return symbol(KBSym.LPAREN); }
 ")" { return symbol(KBSym.RPAREN); }
-"." { return symbol(KBSym.DOT); }
 "->" { return symbol(KBSym.IMPLY); }
 [A-Z][a-zA-Z0-9]* { return symbol(KBSym.VARIABLE, new String(yytext())); }
 [a-z][a-zA-Z0-9]* { return symbol(KBSym.NONVAR, new String(yytext())); }
