@@ -31,13 +31,14 @@ public class Clause extends Formula {
 		return litVector.iterator();
 	}
 	
+	@Override
 	public String toString() {
 		Iterator<Literal> it = litVector.iterator();
 		StringBuilder str = new StringBuilder();
 		while (it.hasNext()) {
 			str.append(it.next());
 			if (it.hasNext())
-				str.append(" & ");
+				str.append(" | ");
 		}
 
 		return str.toString();
