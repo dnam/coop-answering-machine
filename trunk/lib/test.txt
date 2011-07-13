@@ -1,1 +1,2 @@
--ill(X, cold) & treat(Y, medi) & play(X, playstation)
+ill(X) -> ill(Y) . ill(X) . cold(Y) | cold(Z) . 
+cold(X) & cold(Y)-> treat(X) & treat(Y). kill(Z)
