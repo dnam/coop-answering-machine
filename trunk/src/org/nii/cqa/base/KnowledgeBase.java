@@ -23,7 +23,14 @@ public class KnowledgeBase {
 	}
 	
 	public String toString() {
-		String str = "Number of clauses: " + formulaList.size();
-		return str;
+		StringBuilder str = new StringBuilder();
+		int n = formulaList.size();
+		for (int i = 0; i < n; i++) {
+			str.append(formulaList.get(i));
+			if (i < n-1)
+				str.append(", ");
+		}
+
+		return str.toString();
 	}
 }

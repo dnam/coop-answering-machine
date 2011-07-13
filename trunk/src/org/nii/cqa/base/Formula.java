@@ -31,4 +31,6 @@ public abstract class Formula {
 		
 		return (Rule) this;
 	}
+	
+	public abstract String toString();
 }

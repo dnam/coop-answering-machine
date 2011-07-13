@@ -1,6 +1,7 @@
 package org.nii.cqa.base;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
 
@@ -93,6 +94,29 @@ public class Rule extends Formula {
 			checkSHRR();
 		
 		return (trackSHRR == 1);
+	}
+	
+	@Override
+	public String toString() {
+		Iterator<Literal> it = rightSide.iterator();
+		StringBuilder str = new StringBuilder();
+		while (it.hasNext()) {
+			str.append(it.next());
+			if (it.hasNext())
+				str.append(" & ");
+		}
+		
+		str.append(" -> ");
+		
+		it = leftSide.iterator();
+		while (it.hasNext()) {
+			str.append(it.next());
+			if (it.hasNext())
+				str.append(" & ");
+		}
+		
+
+		return str.toString();
 	}
 	
 }
