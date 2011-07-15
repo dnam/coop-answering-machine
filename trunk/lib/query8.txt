@@ -1,0 +1,1 @@
+painting(H) & tree(X) & tree(Y) & tree(Z) & tree(U) & tree(V) & tree(W) & tree(U) & tree(X) & tree(Q) & tree(R) & tree(M) & tree(N) & -tree(L) & color(X,P) & color(Y,P) & color(Z,G) & color(M,O) & color(N,S) & color(R,T) & -color(V,U) & scene(D)
