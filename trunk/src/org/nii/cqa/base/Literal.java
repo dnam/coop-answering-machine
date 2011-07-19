@@ -6,6 +6,7 @@
 
 package org.nii.cqa.base;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 
@@ -244,6 +245,51 @@ public class Literal implements Comparable<Literal> {
 				return false;
 		}
 		
+		return true;
+	}
+	
+	public boolean subsumes(Literal other, Map<Integer, Integer> theta) {
+		if (this.neg != other.neg || this.id != other.id)
+			return false;
+		
+		if (theta == null)
+			throw new NullPointerException("theta cannot be null");
+
+		Map<Integer, Integer> localTheta = new HashMap<Integer, Integer>(theta);
+		
+		// assertion. for debugging
+		assert this.params.size() == other.params.size();
+		
+		int n = this.params.size();
+		for (int i = 0; i < n; i++) {
+			int elem1 = this.params.get(i);
+			int elem2 = other.params.get(i);
+			
+			SymType type1 = SymTable.getTypeID(elem1);
+			SymType type2 = SymTable.getTypeID(elem2);
+			
+			if (type1 != type2) // different types 
+				return false;
+			
+			if (type1 == SymType.CONSTANT) {
+				if (elem1 != elem2) // constant mismatching
+					return false;
+				continue; // matched constant
+			}
+			
+			// Var vs. var. Check substitution rule that var1 -> someVar
+			// if someVar != var2 (elem2) -> return false
+			// if someVar == var2 -> continue to the next element
+			// if no rule yet -> add rule var1->var2, continue
+			Integer someVar = localTheta.get(elem1);
+			if (someVar == null) { // no rules yet				
+				localTheta.put(elem1, elem2); // add a new rule
+			}
+			else if (!someVar.equals(elem2))
+				return false;
+		}
+		
+		theta.putAll(localTheta);		
 		return true;
 	}
 }
