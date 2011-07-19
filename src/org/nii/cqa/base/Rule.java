@@ -1,5 +1,6 @@
 package org.nii.cqa.base;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -40,6 +41,9 @@ public class Rule extends Formula {
 		
 		trackSHRR = -1; // unchecked
 		leftSide.add(lit);
+		
+		// Sort the left side
+		Collections.sort(leftSide);
 	}
 	
 	public void addRight(Literal lit) {
@@ -47,6 +51,12 @@ public class Rule extends Formula {
 			return;
 		
 		rightSide.add(lit);
+	}
+	
+	public Vector<Literal> extractLeft() {
+		Vector<Literal> ret = new Vector<Literal>();
+		ret.addAll(leftSide);
+		return ret;
 	}
 	
 	private void checkSHRR() {
