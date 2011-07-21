@@ -162,10 +162,8 @@ public class Literal implements Comparable<Literal> {
 			SymType qType = SymTable.getTypeID(q);
 			
 			// if they are of the same type
-			if (pType == qType && (p == q)) {
+			if (pType == qType && (p == q))
 				continue;
-				
-			}
 			else
 				return false;
 		}
@@ -248,7 +246,7 @@ public class Literal implements Comparable<Literal> {
 		return true;
 	}
 	
-	public boolean subsumes(Literal other, Map<Integer, Integer> theta) {
+	public boolean subsume(Literal other, Map<Integer, Integer> theta) {
 		if (this.neg != other.neg || this.id != other.id)
 			return false;
 		

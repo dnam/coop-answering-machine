@@ -59,6 +59,10 @@ public class Rule extends Formula {
 		return ret;
 	}
 	
+	public Literal getFirstRight() {
+		return rightSide.get(0);
+	}
+	
 	private void checkSHRR() {
 		if (trackSHRR != -1)
 			return;

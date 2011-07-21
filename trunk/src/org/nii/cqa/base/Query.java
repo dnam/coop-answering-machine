@@ -4,15 +4,14 @@
  */
 package org.nii.cqa.base;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.util.*;
 
 import javax.swing.text.Segment;
+
+import org.nii.cqa.parser.KBParser;
+import org.nii.cqa.parser.QueryParser;
 
 public class Query {
 	private Vector<Literal> litVector;
@@ -27,6 +26,27 @@ public class Query {
 		// For AI operators
 		idCountMap = new HashMap<Integer, Integer>();
 		idLitMap = new HashMap<Integer, Vector<Literal>>();
+	}
+	
+	public Query(List<Literal> lVector) {
+		litVector = new Vector<Literal>(lVector);
+		
+		// For AI operators
+		idCountMap = new HashMap<Integer, Integer>();
+		idLitMap = new HashMap<Integer, Vector<Literal>>();
+	}
+	
+	public static Query parse(String filePath) throws Exception {
+		Query q = new Query();
+		
+		QueryParser p = new QueryParser(new FileReader(filePath));
+		Query parsedQuery = (Query) p.parse().value;
+		
+		for (int i = 0; i < parsedQuery.litVector.size(); i++) {
+			q.add(parsedQuery.litVector.get(i));
+		}
+		
+		return q;
 	}
 	
 
@@ -382,9 +402,71 @@ public class Query {
 	 * the given rule.
 	 * returns a set of resulted queries after substitution
 	 */
-	public Set<Query> tryMatch(Rule rule) {
-		// Firts locate the matching
+	public Query doGR(List<Literal> other, Literal replacement) {
+		Iterator<Literal> it = other.iterator();
+
+		// Now the query
+		Query q = this.clone();
+		while (it.hasNext())
+			q.remove(it.next());
 		
-		return null;
+		// Add the replacement
+		q.add(replacement);
+		
+		return q;
+	}
+	
+	public void remove(Literal lit) {
+		int begin = 0, end = litVector.size() - 1;
+		int mid = -1;
+		while (begin <= end) {
+			mid = (begin + end)/2;
+			int comp = litVector.get(mid).compareTo(lit);
+			if (comp == 0)
+				break;
+			else if (comp > 0)
+				end = mid - 1;
+			else if (comp < 0)
+				begin = mid + 1;
+		}
+		
+		if (mid == -1 || litVector.get(mid).compareTo(lit) != 0)
+			throw new IllegalStateException("Unable to remove the literal: " + lit);
+		
+		while (mid >= 0 && litVector.get(mid).compareTo(lit) == 0)
+			mid--;
+		mid++;
+		
+		while (mid < litVector.size() && litVector.get(mid).compareTo(lit) == 0) {
+			if (litVector.get(mid).equals(lit)) {
+				litVector.remove(mid);
+				return;
+			}
+			mid++;
+		}
+		
+		// Otherwise
+		throw new IllegalStateException("Unable to remove the literal: " + lit);
+	}
+	
+	/**
+	 * Check if the current query is subsumed by the other Query
+	 * That is to say: there exists a substitution theta such
+	 * that: (other Query) (theta) := thisQuery
+	 * @param other
+	 * @return
+	 */
+	public boolean subsumed(Vector<Literal> other) {
+		if (this.size() != other.size())
+			return false;
+		
+		Map<Integer, Integer> theta = new HashMap<Integer, Integer>();
+		for (int i = 0; i < this.size(); i++) {
+			if (!other.get(i).subsume(this.litVector.get(i), theta))
+				return false;
+		}
+		
+		
+		return true;
 	}
 }
