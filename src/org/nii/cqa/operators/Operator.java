@@ -15,6 +15,7 @@ public abstract class Operator {
 	// List of operator objects for external access
 	public static final Operator AI = new OperatorAI();
 	public static final Operator DC = new OperatorDC();
+	public static final Operator GR = new OperatorGR();
 	
 	
 	/**
