@@ -1,2 +1,1 @@
-conseq([+ans(mary)]).
-conseq([+ans(pete)]).
+conseq([+ans(pete)], used([[+ans(pete), -ill(pete,sinusitis)], [+ill(pete,sinusitis)]])).
