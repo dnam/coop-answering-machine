@@ -229,37 +229,47 @@ public class Query {
 		return true;
 	}
 	
-	
+	/**
+	 * puts a negation before each literal as required by SOLAR to get the answer
+	 * @return the String with negated string literals
+	 */
 	public String negateString() {
 			
 		Iterator<Literal> it = litVector.iterator();
 		StringBuilder str = new StringBuilder();
 		if(it.hasNext())
-			str.append("-");
+			str.append("-" + it.next());
+
 		while (it.hasNext()) {
 			str.append(" , -" + it.next());
-//			if (it.hasNext())
-//				str.append(" , ");
 		}
 		return str.toString().replace("--", "");
 	}
 
+	/**
+	 * returns all the variables in the query
+	 * @return list of variables
+	 */
+	private char[] getAllVars() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	
 	/** Converts the query into TPTP topclause
 	 * 
 	 */
 	public String toTopClause() {
 		UUID id = UUID.randomUUID();
-		
+		System.out.println(this.getAllVars());
 		String res = "cnf(query_clause" + id  + ", top_clause, [" + this.negateString() + " , ans()])";
-		
-		
-//		cnf(query_clause, top_clause, [-ill(X, sinusitis), -treat(pete, Y), -ill(W, Z), ans(X,Y,W,Z)]).
 		return res;
 	}
 	
 	
+
 	
-	
+
 	/**
 	 * Returns a hash value for the current query
 	 * Hash value = sum of literals (negativity taken into account)
