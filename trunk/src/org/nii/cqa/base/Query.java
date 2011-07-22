@@ -4,13 +4,17 @@
  */
 package org.nii.cqa.base;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.Vector;
 
-import javax.swing.text.Segment;
-
-import org.nii.cqa.parser.KBParser;
 import org.nii.cqa.parser.QueryParser;
 
 public class Query {
@@ -224,6 +228,37 @@ public class Query {
 
 		return true;
 	}
+	
+	
+	public String negateString() {
+			
+		Iterator<Literal> it = litVector.iterator();
+		StringBuilder str = new StringBuilder();
+		if(it.hasNext())
+			str.append("-");
+		while (it.hasNext()) {
+			str.append(" , -" + it.next());
+//			if (it.hasNext())
+//				str.append(" , ");
+		}
+		return str.toString().replace("--", "");
+	}
+
+	/** Converts the query into TPTP topclause
+	 * 
+	 */
+	public String toTopClause() {
+		UUID id = UUID.randomUUID();
+		
+		String res = "cnf(query_clause" + id  + ", top_clause, [" + this.negateString() + " , ans()])";
+		
+		
+//		cnf(query_clause, top_clause, [-ill(X, sinusitis), -treat(pete, Y), -ill(W, Z), ans(X,Y,W,Z)]).
+		return res;
+	}
+	
+	
+	
 	
 	/**
 	 * Returns a hash value for the current query

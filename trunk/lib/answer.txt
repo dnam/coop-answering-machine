@@ -1,1 +1,2 @@
-conseq([+ans(pete)], used([[+ans(pete), -ill(pete,sinusitis)], [+ill(pete,sinusitis)]])).
+conseq([+ans(pete,medi,mary,bronchitis)]).
+conseq([+ans(pete,medi,pete,sinusitis)]).

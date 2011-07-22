@@ -1,1 +1,1 @@
--ill(mary,Y) & -ill(pete,Y)
+ill(mary,Y) & ill(pete,Y)
