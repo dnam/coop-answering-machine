@@ -230,7 +230,7 @@ public class Query {
 	}
 	
 	/**
-	 * puts a negation before each literal as required by SOLAR to get the answer
+	 * puts a negation before each literal string
 	 * @return the String with negated string literals
 	 */
 	public String negateString() {
