@@ -3,6 +3,7 @@ package org.nii.cqa.base;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.Iterator;
+import java.util.UUID;
 import java.util.Vector;
 
 import org.nii.cqa.parser.KBParser;
@@ -69,5 +70,24 @@ public class KnowledgeBase {
 	public void clear() {
 		formulaList.clear();
 		setSHRR.clear();
+	}
+	
+	public String toTPTP() {
+		String TPTP = "";
+		String lang = "cnf";
+		String name = "c" + 1;
+		String role = "axiom";
+		Vector<Formula> formulae = this.formulaList;
+		Vector<Rule> shrr = this.setSHRR;
+		for(int i = 0; i < formulae.size(); i++)
+		{
+			TPTP += lang + "(" + name + ", " + role + ", " + formulae.get(i) + ")";
+		}
+		TPTP = TPTP.replace("&", ",");
+		
+		
+//		formulaList.clear();
+//		setSHRR.clear();
+		return TPTP;
 	}
 }
