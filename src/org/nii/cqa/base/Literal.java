@@ -53,6 +53,19 @@ public class Literal implements Comparable<Literal> {
 		return (Vector<Integer>) this.params.clone();
 	}
 
+	public Vector<Integer> getAllVars() {
+		Vector<Integer> vars = new Vector<Integer>();
+		for(int i = 0; i < this.params.size(); i++)
+		{
+			if(SymTable.getTypeID(params.get(i)) == (SymType.VARIABLE))
+				vars.add(params.get(i));
+			
+		}
+		return vars;
+	}
+	
+	
+	
 	public int getParamAt(int i) {
 
 		return this.params.get(i);
