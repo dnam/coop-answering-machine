@@ -5,6 +5,7 @@
 package org.nii.cqa.base;
 
 import java.io.FileReader;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,6 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.Vector;
 
@@ -250,9 +252,13 @@ public class Query {
 	 * returns all the variables in the query
 	 * @return list of variables
 	 */
-	private char[] getAllVars() {
-		// TODO Auto-generated method stub
-		return null;
+	private Set<Integer> getAllVars() {
+		Set<Integer> s = new TreeSet<Integer>();
+		Iterator<Literal> it = litVector.iterator();
+				while (it.hasNext()) {
+			       s.addAll(it.next().getAllVars());
+		}
+		return s;
 	}
 	
 	
@@ -261,8 +267,17 @@ public class Query {
 	 */
 	public String toTopClause() {
 		UUID id = UUID.randomUUID();
-		System.out.println(this.getAllVars());
-		String res = "cnf(query_clause" + id  + ", top_clause, [" + this.negateString() + " , ans()])";
+		Set<Integer> varsIDs = this.getAllVars();
+		Vector<String> vars = new Vector<String>();
+		Iterator<Integer> it = varsIDs.iterator();
+		while(it.hasNext())
+		{
+			vars.add(SymTable.getSym(it.next()));
+		}
+		
+		String varRep = vars.toString().replace("[", "");
+		varRep = varRep.replace("]", "");
+		String res = "cnf(query_clause" + id  + ", top_clause, [" + this.negateString() + " , ans(" + varRep + ")])";
 		return res;
 	}
 	
