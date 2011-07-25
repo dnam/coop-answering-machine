@@ -77,7 +77,7 @@ public class KnowledgeBase {
 		for(int i = 0; i < formulaList.size(); i++)
 		{
 			str.append("cnf(c" + i + ", axiom, [");
-			str.append(formulaList.get(i));
+			str.append(formulaList.get(i).toTPTP());
 			str.append("]).\n");
 		}
 		
