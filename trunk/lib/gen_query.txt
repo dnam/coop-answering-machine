@@ -1,0 +1,1 @@
+ill(X, flu) & treat(Y, medi) 
