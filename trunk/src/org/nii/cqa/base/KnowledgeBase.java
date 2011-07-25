@@ -73,22 +73,14 @@ public class KnowledgeBase {
 	}
 	
 	public String toTPTP() {
-		String TPTP = "";
-		String lang = "cnf";
-		String name = "c" + UUID.randomUUID();
-		String role = "axiom";
-		Vector<Formula> formulae = this.formulaList;
-		Vector<Rule> shrr = this.setSHRR;
-		for(int i = 0; i < formulae.size(); i++)
+		StringBuilder str = new StringBuilder();
+		for(int i = 0; i < formulaList.size(); i++)
 		{
-			TPTP += lang + "(" + name + ", " + role + ", " + formulae.get(i) + ")";
+			str.append("cnf(c" + i + ", axiom, [");
+			str.append(formulaList.get(i));
+			str.append("]).\n");
 		}
-		TPTP = TPTP.replace("&", ",");
 		
-		//System.out.println(this.formulaList);
-		System.out.println(this.setSHRR);
-		
-
-		return TPTP;
+		return str.toString();
 	}
 }

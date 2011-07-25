@@ -33,4 +33,6 @@ public abstract class Formula {
 	}
 	
 	public abstract String toString();
+	
+	public abstract String toTPTP();
 }

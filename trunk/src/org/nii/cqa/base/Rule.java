@@ -77,20 +77,12 @@ public class Rule extends Formula {
 		
 		for (int i = 0; i < leftSide.size(); i++) {
 			Literal lit = leftSide.get(i);
-			for (int j = 0; j < lit.countParams(); j++) {
-				int id = lit.getParamAt(j);
-				if (SymTable.getTypeID(id) == SymType.VARIABLE)
-					setVarLeft.add(id);
-			}
+			setVarLeft.addAll(lit.getAllVars());
 		}
 		
 		for (int i = 0; i < rightSide.size(); i++) {
 			Literal lit = rightSide.get(i);
-			for (int j = 0; j < lit.countParams(); j++) {
-				int id = lit.getParamAt(j);
-				if (SymTable.getTypeID(id) == SymType.VARIABLE)
-					setVarRight.add(id);
-			}
+			setVarRight.addAll(lit.getAllVars());
 		}
 		
 		if (setVarLeft.size() == 0 && setVarRight.size() == 0) { // ground formula
@@ -133,4 +125,21 @@ public class Rule extends Formula {
 		return str.toString();
 	}
 	
+	public String toTPTP() {
+		StringBuilder str = new StringBuilder();
+		Iterator<Literal> it = leftSide.iterator();
+		while (it.hasNext()) {
+			str.append(it.next().toNegTPTP());
+			str.append(", ");
+		}
+		
+		it = rightSide.iterator();
+		while(it.hasNext()) {
+			str.append(it.next());
+			if (it.hasNext())
+				str.append(", ");
+		}
+		
+		return str.toString();
+	}
 }
