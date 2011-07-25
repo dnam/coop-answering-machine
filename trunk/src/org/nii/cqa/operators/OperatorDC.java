@@ -28,4 +28,9 @@ class OperatorDC extends Operator {
 		return retSet;
 	}
 
+	@Override
+	int getType() {
+		return 0;
+	}
+
 }

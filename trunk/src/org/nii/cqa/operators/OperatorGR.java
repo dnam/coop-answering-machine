@@ -135,4 +135,9 @@ class OperatorGR extends Operator {
 			System.out.println(retQ);
 		}
 	}
+
+	@Override
+	int getType() {
+		return 2;
+	}
 }
