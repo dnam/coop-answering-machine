@@ -28,7 +28,28 @@ public abstract class Operator {
 		while (it.hasNext()) {
 			retSet.addAll(perform(it.next()));
 		}
-
+		
+		// Add the children
+		inputSet.addChild(retSet);
+		
+		// Set the parents and operation
+		retSet.setParent(inputSet);
+		
+		// Set corresponding operators
+		retSet.addAllOps(inputSet);
+		int type = getType(); // get the type of the operator
+		switch(type) {
+		case 0:
+			retSet.addOperator(DC);
+			break;
+		case 1:
+			retSet.addOperator(AI);
+			break;
+		case 2:
+			retSet.addOperator(GR);
+			break;
+		}
+		
 		return retSet;
 	}
 	
@@ -36,5 +57,9 @@ public abstract class Operator {
 	 * This method is overriden in sub-classes
 	 */
 	abstract QuerySet perform(Query query);
-
+	
+	/**
+	 * Returns the type: 0= DC, 1=AI, 2=GR
+	 */
+	abstract int getType();
 }

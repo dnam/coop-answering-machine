@@ -24,4 +24,9 @@ class OperatorAI extends Operator {
 		
 		return retSet;
 	}
+
+	@Override
+	int getType() {
+		return 1;
+	}
 }
