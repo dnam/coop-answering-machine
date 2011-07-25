@@ -20,6 +20,7 @@ public class SymTable {
 	private static int varCounter  = GAP; // counter for id
 	private static int constCounter = GAP*2;
 	private static int newVarCnt = 0; // for generating new variable
+	private static int queryCounter = 0; // counter for query
 	// Reset the symbol tablle
 	public static void reset() {
 		newVarCnt = 0;
@@ -104,6 +105,10 @@ public class SymTable {
 	// Returns false otherwise
 	public static boolean removeSym(String symStr) {
 		return false;
+	}
+	
+	public static int getQueryID() {
+		return queryCounter++;
 	}
 	
 	/**

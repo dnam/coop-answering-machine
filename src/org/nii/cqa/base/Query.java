@@ -20,6 +20,7 @@ import java.util.Vector;
 import org.nii.cqa.parser.QueryParser;
 
 public class Query {
+	private int id; // ID of a query, based on a global counter
 	private Vector<Literal> litVector;
 	private Map<Integer, Integer> idCountMap;
 	private Map<Integer, Vector<Literal>> idLitMap;
@@ -27,6 +28,7 @@ public class Query {
 	
 
 	public Query() {
+		id = SymTable.getQueryID();
 		litVector = new Vector<Literal>();
 		
 		// For AI operators
@@ -35,6 +37,7 @@ public class Query {
 	}
 	
 	public Query(List<Literal> lVector) {
+		id = SymTable.getQueryID();
 		litVector = new Vector<Literal>(lVector);
 		
 		// For AI operators
@@ -230,23 +233,6 @@ public class Query {
 
 		return true;
 	}
-	
-	/**
-	 * puts a negation before each literal string
-	 * @return the String with negated string literals
-	 */
-	public String negateString() {
-			
-		Iterator<Literal> it = litVector.iterator();
-		StringBuilder str = new StringBuilder();
-		if(it.hasNext())
-			str.append("-" + it.next());
-
-		while (it.hasNext()) {
-			str.append(" , -" + it.next());
-		}
-		return str.toString().replace("--", "");
-	}
 
 	/**
 	 * returns all the variables in the query
@@ -266,24 +252,26 @@ public class Query {
 	 * 
 	 */
 	public String toTopClause() {
-		UUID id = UUID.randomUUID();
-		Set<Integer> varsIDs = this.getAllVars();
-		Vector<String> vars = new Vector<String>();
-		Iterator<Integer> it = varsIDs.iterator();
-		while(it.hasNext())
-		{
-			vars.add(SymTable.getSym(it.next()));
-		}
+		StringBuilder str = new StringBuilder();
+		str.append("cnf(query" + id + ", top_clause, [");
 		
-		String varRep = vars.toString().replace("[", "");
-		varRep = varRep.replace("]", "");
-		String res = "cnf(query_clause" + id  + ", top_clause, [" + this.negateString() + " , ans(" + varRep + ")])";
-		return res;
-	}
-	
-	
-
-	
+		Iterator<Literal> litIt = litVector.iterator();
+		while (litIt.hasNext()) {
+			str.append(litIt.next().toNegTPTP());
+			str.append(", ");
+		}
+		str.append("ans" + id + "(");
+		
+		Iterator<Integer> varIt = this.getAllVars().iterator();
+		while(varIt.hasNext()) {
+			str.append(SymTable.getSym(varIt.next()));
+			if (varIt.hasNext())
+				str.append(", ");
+		}
+		str.append(")]).");
+		
+		return str.toString();
+	}		
 
 	/**
 	 * Returns a hash value for the current query

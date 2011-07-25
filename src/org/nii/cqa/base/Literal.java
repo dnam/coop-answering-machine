@@ -64,8 +64,6 @@ public class Literal implements Comparable<Literal> {
 		return vars;
 	}
 	
-	
-	
 	public int getParamAt(int i) {
 
 		return this.params.get(i);
@@ -90,10 +88,6 @@ public class Literal implements Comparable<Literal> {
 		return this.params.size();
 	}
 
-	public void toTPTP(String q) {
-		// to convert to TPTP format
-	}
-	
 	public Literal clone() {
 		Literal l = new Literal();
 		l.id = this.id;
@@ -101,6 +95,20 @@ public class Literal implements Comparable<Literal> {
 		l.params.addAll(this.params);
 		
 		return l;
+	}
+	
+	public String toNegTPTP() {
+		StringBuilder str = new StringBuilder();
+		str.append((!neg)? "-" : "" );
+		str.append(SymTable.getSym(id) + "(");
+		for (int i = 0; i < params.size(); i++) {
+			str.append(SymTable.getSym(params.get(i)));
+			if (i + 1 < params.size())
+				str.append(", ");
+		}
+		str.append(")");
+
+		return str.toString();
 	}
 	
 	/**

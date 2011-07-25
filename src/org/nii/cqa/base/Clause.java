@@ -43,4 +43,17 @@ public class Clause extends Formula {
 
 		return str.toString();
 	}
+
+	@Override
+	public String toTPTP() {
+		Iterator<Literal> it = litVector.iterator();
+		StringBuilder str = new StringBuilder();
+		while (it.hasNext()) {
+			str.append(it.next());
+			if (it.hasNext())
+				str.append(", ");
+		}
+
+		return str.toString();
+	}
 }
