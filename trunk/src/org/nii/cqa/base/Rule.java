@@ -50,7 +50,12 @@ public class Rule extends Formula {
 		if(rightSide.contains(lit))
 			return;
 		
+		// Sort the left side
+		trackSHRR = -1; // unchecked
 		rightSide.add(lit);
+		
+		// Sort the right side
+		Collections.sort(rightSide);
 	}
 	
 	public Vector<Literal> extractLeft() {
