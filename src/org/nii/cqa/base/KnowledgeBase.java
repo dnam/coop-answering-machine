@@ -2,6 +2,8 @@ package org.nii.cqa.base;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.UUID;
 import java.util.Vector;
@@ -82,5 +84,14 @@ public class KnowledgeBase {
 		}
 		
 		return str.toString();
+	}
+	
+	public void writeToFile(PrintWriter writer) {
+		for(int i = 0; i < formulaList.size(); i++)
+		{
+			writer.print("cnf(c" + i + ", axiom, [");
+			writer.print(formulaList.get(i).toTPTP());
+			writer.println("]).");
+		}
 	}
 }
