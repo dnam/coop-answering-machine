@@ -75,7 +75,7 @@ public class KnowledgeBase {
 	public String toTPTP() {
 		String TPTP = "";
 		String lang = "cnf";
-		String name = "c" + 1;
+		String name = "c" + UUID.randomUUID();
 		String role = "axiom";
 		Vector<Formula> formulae = this.formulaList;
 		Vector<Rule> shrr = this.setSHRR;
