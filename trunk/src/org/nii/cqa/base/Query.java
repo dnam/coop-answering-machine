@@ -58,6 +58,10 @@ public class Query {
 		return q;
 	}
 	
+	public int getID() {
+		return this.id;
+	}
+	
 
 	/**
 	 * @param literal
@@ -253,6 +257,7 @@ public class Query {
 	 */
 	public String toTopClause() {
 		StringBuilder str = new StringBuilder();
+		
 		str.append("cnf(query" + id + ", top_clause, [");
 		
 		Iterator<Literal> litIt = litVector.iterator();
@@ -262,13 +267,22 @@ public class Query {
 		}
 		str.append("ans" + id + "(");
 		
+		String ans_pred = "pf([ans" + id + "(";
+		
 		Iterator<Integer> varIt = this.getAllVars().iterator();
 		while(varIt.hasNext()) {
 			str.append(SymTable.getSym(varIt.next()));
-			if (varIt.hasNext())
+			ans_pred += "_";
+			if (varIt.hasNext()) {
 				str.append(", ");
+				ans_pred += ",";
+			}
 		}
-		str.append(")]).");
+		str.append(")]).\n");
+		ans_pred += ")]).";
+		
+		// Append the production field
+		str.append(ans_pred);
 		
 		return str.toString();
 	}		
