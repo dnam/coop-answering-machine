@@ -113,7 +113,7 @@ public class SolarConnector {
 			System.err.println("PARSE ERROR");
 			break;
 		case 901:
-			System.err.println("FILE NOT FOULD");
+			System.err.println("FILE NOT FOUND");
 			break;
 		case 902:
 			System.err.println("OPTION ERROR");
