@@ -6,12 +6,12 @@ import org.nii.cqa.CQA;
 import org.nii.cqa.base.*;
 import org.nii.cqa.operators.comgen.MultiCombinationGenerator;
 
-public class OperatorGR extends Operator {
+class OperatorGR extends Operator {
 	// Suppose we already have a knowledge base
 
 	@Override
-	Set<Query> perform(Query query) {
-		Set<Query> retSet = new HashSet<Query>();
+	QuerySet perform(Query query) {
+		QuerySet retSet = new QuerySet();
 		
 		KnowledgeBase kb = null;
 		try {
@@ -29,7 +29,7 @@ public class OperatorGR extends Operator {
 		return retSet;
 	}
 	
-	Set<Query> doGR(Query q, Rule r) {
+	QuerySet doGR(Query q, Rule r) {
 		// Extract two vectors of Query and Rule
 		List<Literal> qVector = new Vector<Literal>();
 		Iterator<Literal> it = q.iterator();
@@ -39,11 +39,6 @@ public class OperatorGR extends Operator {
 		
 		Vector<Literal> rVector = r.extractLeft();
 		Collections.sort(rVector);
-		
-//		for (int i = 0; i < rVector.size(); i++) {
-//			System.out.print(rVector.get(i) + " ");
-//		}
-//		System.out.println();
 		
 		// Create segments of Rule
 		Vector<Vector<Literal>> rSegments = new Vector<Vector<Literal>>();
@@ -105,7 +100,7 @@ public class OperatorGR extends Operator {
 			rSegs[i] = rSegments.get(i).size();
 		
 		//Set of retrurned query
-		Set<Query> setQ = new HashSet<Query>();
+		QuerySet setQ = new QuerySet();
 		
 		// Generate a combination
 		MultiCombinationGenerator<Literal> comGen = 
@@ -117,7 +112,7 @@ public class OperatorGR extends Operator {
 			Query subQ = new Query(lVector);
 			if (subQ.subsumed(rVector)) {
 				Query newQuery = q.doGR(lVector, r.getFirstRight());
-				System.out.println(newQuery); //TODO: remove
+//				System.out.println(newQuery); //TODO: remove
 				setQ.add(newQuery);
 			}
 		}
@@ -131,7 +126,13 @@ public class OperatorGR extends Operator {
 		Query q = Query.parse("../CQA/lib/gen_query.txt");
 		
 		System.out.println("Query: " + q);
+		System.out.println(q.toTopClause());
+		System.out.println();
+		System.out.println(KnowledgeBase.get().toTPTP());
 		
-		Operator.GR.perform(q);
+		QuerySet ret = Operator.GR.perform(q);
+		for(Query retQ : ret) {
+			System.out.println(retQ);
+		}
 	}
 }
