@@ -240,15 +240,18 @@ public class Query {
 
 	/**
 	 * returns all the variables in the query
-	 * @return list of variables
+	 * @return sorted list of variables
 	 */
-	private Set<Integer> getAllVars() {
-		Set<Integer> s = new TreeSet<Integer>();
+	private Vector<Integer> getAllVars() {
+		Vector<Integer> varVector = new Vector<Integer>();
 		Iterator<Literal> it = litVector.iterator();
 				while (it.hasNext()) {
-			       s.addAll(it.next().getAllVars());
+			       varVector.addAll(it.next().getAllVars());
 		}
-		return s;
+				
+		Collections.sort(varVector);
+		
+		return varVector;
 	}
 	
 	
