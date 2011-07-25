@@ -89,7 +89,7 @@ public class Rule extends Formula {
 			for (int j = 0; j < lit.countParams(); j++) {
 				int id = lit.getParamAt(j);
 				if (SymTable.getTypeID(id) == SymType.VARIABLE)
-					setVarLeft.add(id);
+					setVarRight.add(id);
 			}
 		}
 		
@@ -99,12 +99,12 @@ public class Rule extends Formula {
 		}
 		
 		// check the two sets of variables
-		trackSHRR = (setVarLeft.contains(setVarRight))? 0 : 1;
+		trackSHRR = (setVarLeft.containsAll(setVarRight))? 1 : 0;
 		return;
 	}
 	
 	public boolean isSHRR() {
-		if (trackSHRR == -1)
+		//if (trackSHRR == -1)
 			checkSHRR();
 		
 		return (trackSHRR == 1);
@@ -112,7 +112,7 @@ public class Rule extends Formula {
 	
 	@Override
 	public String toString() {
-		Iterator<Literal> it = rightSide.iterator();
+		Iterator<Literal> it = leftSide.iterator();
 		StringBuilder str = new StringBuilder();
 		while (it.hasNext()) {
 			str.append(it.next());
@@ -122,7 +122,7 @@ public class Rule extends Formula {
 		
 		str.append(" -> ");
 		
-		it = leftSide.iterator();
+		it = rightSide.iterator();
 		while (it.hasNext()) {
 			str.append(it.next());
 			if (it.hasNext())

@@ -85,9 +85,10 @@ public class KnowledgeBase {
 		}
 		TPTP = TPTP.replace("&", ",");
 		
+		//System.out.println(this.formulaList);
+		System.out.println(this.setSHRR);
 		
-//		formulaList.clear();
-//		setSHRR.clear();
+
 		return TPTP;
 	}
 }
