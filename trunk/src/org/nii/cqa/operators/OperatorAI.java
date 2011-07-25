@@ -5,15 +5,13 @@ package org.nii.cqa.operators;
  * upon a given set of Queries
  */
 
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 import org.nii.cqa.base.*;
 
 class OperatorAI extends Operator {
 	@Override
-	Set<Query> perform(Query query) {
-		Set<Query> retSet = new HashSet<Query>();
+	QuerySet perform(Query query) {
+		QuerySet retSet = new QuerySet();
 		Iterator<Integer> idIt = query.extractSet().iterator();
 		
 		// Generate a new variable to replace

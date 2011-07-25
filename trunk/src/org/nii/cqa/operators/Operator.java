@@ -6,10 +6,8 @@
 package org.nii.cqa.operators;
 
 import java.util.Iterator;
-import java.util.Set;
-import java.util.HashSet;
 
-import org.nii.cqa.base.Query;
+import org.nii.cqa.base.*;
 
 public abstract class Operator {
 	// List of operator objects for external access
@@ -23,9 +21,9 @@ public abstract class Operator {
 	 * DC upon every queries given in inSet
 	 * @param inSet the input set of queries
 	 */
-	public Set<Query> run(Set<Query> inputSet) {
+	public QuerySet run(QuerySet inputSet) {
 		Iterator<Query> it = inputSet.iterator();
-		Set<Query> retSet = new HashSet<Query>();
+		QuerySet retSet = new QuerySet();
 		
 		while (it.hasNext()) {
 			retSet.addAll(perform(it.next()));
@@ -37,6 +35,6 @@ public abstract class Operator {
 	/**
 	 * This method is overriden in sub-classes
 	 */
-	abstract Set<Query> perform(Query query);
+	abstract QuerySet perform(Query query);
 
 }

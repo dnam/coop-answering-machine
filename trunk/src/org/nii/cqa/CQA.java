@@ -12,13 +12,14 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.nii.cqa.base.KnowledgeBase;
 import org.nii.cqa.base.Query;
+import org.nii.cqa.base.QuerySet;
 import org.nii.cqa.operators.Operator;
 import org.nii.cqa.parser.QueryParser;
 
-
-
 public class CQA {
+	private static KnowledgeBase knowledgeBase;
 
 	/**
 	 * @param args
@@ -37,17 +38,19 @@ public class CQA {
 		p = new QueryParser(new FileReader("../CQA/lib/query1.txt"));
 		
 		Query q1 = (Query) p.parse().value;
+		
 				
 //		p = new QueryParser(new FileReader("../CQA/lib/query2.txt"));
 //		Query q2 = (Query) p.parse().value;
+//		System.out.println("q1: " + q1 + "\nq2" + q2);
 //		System.out.println("Result: " + q1.equals(q2));
 
 		
-		Set<Query> inSet = new HashSet<Query>();
+		QuerySet inSet = new QuerySet();
 		inSet.add(q1);
 		
 		System.out.println("________________");
-		Set<Query> ret = Operator.AI.run(inSet);
+		QuerySet ret = Operator.AI.run(inSet);
 		Iterator<Query> it = ret.iterator();
 		inSet.clear();
 		while(it.hasNext()) {

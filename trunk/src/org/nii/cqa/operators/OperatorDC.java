@@ -18,8 +18,8 @@ class OperatorDC extends Operator {
 	 * @return set of queries
 	 */
 	@Override
-	Set<Query> perform(Query query) {
-		Set<Query> retSet = new HashSet<Query>();
+	QuerySet perform(Query query) {
+		QuerySet retSet = new QuerySet();
 		
 		int n = query.size();
 		for (int i = 0; i < n; i++)
