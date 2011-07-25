@@ -1,0 +1,1 @@
+ill(pete, cold),ill(marry, flu),treat(pete, medi),ill(X, cold) -> treat(X, medi)
