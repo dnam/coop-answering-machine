@@ -61,4 +61,8 @@ public class QuerySet extends HashSet<Query> {
 	public QuerySet getChildAt(int idx) {
 		return children.get(idx);
 	}
+	
+	public void addAllOps(QuerySet other) {
+		this.ops.addAll(other.ops);
+	}
 }
