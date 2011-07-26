@@ -5,9 +5,7 @@
  */
 package org.nii.cqa.operators;
 
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 
 import org.nii.cqa.base.*;
 
@@ -18,7 +16,7 @@ public abstract class Operator {
 	public static final Operator GR = new OperatorGR();
 	
 	// A global storage for all generated queries
-	protected static final Set<Query> globalSet = new HashSet<Query>();
+	protected static final QuerySet globalSet = new QuerySet();
 	
 	
 	/**
