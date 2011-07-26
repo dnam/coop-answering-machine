@@ -6,11 +6,8 @@
 package org.nii.cqa.operators;
 
 import org.nii.cqa.base.*;
-import java.util.*;
 
-class OperatorDC extends Operator {
-	
-	
+class OperatorDC extends Operator {	
 	/**
 	 * Returns the set of queries after applying
 	 * DC on each literal of q
@@ -22,8 +19,13 @@ class OperatorDC extends Operator {
 		QuerySet retSet = new QuerySet();
 		
 		int n = query.size();
-		for (int i = 0; i < n; i++)
-			retSet.add(query.dropAt(i));
+		for (int i = 0; i < n; i++) {
+			Query q = query.dropAt(i);
+			if (!globalSet.contains(q)) {
+				retSet.add(q);
+				globalSet.add(q);
+			}
+		}
 		
 		return retSet;
 	}

@@ -2,7 +2,6 @@ package org.nii.cqa.operators;
 
 import java.util.*;
 
-import org.nii.cqa.CQA;
 import org.nii.cqa.base.*;
 import org.nii.cqa.operators.comgen.MultiCombinationGenerator;
 
@@ -112,12 +111,19 @@ class OperatorGR extends Operator {
 			Query subQ = new Query(lVector);
 			if (subQ.subsumed(rVector)) {
 				Query newQuery = q.doGR(lVector, r.getFirstRight());
-//				System.out.println(newQuery); //TODO: remove
-				setQ.add(newQuery);
+				if (!globalSet.contains(newQuery)) {
+					setQ.add(newQuery);
+					globalSet.add(newQuery);
+				}
 			}
 		}
 		
 		return setQ;		
+	}
+	
+	@Override
+	int getType() {
+		return 2;
 	}
 	
 	public static void main(String args[]) throws Exception {
@@ -134,10 +140,5 @@ class OperatorGR extends Operator {
 		for(Query retQ : ret) {
 			System.out.println(retQ);
 		}
-	}
-
-	@Override
-	int getType() {
-		return 2;
 	}
 }
