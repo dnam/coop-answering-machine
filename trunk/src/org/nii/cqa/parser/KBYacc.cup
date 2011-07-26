@@ -9,6 +9,7 @@ parser code {:
 		super(new KBScanner(input));
 	}
 	
+	/* Test code */
 	public static void main(String args[]) throws Exception {
 		KBParser p;
 		p = new KBParser(new FileReader("../CQA/lib/test.txt"));
@@ -63,7 +64,7 @@ clause ::= literal:l1 OR literal:l2
 rule ::= ruleSide:l IMPLY ruleSide:r
 			{: Rule rule = new Rule(l, r); RESULT=rule; :}
 		| literal:l IMPLY literal:r
-			{: Rule rule = new Rule(); rule.addRight(r); rule.addLeft(r); RESULT=rule; :}
+			{: Rule rule = new Rule(); rule.addRight(r); rule.addLeft(l); RESULT=rule; :}
 		| literal:l IMPLY ruleSide:r
 			{: Rule rule = new Rule(null, r); rule.addLeft(l); RESULT=rule; :}
 		| ruleSide:l IMPLY literal:r

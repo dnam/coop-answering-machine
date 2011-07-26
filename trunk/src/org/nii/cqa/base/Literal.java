@@ -84,7 +84,7 @@ public class Literal implements Comparable<Literal> {
 		return str.toString();
 	}
 
-	public int countParams() {
+	public int size() {
 		return this.params.size();
 	}
 

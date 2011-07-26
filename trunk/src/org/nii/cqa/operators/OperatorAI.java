@@ -33,7 +33,7 @@ class OperatorAI extends Operator {
 	}
 
 	@Override
-	int getType() {
-		return 1;
+	public	int getType() {
+		return AI_t;
 	}
 }

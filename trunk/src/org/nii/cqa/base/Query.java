@@ -23,7 +23,6 @@ public class Query {
 	private int id; // ID of a query, based on a global counter
 	private Vector<Literal> litVector;
 	private Map<Integer, Integer> idCountMap;
-	private Map<Integer, Vector<Literal>> idLitMap;
 	private Vector<Integer> segVector; // segment vector
 	
 
@@ -33,7 +32,6 @@ public class Query {
 		
 		// For AI operators
 		idCountMap = new HashMap<Integer, Integer>();
-		idLitMap = new HashMap<Integer, Vector<Literal>>();
 	}
 	
 	public Query(List<Literal> lVector) {
@@ -42,7 +40,6 @@ public class Query {
 		
 		// For AI operators
 		idCountMap = new HashMap<Integer, Integer>();
-		idLitMap = new HashMap<Integer, Vector<Literal>>();
 	}
 	
 	public static Query parse(String filePath) throws Exception {
@@ -75,20 +72,13 @@ public class Query {
 		Collections.sort(litVector);
 		
 		// Update the countVarMap and constSet
-		int n = literal.countParams(); // no. of params
+		int n = literal.size(); // no. of params
 		for (int i = 0; i < n; i++) {
 			int id = literal.getParamAt(i);
 
 			Integer cnt = idCountMap.get(id);
 			cnt = (cnt == null)? 1 : cnt + 1;
 			idCountMap.put(id, cnt);
-			
-			Vector<Literal> litMapping = idLitMap.get(id);
-			if (litMapping == null)
-				litMapping = new Vector<Literal>();
-			
-			litMapping.add(literal);
-			idLitMap.put(id, litMapping);
 		}
 	}
 
@@ -354,12 +344,28 @@ public class Query {
 	 * @return a new query by dropping the specified literal
 	 */
 	public Query dropAt(int i) {
-		assert i < litVector.size();
-
 		Query q = this.clone();
-		q.litVector.remove(i);
+		q.remove(i);
 		
 		return q;
+	}
+	
+	public Literal remove(int idx) {
+		if (idx >= litVector.size() || idx < 0)
+			throw new IllegalArgumentException("Invalid index");
+		
+		Literal l = litVector.get(idx);
+		for (int i = 0; i < l.size(); i++) {
+			int sym = l.getParamAt(i);
+			
+			// Update the count map
+			Integer cnt = idCountMap.remove(sym);
+			if (cnt > 1)
+				idCountMap.put(sym, cnt-1);
+		}
+		litVector.remove(idx);
+		
+		return l;
 	}
 	
 	/********* Anti-Instantiation ****************/
@@ -431,23 +437,20 @@ public class Query {
 		if (SymTable.getTypeID(id) == SymType.VARIABLE && repCnt == 2)
 			repCnt = 1;
 		
-		Vector<Literal> litMapping = idLitMap.get(id);
-		for (int i = 0; i < litMapping.size() && repCnt > 0; i++) {
-				
-			Literal l = litMapping.get(i);
-			Query cloneQuery = this.clone(); // make a clone
-				
-			for (int j = 0; j < l.countParams() && repCnt > 0; 
+		for (int i = 0; i < litVector.size() && repCnt > 0; i++) {
+			Literal l = litVector.get(i);
+			for (int j = 0; j < l.size() && repCnt > 0; 
 						j++) {
 				if (l.getParamAt(j) == id) {
 					Literal newLiteral = l.clone(); // clone the literal
 					newLiteral.setParamAt(j, newVar); // set new variable to the clone
 					
 					// Create a query
-					Query newQuery = cloneQuery.clone();
-					newQuery.litVector.remove(l);
+					Query newQuery = this.clone();
+					newQuery.remove(i);
+
 					newQuery.add(newLiteral); // add the modified literal
-					
+
 					// Add to the result set
 					retSet.add(newQuery);
 					
@@ -504,7 +507,7 @@ public class Query {
 		
 		while (mid < litVector.size() && litVector.get(mid).compareTo(lit) == 0) {
 			if (litVector.get(mid).equals(lit)) {
-				litVector.remove(mid);
+				this.remove(mid);
 				return;
 			}
 			mid++;

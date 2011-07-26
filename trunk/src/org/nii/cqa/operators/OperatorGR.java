@@ -22,7 +22,9 @@ class OperatorGR extends Operator {
 		
 		Iterator<Rule> itRule = kb.iteratorSHRR();
 		while(itRule.hasNext()) {
-			retSet.addAll(doGR(query, itRule.next()));
+			QuerySet set = doGR(query, itRule.next());
+			if (set != null)
+				retSet.addAll(set);
 		}
 		
 		return retSet;
@@ -90,6 +92,7 @@ class OperatorGR extends Operator {
 			qSegments.add(segment);			
 		}
 		
+		
 		// mismatching segment
 		if (rSegments.size() != qSegments.size())
 			return null;
@@ -115,6 +118,8 @@ class OperatorGR extends Operator {
 					setQ.add(newQuery);
 					globalSet.add(newQuery);
 				}
+				else
+					System.out.println("Dup: " + newQuery);
 			}
 		}
 		
@@ -122,8 +127,8 @@ class OperatorGR extends Operator {
 	}
 	
 	@Override
-	int getType() {
-		return 2;
+	public int getType() {
+		return GR_t;
 	}
 	
 	public static void main(String args[]) throws Exception {
@@ -132,13 +137,11 @@ class OperatorGR extends Operator {
 		Query q = Query.parse("../CQA/lib/gen_query.txt");
 		
 		System.out.println("Query: " + q);
-		System.out.println(q.toTopClause());
-		System.out.println();
-		System.out.println(KnowledgeBase.get().toTPTP());
+//		System.out.println(q.toTopClause());
+//		System.out.println();
+//		System.out.println(KnowledgeBase.get().toTPTP());
 		
 		QuerySet ret = Operator.GR.perform(q);
-		for(Query retQ : ret) {
-			System.out.println(retQ);
-		}
+		System.out.println(ret);
 	}
 }

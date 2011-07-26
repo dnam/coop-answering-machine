@@ -8,9 +8,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 import org.nii.cqa.base.KnowledgeBase;
 import org.nii.cqa.base.Query;
@@ -19,67 +17,72 @@ import org.nii.cqa.operators.Operator;
 import org.nii.cqa.parser.QueryParser;
 
 public class CQA {
-	private static KnowledgeBase knowledgeBase;
+	private static QuerySet root = new QuerySet(); 
 
 	/**
 	 * @param args
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
-		//just checking SymTable[remove]
-		//int id = SymTable.addSymbol("researches", SymType.PREDICATE);
+		//The root of the tree
+		Query q = Query.parse("../CQA/lib/gen_query.txt");
+		root.add(q);
 		
-		//just checking Literal[remove]
-		//Literal l = new Literal();
-		//l.setId(id);
-		//System.out.println(l.getId() + " " + l.toString());
+		// Initializes the static Knowledgebase
+		KnowledgeBase.initKB("../CQA/lib/gen_kb.txt");
 		
-		QueryParser p;
-		p = new QueryParser(new FileReader("../CQA/lib/query1.txt"));
+		// A queue of QuerySet to process
+		Queue<QuerySet> workingQueue = new LinkedList<QuerySet>();
+		workingQueue.offer(root); // add the root
 		
-		Query q1 = (Query) p.parse().value;
-		
-				
-//		p = new QueryParser(new FileReader("../CQA/lib/query2.txt"));
-//		Query q2 = (Query) p.parse().value;
-//		System.out.println("q1: " + q1 + "\nq2" + q2);
-//		System.out.println("Result: " + q1.equals(q2));
-
-		
-		QuerySet inSet = new QuerySet();
-		inSet.add(q1);
-		
-		System.out.println("________________");
-		QuerySet ret = Operator.AI.run(inSet);
-		Iterator<Query> it = ret.iterator();
-		inSet.clear();
-		while(it.hasNext()) {
-			System.out.println("DC: " + it.next());
+		// Runs until the queue is empty
+		while(!workingQueue.isEmpty()) {
+//			System.out.println("Size: " + workingQueue.size());
+			
+			QuerySet nextSet = workingQueue.poll();
+			
+			Integer op = nextSet.getLastOp();
+			QuerySet ret = null;
+			
+			boolean doAI = false, doDC = false, doGR = false;
+			
+			// Root
+			if (op == null || op == Operator.GR_t) {
+				doAI = true; doDC = true; doGR = true;
+			}
+			else if (op == Operator.DC_t) {
+				doDC = true; doAI = true;
+			}
+			else if (op == Operator.AI_t) {
+				doAI = true;
+			}
+			
+			if (doAI) {
+				ret = Operator.AI.run(nextSet);
+				if (ret != null) {
+					workingQueue.add(ret);
+					System.out.println(ret);
+					
+				}
+			}
+			
+			if (doDC) {
+				ret = Operator.DC.run(nextSet);
+				if (ret != null) {
+					workingQueue.add(ret);
+					System.out.println(ret);
+				}
+			}
+			
+			if (doGR) {
+				ret = Operator.GR.run(nextSet);
+				if (ret != null) {
+					workingQueue.add(ret);
+					System.out.println(ret);
+				}
+			}
+			
+			
 		}
-		
-//		ret = Operator.DC.run(ret);
-//		System.out.println("________________");
-//		it = ret.iterator();
-//		inSet.clear();
-//		while(it.hasNext()) {
-//			System.out.println("DC: " + it.next());
-//		}
-//		
-//		ret = Operator.DC.run(ret);
-//		System.out.println("________________");
-//		it = ret.iterator();
-//		inSet.clear();
-//		while(it.hasNext()) {
-//			System.out.println("DC: " + it.next());
-//		}
-//		
-//		ret = Operator.DC.run(ret);
-//		System.out.println("________________");
-//		it = ret.iterator();
-//		inSet.clear();
-//		while(it.hasNext()) {
-//			System.out.println("DC: " + it.next());
-//		}
 	}
-
 }

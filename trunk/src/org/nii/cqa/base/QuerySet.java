@@ -10,20 +10,20 @@ public class QuerySet extends HashSet<Query> {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private Vector<Operator> ops; // Operator performed upon this set
+	private Vector<Integer> ops; // Operator performed upon this set
 	private QuerySet parent;
 	private Vector<QuerySet> children;
 
 	public QuerySet() {
 		super();		
-		ops = new Vector<Operator>();
+		ops = new Vector<Integer>();
 		children = new Vector<QuerySet>();
 		parent = null;
 	}
 	
 	public QuerySet(Set<Query> set) {
 		super(set);		
-		ops = new Vector<Operator>();
+		ops = new Vector<Integer>();
 		children = new Vector<QuerySet>();
 		parent = null;
 	}
@@ -39,7 +39,7 @@ public class QuerySet extends HashSet<Query> {
 	}
 	
 	public void addOperator(Operator op) {
-		ops.add(op);
+		ops.add(op.getType());
 	}
 	
 	public void setParent(QuerySet parent) {
@@ -64,5 +64,43 @@ public class QuerySet extends HashSet<Query> {
 	
 	public void addAllOps(QuerySet other) {
 		this.ops.addAll(other.ops);
+	}
+	
+	public Integer getLastOp() {
+		if (this.ops.size() == 0)
+			return null;
+		
+		return this.ops.lastElement();
+	}
+	
+	public String toString() {
+		StringBuilder bld = new StringBuilder();
+		if (ops.size() == 0) {
+			bld.append("[]: ");
+		}
+		else {
+			for (int i = 0 ; i < ops.size(); i++) {
+				int op = ops.get(i);
+				switch(op) {
+				case Operator.AI_t:
+					bld.append("AI");
+					break;
+				case Operator.DC_t:
+					bld.append("DC");
+					break;
+				case Operator.GR_t:
+					bld.append("GR");
+					break;
+				}
+				
+				if (i + 1 < ops.size())
+					bld.append(".");
+			}
+		}
+		
+		bld.append(" ");
+		bld.append(super.toString());
+		
+		return bld.toString();
 	}
 }
