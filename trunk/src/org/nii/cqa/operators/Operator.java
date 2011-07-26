@@ -5,7 +5,9 @@
  */
 package org.nii.cqa.operators;
 
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import org.nii.cqa.base.*;
 
@@ -14,6 +16,9 @@ public abstract class Operator {
 	public static final Operator AI = new OperatorAI();
 	public static final Operator DC = new OperatorDC();
 	public static final Operator GR = new OperatorGR();
+	
+	// A global storage for all generated queries
+	protected static final Set<Query> globalSet = new HashSet<Query>();
 	
 	
 	/**
@@ -53,6 +58,13 @@ public abstract class Operator {
 		return retSet;
 	}
 	
+	
+	/**
+	 * Resets the shared set of all generated queries
+	 */
+	 public void reset() {
+		 globalSet.clear();
+	 }
 	/**
 	 * This method is overriden in sub-classes
 	 */

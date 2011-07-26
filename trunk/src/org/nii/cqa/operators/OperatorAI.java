@@ -19,7 +19,14 @@ class OperatorAI extends Operator {
 		int newVarID = SymTable.generateVar();
 		while(idIt.hasNext()) {
 			int id = idIt.next();
-			retSet.addAll(query.replace(id, newVarID));
+			Iterator<Query> itQu = query.replace(id, newVarID).iterator();
+			while (itQu.hasNext()) {
+				Query q = itQu.next();
+				if (!globalSet.contains(q)) { // if previously generated
+					retSet.add(q);
+					globalSet.add(q);
+				}
+			}
 		}
 		
 		return retSet;
