@@ -19,6 +19,7 @@ public class SolarConnector {
 	private static String SOLARPATH = "../CQA/lib/solar2-build310.jar"; // solar path
 	private static File tmpDir; // tmp directory
 	private static int runCnt = 0;
+	private static int runTime = 2; // max: 2 minutes running time
 	
 	public static void setPath(String path) {
 		File checkFile = new File(path);
@@ -41,6 +42,14 @@ public class SolarConnector {
 			throw new IllegalAccessError("Unable to create a tmp directory");
 		
 		return tmpDir;
+	}
+	
+	/**
+	 * Set the maximum running time for solar at each iteration
+	 * @param newTime
+	 */
+	public static void setRunTime(int newTime) {
+		runTime = newTime;
 	}
 	
 	/**
@@ -77,7 +86,8 @@ public class SolarConnector {
 	public static Vector<String> execute(String inputPath) throws IOException {
 		String tmpOutput = inputPath + ".tmp";
 		
-		Process solar = Runtime.getRuntime().exec("java -jar " + SOLARPATH + " -t 2m -o " 
+		Process solar = Runtime.getRuntime().exec("java -jar " + SOLARPATH + 
+				" -t " + runTime + "m -o " 
 				+ tmpOutput + " " + inputPath);
 		
 		int exitCode = 999;

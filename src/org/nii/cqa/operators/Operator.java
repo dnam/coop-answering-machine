@@ -15,6 +15,10 @@ public abstract class Operator {
 	public static final Operator DC = new OperatorDC();
 	public static final Operator GR = new OperatorGR();
 	
+	public static final int DC_t = 0;
+	public static final int AI_t = 1;
+	public static final int GR_t = 2;
+	
 	// A global storage for all generated queries
 	protected static final QuerySet globalSet = new QuerySet();
 	
@@ -29,8 +33,13 @@ public abstract class Operator {
 		QuerySet retSet = new QuerySet();
 		
 		while (it.hasNext()) {
-			retSet.addAll(perform(it.next()));
+			QuerySet set = perform(it.next());
+			if (set != null)
+				retSet.addAll(set);
 		}
+		
+		if (retSet.isEmpty())
+			return null;
 		
 		// Add the children
 		inputSet.addChild(retSet);
@@ -42,13 +51,13 @@ public abstract class Operator {
 		retSet.addAllOps(inputSet);
 		int type = getType(); // get the type of the operator
 		switch(type) {
-		case 0:
+		case DC_t:
 			retSet.addOperator(DC);
 			break;
-		case 1:
+		case AI_t:
 			retSet.addOperator(AI);
 			break;
-		case 2:
+		case GR_t:
 			retSet.addOperator(GR);
 			break;
 		}
@@ -71,5 +80,5 @@ public abstract class Operator {
 	/**
 	 * Returns the type: 0= DC, 1=AI, 2=GR
 	 */
-	abstract int getType();
+	public abstract int getType();
 }

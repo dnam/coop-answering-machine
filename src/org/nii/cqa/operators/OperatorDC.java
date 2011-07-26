@@ -19,6 +19,10 @@ class OperatorDC extends Operator {
 		QuerySet retSet = new QuerySet();
 		
 		int n = query.size();
+		
+		if (n <= 1)
+			return null;
+		
 		for (int i = 0; i < n; i++) {
 			Query q = query.dropAt(i);
 			if (!globalSet.contains(q)) {
@@ -31,8 +35,8 @@ class OperatorDC extends Operator {
 	}
 
 	@Override
-	int getType() {
-		return 0;
+	public int getType() {
+		return DC_t;
 	}
 
 }
