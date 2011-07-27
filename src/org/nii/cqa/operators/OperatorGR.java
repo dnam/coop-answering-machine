@@ -132,7 +132,7 @@ class OperatorGR extends Operator {
 	}
 	
 	public static void main(String args[]) throws Exception {
-		KnowledgeBase.initKB("../CQA/lib/gen_kb.txt");
+		KnowledgeBase.init("../CQA/lib/gen_kb.txt");
 		
 		Query q = Query.parse("../CQA/lib/gen_query.txt");
 		

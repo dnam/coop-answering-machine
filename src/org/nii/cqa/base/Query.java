@@ -5,7 +5,6 @@
 package org.nii.cqa.base;
 
 import java.io.FileReader;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,8 +12,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
-import java.util.UUID;
 import java.util.Vector;
 
 import org.nii.cqa.parser.QueryParser;
@@ -24,11 +21,13 @@ public class Query {
 	private Vector<Literal> litVector;
 	private Map<Integer, Integer> idCountMap;
 	private Vector<Integer> segVector; // segment vector
+	private Integer hashVal; // hash code of the object
 	
 
 	public Query() {
 		id = SymTable.getQueryID();
 		litVector = new Vector<Literal>();
+		hashVal = null;
 		
 		// For AI operators
 		idCountMap = new HashMap<Integer, Integer>();
@@ -37,15 +36,21 @@ public class Query {
 	public Query(List<Literal> lVector) {
 		id = SymTable.getQueryID();
 		litVector = new Vector<Literal>(lVector);
+		hashVal = null;
 		
 		// For AI operators
 		idCountMap = new HashMap<Integer, Integer>();
 	}
 	
-	public static Query parse(String filePath) throws Exception {
+	/**
+	 * @param inputFile the path of the input file
+	 * @return a  Query object parsed from inputFile
+	 * @throws Exception if any error occurs
+	 */
+	public static Query parse(String inputFile) throws Exception {
 		Query q = new Query();
 		
-		QueryParser p = new QueryParser(new FileReader(filePath));
+		QueryParser p = new QueryParser(new FileReader(inputFile));
 		Query parsedQuery = (Query) p.parse().value;
 		
 		for (int i = 0; i < parsedQuery.litVector.size(); i++) {
@@ -59,10 +64,32 @@ public class Query {
 		return this.id;
 	}
 	
+	/**
+	 * @return Iterator to iterate the literal list
+	 */
+	public Iterator<Literal> iterator() {
+		return litVector.iterator();
+	}
+	
+	/**
+	 * returns all the variables in the query
+	 * @return sorted list of variables
+	 */
+	private Vector<Integer> getAllVars() {
+		Vector<Integer> varVector = new Vector<Integer>();
+		
+		Iterator<Literal> it = litVector.iterator();
+				while (it.hasNext()) {
+			       varVector.addAll(it.next().getAllVars());
+		}		
+		Collections.sort(varVector);
+		
+		return varVector;
+	}
 
 	/**
-	 * @param literal
-	 * add a literal to the query
+	 * adds a literal to the query
+	 * @param literal the literal to add
 	 */
 	public void add(Literal literal) {	
 		if (litVector.contains(literal)) // Remove duplicates
@@ -70,9 +97,10 @@ public class Query {
 		
 		litVector.add(literal);
 		Collections.sort(litVector);
+		hashVal = null; // reset the hash code for later computing
 		
 		// Update the countVarMap and constSet
-		int n = literal.size(); // no. of params
+		int n = literal.paramSize(); // no. of params
 		for (int i = 0; i < n; i++) {
 			int id = literal.getParamAt(i);
 
@@ -82,24 +110,16 @@ public class Query {
 		}
 	}
 
-	/**
-	 * @param literal to be iterated
-	 * @return: Iterator to iterate the literal
-	 */
-	public Iterator<Literal> iterator() {
-		return litVector.iterator();
-	}
-
-	private void swap(Vector<Literal> litVector2, int i, int j) {
-		Literal tmp = litVector2.get(i);
-		litVector2.set(i, litVector2.get(j));
-		litVector2.set(j, tmp);
-	}
 	
 	/**
-	 * Returns true if the two queries are equivalent
-	 * Returns false otherwise
+	 * @param litVector a vector of literal to swap
 	 */
+	private static void swap(Vector<Literal> litVector, int i, int j) {
+		Literal tmp = litVector.get(i);
+		litVector.set(i, litVector.get(j));
+		litVector.set(j, tmp);
+	}
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (!(obj instanceof Query))
@@ -124,6 +144,7 @@ public class Query {
 				return false;
 		}
 		
+		// Build segmentation vector
 		if (this.segVector == null)
 			this.buildSegment();
 		if (other.segVector == null)
@@ -228,25 +249,11 @@ public class Query {
 		return true;
 	}
 
+	
+	
+	
 	/**
-	 * returns all the variables in the query
-	 * @return sorted list of variables
-	 */
-	private Vector<Integer> getAllVars() {
-		Vector<Integer> varVector = new Vector<Integer>();
-		Iterator<Literal> it = litVector.iterator();
-				while (it.hasNext()) {
-			       varVector.addAll(it.next().getAllVars());
-		}
-				
-		Collections.sort(varVector);
-		
-		return varVector;
-	}
-	
-	
-	/** Converts the query into TPTP topclause
-	 * 
+	 * Converts the query into TPTP topclause
 	 */
 	public String toTopClause() {
 		StringBuilder str = new StringBuilder();
@@ -255,11 +262,12 @@ public class Query {
 		
 		Iterator<Literal> litIt = litVector.iterator();
 		while (litIt.hasNext()) {
-			str.append(litIt.next().toNegTPTP());
+			str.append(litIt.next().toNegatedString());
 			str.append(", ");
 		}
 		str.append("ans" + id + "(");
 		
+		// For answer predicate
 		String ans_pred = "pf([ans" + id + "(";
 		
 		Iterator<Integer> varIt = this.getAllVars().iterator();
@@ -279,44 +287,8 @@ public class Query {
 		
 		return str.toString();
 	}		
-
-	/**
-	 * Returns a hash value for the current query
-	 * Hash value = sum of literals (negativity taken into account)
-	 * This hashcode() returns a consistent value for an object
-	 * If Q1 and Q2 are equivalent, Q1.hashcode() == Q2.hashcode();
-	 */
+	
 	@Override
-	public int hashCode() {
-		int sum = 0;
-		Iterator<Literal> it = litVector.iterator();
-		while (it.hasNext()) {
-			Literal lit = it.next();
-			sum += lit.getID() * ((lit.isNegative()? -1 : 1));
-		}
-		
-		return sum;
-	}
-
-	/**
-	 * description: prints the query
-	 */
-	public void printQ() {
-		System.out.println("Query:");
-		Iterator<Literal> it = litVector.iterator();
-		while (it.hasNext()) {
-			Literal l = it.next();
-
-			System.out.println("literal " + l.getID() + "(" + l.getAllParams()
-					+ ")");
-		}
-		System.out.println("---------------------------------------");
-	}
-
-	/**
-	 * @author Nam Dang description: Converts the query into a string. Now is
-	 *         just a fake class
-	 */
 	public String toString() {
 		Iterator<Literal> it = litVector.iterator();
 		StringBuilder str = new StringBuilder();
@@ -328,6 +300,28 @@ public class Query {
 
 		return str.toString();
 	}
+
+	
+	@Override
+	public int hashCode() {
+		if (hashVal == null)
+			hashVal = computeHash();
+		
+		return hashVal;
+	}
+	
+	/**
+	 * @return the hash value for the Query
+	 */
+	private int computeHash() {
+		int result = 17;
+		
+		for (int i = 0; i < litVector.size(); i++)
+			result = result * 19 + litVector.get(i).hashCode();
+		
+		return result;
+	}
+	
 
 	/**
 	 * @return the size of the internal query
@@ -350,12 +344,17 @@ public class Query {
 		return q;
 	}
 	
+	/**
+	 * removes a literal at a certain index
+	 * @param idx the index
+	 * @return the removed literal
+	 */
 	public Literal remove(int idx) {
 		if (idx >= litVector.size() || idx < 0)
 			throw new IllegalArgumentException("Invalid index");
 		
 		Literal l = litVector.get(idx);
-		for (int i = 0; i < l.size(); i++) {
+		for (int i = 0; i < l.paramSize(); i++) {
 			int sym = l.getParamAt(i);
 			
 			// Update the count map
@@ -364,6 +363,8 @@ public class Query {
 				idCountMap.put(sym, cnt-1);
 		}
 		litVector.remove(idx);
+		
+		hashVal = null; // reset the hash code
 		
 		return l;
 	}
@@ -374,6 +375,7 @@ public class Query {
 		for (int i = 0; i < this.litVector.size(); i++) {
 			q.add(this.litVector.get(i));
 		}
+		q.hashVal = this.hashVal;
 		
 		return q;
 	}
@@ -439,7 +441,7 @@ public class Query {
 		
 		for (int i = 0; i < litVector.size() && repCnt > 0; i++) {
 			Literal l = litVector.get(i);
-			for (int j = 0; j < l.size() && repCnt > 0; 
+			for (int j = 0; j < l.paramSize() && repCnt > 0; 
 						j++) {
 				if (l.getParamAt(j) == id) {
 					Literal newLiteral = l.clone(); // clone the literal
@@ -449,7 +451,8 @@ public class Query {
 					Query newQuery = this.clone();
 					newQuery.remove(i);
 
-					newQuery.add(newLiteral); // add the modified literal
+					// add the modified literal
+					newQuery.add(newLiteral);
 
 					// Add to the result set
 					retSet.add(newQuery);
@@ -457,18 +460,17 @@ public class Query {
 					repCnt--; // decrease the counter
 				}
 			}
-		}
-	
+		}	
 		
 		return retSet;
 	}
 	
-	/************ Rule Matching ****************/
+	/****************** GR OPERATOR *********************/
 	
 	/**
 	 * matches the current query with the left side of
 	 * the given rule.
-	 * returns a set of resulted queries after substitution
+	 * @return a set of resulted queries after substitution
 	 */
 	public Query doGR(List<Literal> other, Literal replacement) {
 		Iterator<Literal> it = other.iterator();
@@ -499,7 +501,7 @@ public class Query {
 		}
 		
 		if (mid == -1 || litVector.get(mid).compareTo(lit) != 0)
-			throw new IllegalStateException("Unable to remove the literal: " + lit);
+			throw new IllegalStateException("Unable to locate the literal: " + lit + " in " + this);
 		
 		while (mid >= 0 && litVector.get(mid).compareTo(lit) == 0)
 			mid--;
@@ -508,13 +510,14 @@ public class Query {
 		while (mid < litVector.size() && litVector.get(mid).compareTo(lit) == 0) {
 			if (litVector.get(mid).equals(lit)) {
 				this.remove(mid);
+				hashVal = null;
 				return;
 			}
 			mid++;
 		}
 		
 		// Otherwise
-		throw new IllegalStateException("Unable to remove the literal: " + lit);
+		throw new IllegalStateException("Unable to locate the literal: " + lit + " in " + this);
 	}
 	
 	/**

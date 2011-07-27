@@ -1,13 +1,10 @@
 package org.nii.cqa.solar;
 
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.*;
 
@@ -21,6 +18,11 @@ public class SolarConnector {
 	private static int runCnt = 0;
 	private static int runTime = 2; // max: 2 minutes running time
 	
+	/**
+	 * Sets the path for the connection
+	 * @param path the new path
+	 * @throws IllegalArgumentException if the path is invalid
+	 */
 	public static void setPath(String path) {
 		File checkFile = new File(path);
 		if (!checkFile.exists())
@@ -29,7 +31,7 @@ public class SolarConnector {
 		SOLARPATH = path;
 	}
 	
-	public static File getTmpDir() {
+	private static File getTmpDir() {
 		if (tmpDir != null)
 			return tmpDir;
 		
@@ -46,7 +48,7 @@ public class SolarConnector {
 	
 	/**
 	 * Set the maximum running time for solar at each iteration
-	 * @param newTime
+	 * @param newTime the new time in minutes
 	 */
 	public static void setRunTime(int newTime) {
 		runTime = newTime;
@@ -58,7 +60,7 @@ public class SolarConnector {
 	 * @throws IOException 
 	 * @throws IllegalAccessException 
 	 */
-	public static String makeTPTP(Set<Query> querySet) 
+	private static String makeTPTP(Set<Query> querySet) 
 		throws IOException, IllegalAccessException {
 		File tmpDir = getTmpDir();
 		
@@ -83,7 +85,12 @@ public class SolarConnector {
 		return newFilePath;
 	}
 	
-	public static Vector<String> execute(String inputPath) throws IOException {
+	/**
+	 * @param inputPath the input file
+	 * @return a string of resulted consequences
+	 * @throws IOException
+	 */
+	private static Vector<String> execute(String inputPath) throws IOException {
 		String tmpOutput = inputPath + ".tmp";
 		
 		Process solar = Runtime.getRuntime().exec("java -jar " + SOLARPATH + 
@@ -184,7 +191,7 @@ public class SolarConnector {
 	}
 	
 	public static void main(String args[]) throws Exception {
-		KnowledgeBase.initKB("../CQA/lib/gen_kb.txt");
+		KnowledgeBase.init("../CQA/lib/gen_kb.txt");
 		
 		Query q = Query.parse("../CQA/lib/gen_query.txt");
 		Set qSet = new HashSet<Query>(); 

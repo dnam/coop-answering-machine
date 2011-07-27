@@ -13,8 +13,8 @@ public class Clause extends Formula {
 	}
 	
 	/**
-	 * @param literal
-	 * add a literal to the clause
+	 * @param literal the new literal
+	 * adds a literal to the clause
 	 */
 	public void add(Literal literal) {	
 		if (litVector.contains(literal)) // Remove duplicates
@@ -24,8 +24,7 @@ public class Clause extends Formula {
 	}
 	
 	/**
-	 * @param literal to be iterated
-	 * @return: Iterator to iterate the literal
+	 * @return Iterator to iterate the literal
 	 */
 	public Iterator<Literal> iterator() {
 		return litVector.iterator();

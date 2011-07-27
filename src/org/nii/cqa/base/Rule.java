@@ -134,7 +134,7 @@ public class Rule extends Formula {
 		StringBuilder str = new StringBuilder();
 		Iterator<Literal> it = leftSide.iterator();
 		while (it.hasNext()) {
-			str.append(it.next().toNegTPTP());
+			str.append(it.next().toNegatedString());
 			str.append(", ");
 		}
 		

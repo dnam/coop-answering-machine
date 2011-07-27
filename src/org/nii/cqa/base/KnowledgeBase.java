@@ -1,11 +1,8 @@
 package org.nii.cqa.base;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.Iterator;
-import java.util.UUID;
 import java.util.Vector;
 
 import org.nii.cqa.parser.KBParser;
@@ -20,33 +17,33 @@ public class KnowledgeBase {
 		setSHRR = new Vector<Rule>();
 	}
 	
+	/**
+	 * @return the static knowleget base (universally accessible)
+	 * @throws IllegalAccessException
+	 */
 	public static KnowledgeBase get() throws IllegalAccessException {
 		if (KB == null)
 			throw new IllegalAccessException("KB uninitialized");
 		return KB;
 	}
 	
-	public static void initKB(String filePath) throws Exception {
+	/**
+	 * @param inputFile the input file for the knowledgebase
+	 * @throws Exception if parsing error occurs
+	 */
+	public static void init(String inputFile) throws Exception {
 		KB = new KnowledgeBase();
-		KnowledgeBase newKB = parse(filePath);
-		KB.formulaList = newKB.formulaList;
-		KB.setSHRR = newKB.setSHRR;
+
+		KBParser kbParser = new KBParser(new FileReader(inputFile));
+		KnowledgeBase kb = (KnowledgeBase) kbParser.parse().value;		
+		
+		KB.formulaList = kb.formulaList;
+		KB.setSHRR = kb.setSHRR;
 	}
 	
-	public static KnowledgeBase parse(String filePath) throws Exception {
-		KnowledgeBase newKb = new KnowledgeBase();
-		
-		KBParser kbp = new KBParser(new FileReader(filePath));
-		KnowledgeBase kb = (KnowledgeBase) kbp.parse().value;
-		
-		newKb.clear();
-		
-		newKb.formulaList.addAll(kb.formulaList);
-		newKb.setSHRR.addAll(kb.setSHRR);
-		
-		return newKb;
-	}
-	
+	/**
+	 * @param formu adds a formula
+	 */
 	public void add(Formula formu) {
 		formulaList.add(formu);
 		if (formu.isRule() && formu.getRule().isSHRR())

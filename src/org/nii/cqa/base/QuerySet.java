@@ -42,29 +42,30 @@ public class QuerySet extends HashSet<Query> {
 		ops.add(op.getType());
 	}
 	
+	public void addAllOps(QuerySet other) {
+		this.ops.addAll(other.ops);
+	}
+	
 	public void setParent(QuerySet parent) {
 		this.parent = parent;
+	}	
+	
+	public void addChild(QuerySet child) {
+		children.add(child);
 	}
 	
 	public QuerySet getParent() {
 		return this.parent;
 	}
 	
-	public void addChild(QuerySet child) {
-		children.add(child);
+	public QuerySet getChildAt(int idx) {
+		return children.get(idx);
 	}
-	
+		
 	public Iterator<QuerySet> getChildIterator() {
 		return children.iterator();
 	}
 	
-	public QuerySet getChildAt(int idx) {
-		return children.get(idx);
-	}
-	
-	public void addAllOps(QuerySet other) {
-		this.ops.addAll(other.ops);
-	}
 	
 	public Integer getLastOp() {
 		if (this.ops.size() == 0)
@@ -73,6 +74,7 @@ public class QuerySet extends HashSet<Query> {
 		return this.ops.lastElement();
 	}
 	
+	@Override
 	public String toString() {
 		StringBuilder bld = new StringBuilder();
 		if (ops.size() == 0) {
