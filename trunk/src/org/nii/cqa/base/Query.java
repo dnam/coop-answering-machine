@@ -53,13 +53,16 @@ public class Query {
 		QueryParser p = new QueryParser(new FileReader(inputFile));
 		Query parsedQuery = (Query) p.parse().value;
 		
-		for (int i = 0; i < parsedQuery.litVector.size(); i++) {
-			q.add(parsedQuery.litVector.get(i));
+		for (Literal l : parsedQuery.litVector) {
+			q.add(l);
 		}
 		
 		return q;
 	}
 	
+	/**
+	 * @return the unique id of this query
+	 */
 	public int getID() {
 		return this.id;
 	}
@@ -524,8 +527,9 @@ public class Query {
 	 * Check if the current query is subsumed by the other Query
 	 * That is to say: there exists a substitution theta such
 	 * that: (other Query) (theta) := thisQuery
-	 * @param other
-	 * @return
+	 * @param other the other query in form of vector of literals
+	 * @return true if the other query subsumes this query
+	 * 			false otherwise
 	 */
 	public boolean subsumed(Vector<Literal> other) {
 		if (this.size() != other.size())

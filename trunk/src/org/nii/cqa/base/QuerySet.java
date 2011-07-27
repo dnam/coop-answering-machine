@@ -78,10 +78,10 @@ public class QuerySet extends HashSet<Query> {
 	public String toString() {
 		StringBuilder bld = new StringBuilder();
 		if (ops.size() == 0) {
-			bld.append("[]: ");
+			bld.append("(): ");
 		}
 		else {
-			for (int i = 0 ; i < ops.size(); i++) {
+			for (int i = ops.size() - 1; i >= 0; i--) {
 				int op = ops.get(i);
 				switch(op) {
 				case Operator.AI_t:
@@ -95,9 +95,14 @@ public class QuerySet extends HashSet<Query> {
 					break;
 				}
 				
-				if (i + 1 < ops.size())
-					bld.append(".");
+				if (i >= 0)
+					bld.append("(");
 			}
+			
+			bld.append(" Q(X) ");
+			for (int i = 0; i < ops.size(); i++)
+				bld.append(")");
+			bld.append(": ");
 		}
 		
 		bld.append(" ");
