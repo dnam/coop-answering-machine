@@ -14,45 +14,63 @@ public class Literal implements Comparable<Literal> {
 	private int id;
 	private boolean neg;
 	private Vector<Integer> params;
+	private Integer hashval;
 
 	// constructors
 	public Literal() {
 		params = new Vector<Integer>();
+		hashval = null;
 	}
 
-	// methods
+	/**
+	 * Sets the id of the literal's predicate
+	 * @param id the id of predicate
+	 */
 	public void setID(int id) {
 		this.id = id;
-	}
-
-	public int getID() {
-		return id;
+		hashval = null;
 	}
 
 	public void setNegative(boolean neg) {
 		this.neg = neg;
+		hashval = null;
+	}
+
+	/**
+	 * Sets multiple parameters of the literal
+	 * @param params the list of params
+	 */
+	public void setMultiParams(Vector<Integer> params) {
+		this.params.addAll(params);
+		hashval = null;
+	}
+
+	/**
+	 * Sets a parameter at a specified index
+	 * @param i the index
+	 * @param value the new parameter id
+	 */
+	public void setParamAt(int i, int value) {
+		this.params.set(i, value);
+		hashval = null;
+	}
+	
+	public int getID() {
+		return id;
 	}
 
 	public boolean isNegative() {
 		return neg;
 	}
-
-	public void setMultiParams(Vector<Integer> params) {
-		this.params.addAll(params);
-	}
-
-	public void setParamAt(int i, int value) {
-		this.params.set(i, value);
-	}
 	
-	/**
-	 * @return Vector<Integer> a copy of the integer vectors in the literal
-	 */
-	@SuppressWarnings("unchecked")
-	public Vector<Integer> getAllParams() {
-		return (Vector<Integer>) this.params.clone();
+	public int getParamAt(int i) {
+		return this.params.get(i);
 	}
 
+	/**
+	 * Gets all variables from the literal
+	 * @return a list of all variables
+	 */
 	public Vector<Integer> getAllVars() {
 		Vector<Integer> vars = new Vector<Integer>();
 		for(int i = 0; i < this.params.size(); i++)
@@ -63,13 +81,26 @@ public class Literal implements Comparable<Literal> {
 		}
 		return vars;
 	}
-	
-	public int getParamAt(int i) {
 
-		return this.params.get(i);
+	/**
+	 * @return the number of parameters
+	 */
+	public int paramSize() {
+		return this.params.size();
 	}
 
-	// returns the corresponding String name of the literal
+	@Override
+	public Literal clone() {
+		Literal l = new Literal();
+		l.id = this.id;
+		l.neg = this.neg;
+		l.params.addAll(this.params);
+		l.hashval = this.hashval;
+		
+		return l;
+	}
+	
+	@Override
 	public String toString() {
 		StringBuilder str = new StringBuilder();
 		str.append((neg)? "-" : "" );
@@ -83,24 +114,16 @@ public class Literal implements Comparable<Literal> {
 
 		return str.toString();
 	}
-
-	public int size() {
-		return this.params.size();
-	}
-
-	public Literal clone() {
-		Literal l = new Literal();
-		l.id = this.id;
-		l.neg = this.neg;
-		l.params.addAll(this.params);
-		
-		return l;
-	}
 	
-	public String toNegTPTP() {
+	/**
+	 * @return the string of the negated literal
+	 */
+	public String toNegatedString() {
 		StringBuilder str = new StringBuilder();
+		
 		str.append((!neg)? "-" : "" );
 		str.append(SymTable.getSym(id) + "(");
+		
 		for (int i = 0; i < params.size(); i++) {
 			str.append(SymTable.getSym(params.get(i)));
 			if (i + 1 < params.size())
@@ -109,6 +132,30 @@ public class Literal implements Comparable<Literal> {
 		str.append(")");
 
 		return str.toString();
+	}
+	
+	
+	@Override
+	public int hashCode() {
+		if (hashval == null)
+			hashval = computeHash();
+		
+		return hashval;
+	}
+	
+	/**
+	 * @return the hash value of the literal
+	 */
+	private int computeHash() {
+		int result = 11 * id + ((neg)? -7:5);
+		
+		for (int i = 0; i < params.size(); i++) {
+			int param = params.get(i);
+			if (SymTable.getTypeID(param) == SymType.CONSTANT)
+				result = 37 * result + params.get(i);
+		}
+		
+		return result;
 	}
 	
 	/**
@@ -158,7 +205,6 @@ public class Literal implements Comparable<Literal> {
 		
 		return 0;
 	}
-	
 	
 	@Override
 	public boolean equals(Object obj) {
@@ -267,17 +313,26 @@ public class Literal implements Comparable<Literal> {
 		return true;
 	}
 	
+	/**
+	 * @param other the other literal the check against
+	 * @param theta the substitution
+	 * @return true if the current literal subsume the others,
+	 * 			false otherwise
+	 */
 	public boolean subsume(Literal other, Map<Integer, Integer> theta) {
 		if (this.neg != other.neg || this.id != other.id)
 			return false;
 		
-		if (theta == null)
-			throw new NullPointerException("theta cannot be null");
-
-		Map<Integer, Integer> localTheta = new HashMap<Integer, Integer>(theta);
+		// check size
+		if (this.params.size() != other.params.size())
+			throw new IllegalStateException("invalid input: two literals" +
+					" must be of the same size");
 		
-		// assertion. for debugging
-		assert this.params.size() == other.params.size();
+		if (theta == null)
+			throw new IllegalArgumentException("theta cannot be null");
+		
+		// Main code		
+		Map<Integer, Integer> localTheta = new HashMap<Integer, Integer>(theta);
 		
 		int n = this.params.size();
 		for (int i = 0; i < n; i++) {

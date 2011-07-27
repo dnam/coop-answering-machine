@@ -72,13 +72,14 @@ public abstract class Operator {
 	 public void reset() {
 		 globalSet.clear();
 	 }
+	 
 	/**
-	 * This method is overriden in sub-classes
+	 * Performs the operation upon a single query
 	 */
 	abstract QuerySet perform(Query query);
 	
 	/**
-	 * Returns the type: 0= DC, 1=AI, 2=GR
+	 * @return the type: 0= DC, 1=AI, 2=GR
 	 */
 	public abstract int getType();
 }
