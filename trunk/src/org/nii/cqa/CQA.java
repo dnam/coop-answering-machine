@@ -4,17 +4,17 @@
  */
 package org.nii.cqa;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.*;
 
 import org.nii.cqa.base.KnowledgeBase;
 import org.nii.cqa.base.Query;
 import org.nii.cqa.base.QuerySet;
 import org.nii.cqa.operators.Operator;
-import org.nii.cqa.parser.QueryParser;
+
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+import javax.print.attribute.standard.Finishings;
 
 public class CQA {
 	private static QuerySet root = new QuerySet(); 
@@ -29,13 +29,19 @@ public class CQA {
 		root.add(q);
 		
 		// Initializes the static Knowledgebase
-		KnowledgeBase.initKB("../CQA/lib/gen_kb.txt");
+		KnowledgeBase.init("../CQA/lib/gen_kb.txt");
 		
 		// A queue of QuerySet to process
 		Queue<QuerySet> workingQueue = new LinkedList<QuerySet>();
 		workingQueue.offer(root); // add the root
 		
+		// The thread to handle solar connection
+		SolarWorker worker = new SolarWorker();
+		Thread workerThread = new Thread(worker);
+		workerThread.start();
+		
 		// Runs until the queue is empty
+		int cnt = 0; // TODO: configurable
 		while(!workingQueue.isEmpty()) {
 //			System.out.println("Size: " + workingQueue.size());
 			
@@ -62,6 +68,8 @@ public class CQA {
 				if (ret != null) {
 					workingQueue.add(ret);
 					System.out.println(ret);
+					worker.queue(ret);
+					cnt += ret.size();
 					
 				}
 			}
@@ -70,6 +78,8 @@ public class CQA {
 				ret = Operator.DC.run(nextSet);
 				if (ret != null) {
 					workingQueue.add(ret);
+					worker.queue(ret);
+					cnt += ret.size();
 					System.out.println(ret);
 				}
 			}
@@ -78,11 +88,19 @@ public class CQA {
 				ret = Operator.GR.run(nextSet);
 				if (ret != null) {
 					workingQueue.add(ret);
+					worker.queue(ret);
+					cnt += ret.size();
 					System.out.println(ret);
 				}
 			}
-			
-			
 		}
+		
+		worker.setFinished(); // Notify the worker that we're done
+		
+		workerThread.join();
+		
+		System.out.println("\n");
+		System.out.println("Answer set: " + worker.ansMap);
+		System.out.println("Done");
 	}
 }
