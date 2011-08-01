@@ -5,6 +5,7 @@
 package org.nii.cqa.base;
 
 import java.io.FileReader;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,7 +17,11 @@ import java.util.Vector;
 
 import org.nii.cqa.parser.QueryParser;
 
-public class Query {
+public class Query implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 22L;
 	private int id; // ID of a query, based on a global counter
 	private Vector<Literal> litVector;
 	private Map<Integer, Integer> idCountMap;

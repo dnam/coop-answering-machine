@@ -6,11 +6,16 @@
 
 package org.nii.cqa.base;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 
-public class Literal implements Comparable<Literal> {
+public class Literal implements Comparable<Literal>, Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 87L;
 	private int id;
 	private boolean neg;
 	private Vector<Integer> params;
