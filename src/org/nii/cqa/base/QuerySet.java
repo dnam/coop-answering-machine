@@ -1,15 +1,15 @@
 package org.nii.cqa.base;
 
+import java.io.Serializable;
 import java.util.*;
 
-import org.nii.cqa.base.*;
 import org.nii.cqa.operators.*;
 
-public class QuerySet extends HashSet<Query> {
+public class QuerySet extends HashSet<Query> implements Serializable {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 10L;
 	private Vector<Integer> ops; // Operator performed upon this set
 	private QuerySet parent;
 	private Vector<QuerySet> children;
@@ -107,6 +107,11 @@ public class QuerySet extends HashSet<Query> {
 		
 		bld.append(" ");
 		bld.append(super.toString());
+		bld.append("\n");
+		
+		for (int i = 0; i < children.size(); i++) {
+			bld.append(children.get(i));
+		}
 		
 		return bld.toString();
 	}
