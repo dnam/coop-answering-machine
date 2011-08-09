@@ -8,45 +8,47 @@ import java.io.*;
 import java.util.*;
 
 import org.nii.cqa.base.AnswerMap;
-import org.nii.cqa.base.KnowledgeBase;
+import org.nii.cqa.base.CoopQAJob;
 import org.nii.cqa.base.Query;
 import org.nii.cqa.base.QuerySet;
 import org.nii.cqa.operators.Operator;
 import org.nii.cqa.solar.SolarWorker;
-import org.nii.cqa.web.shared.WebAnswerMap;
 import org.nii.cqa.web.shared.WebQuerySet;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 
-public class CQA {
+public class CoopQA {
 	private static QuerySet root = new QuerySet();
+	private static CoopQAJob job = new CoopQAJob();
 
 	/**
 	 * @param args
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
+		
 		// The root of the tree
-		Query q = Query.parse("../CQA/lib/gen_query.txt");
+		Query q = Query.parse("../CQA/lib/gen_query.txt", job);
 		root.add(q);
 
-		// Initializes the static Knowledgebase
-		KnowledgeBase.init("../CQA/lib/gen_kb.txt");
+		// Initializes the job
+		job.init("../CQA/lib/gen_kb.txt");
 
 		// A queue of QuerySet to process
 		Queue<QuerySet> workingQueue = new LinkedList<QuerySet>();
 		workingQueue.offer(root); // add the root
 
 		// The thread to handle solar connection
-		SolarWorker worker = new SolarWorker();
+		SolarWorker worker = job.worker();
 		FutureTask<AnswerMap> future = new FutureTask<AnswerMap>(worker);
 		ExecutorService executor = Executors.newFixedThreadPool(1);
 		executor.execute(future);
 
 		// Runs until the queue is empty
 		int cnt = 0; // TODO: configurable
+		Operator OP = job.op();
 		while (!workingQueue.isEmpty()) {
 			// System.out.println("Size: " + workingQueue.size());
 
@@ -70,7 +72,7 @@ public class CQA {
 			}
 
 			if (doAI) {
-				ret = Operator.AI.run(nextSet);
+				ret = OP.AI.run(nextSet);
 				if (ret != null) {
 					workingQueue.add(ret);
 					worker.queue(ret);
@@ -80,7 +82,7 @@ public class CQA {
 			}
 
 			if (doDC) {
-				ret = Operator.DC.run(nextSet);
+				ret = OP.DC.run(nextSet);
 				if (ret != null) {
 					workingQueue.add(ret);
 					worker.queue(ret);
@@ -89,7 +91,7 @@ public class CQA {
 			}
 
 			if (doGR) {
-				ret = Operator.GR.run(nextSet);
+				ret = OP.GR.run(nextSet);
 				if (ret != null) {
 					workingQueue.add(ret);
 					worker.queue(ret);
