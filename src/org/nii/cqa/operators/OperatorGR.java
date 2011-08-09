@@ -6,21 +6,19 @@ import org.nii.cqa.base.*;
 import org.nii.cqa.operators.comgen.MultiCombinationGenerator;
 
 class OperatorGR extends Operator {
+	protected OperatorGR(CoopQAJob job) {
+		super(false, job);
+	}
 	// Suppose we already have a knowledge base
 
 	@Override
-	QuerySet perform(Query query) {
+	QuerySet perform(Query query) {		
 		QuerySet retSet = new QuerySet();
 		
-		KnowledgeBase kb = null;
-		try {
-			kb = KnowledgeBase.get();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		Iterator<Rule> itRule = kb.iteratorSHRR();
+		if (query.isSkipped())
+			return retSet;
+
+		Iterator<Rule> itRule = job.kb().iteratorSHRR();
 		while(itRule.hasNext()) {
 			QuerySet set = doGR(query, itRule.next());
 			if (set != null)
@@ -111,12 +109,16 @@ class OperatorGR extends Operator {
 		// Produce segments of query
 		while (comGen.hasNext()) {
 			List<Literal> lVector = comGen.next();
-			Query subQ = new Query(lVector);
+			Query subQ = new Query(lVector, job);
 			if (subQ.subsumed(rVector)) {
 				Query newQuery = q.doGR(lVector, r.getFirstRight());
 				if (!globalSet.contains(newQuery)) {
 					setQ.add(newQuery);
 					globalSet.add(newQuery);
+				}
+				else if (!setQ.contains(q)) { // do not add twice
+					q.setSkipped(true);
+					setQ.add(q);
 				}
 			}
 		}
@@ -129,17 +131,15 @@ class OperatorGR extends Operator {
 		return GR_t;
 	}
 	
-	public static void main(String args[]) throws Exception {
-		KnowledgeBase.init("../CQA/lib/gen_kb.txt");
-		
-		Query q = Query.parse("../CQA/lib/gen_query.txt");
-		
-		System.out.println("Query: " + q);
-//		System.out.println(q.toTopClause());
-//		System.out.println();
-//		System.out.println(KnowledgeBase.get().toTPTP());
-		
-		QuerySet ret = Operator.GR.perform(q);
-		System.out.println(ret);
-	}
+//	public static void main(String args[]) throws Exception {
+//		KnowledgeBase.init("../CQA/lib/gen_kb.txt");
+//		
+//		Query q = Query.parse("../CQA/lib/gen_query.txt");
+//		
+//		System.out.println("Query: " + q);
+//
+//		
+//		QuerySet ret = Operator.get().GR.perform(q);
+//		System.out.println(ret);
+//	}
 }

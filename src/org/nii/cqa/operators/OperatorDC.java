@@ -8,6 +8,10 @@ package org.nii.cqa.operators;
 import org.nii.cqa.base.*;
 
 class OperatorDC extends Operator {	
+	protected OperatorDC(CoopQAJob job) {
+		super(false, job);
+	}
+	
 	/**
 	 * Returns the set of queries after applying
 	 * DC on each literal of q
@@ -17,6 +21,9 @@ class OperatorDC extends Operator {
 	@Override
 	QuerySet perform(Query query) {
 		QuerySet retSet = new QuerySet();
+		
+		if (query.isSkipped())
+			return retSet;
 		
 		int n = query.size();
 		
@@ -28,6 +35,10 @@ class OperatorDC extends Operator {
 			if (!globalSet.contains(q)) {
 				retSet.add(q);
 				globalSet.add(q);
+			}
+			else if (!retSet.contains(q)) { // do not add twice
+				q.setSkipped(true);
+				retSet.add(q);
 			}
 		}
 		
