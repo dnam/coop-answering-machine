@@ -41,5 +41,40 @@ public class AnswerMap extends HashMap<Integer, List<List<Integer>>>{
 		
 		return webMap;
 	}
+	
+	
+	/**
+	 * converts the mapped answer list to String 
+	 */
+	@Override
+	public String toString() {
+		
+		StringBuilder strMap = new StringBuilder();
+		
+		Iterator<Integer> it = this.keySet().iterator();
+		while (it.hasNext()) {
+			int id = it.next();
+			List<List<Integer>> ansList = this.get(id);
+			
+			Vector<Vector<String>> strAnsList = new Vector<Vector<String>>();
+			Iterator<List<Integer>> ansIt = ansList.iterator();
+			while (ansIt.hasNext()) {
+				List<Integer> ans = ansIt.next();
+				Vector<String> strAns = new Vector<String>();
+				
+				Iterator<Integer> localIt = ans.iterator();
+				while (localIt.hasNext()) {
+					strAns.add(SymTable.getSym(localIt.next()));
+				}
+				
+				strAnsList.add(strAns);
+			}
+			
+			strMap.append((id +"\n"+ strAnsList+"\n--------------------------------------\n"));
+			
+		}
+		
+		return strMap.toString();
+	}
 
 }
