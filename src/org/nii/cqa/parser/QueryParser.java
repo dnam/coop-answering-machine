@@ -102,19 +102,16 @@ public class QueryParser extends java_cup.runtime.lr_parser {
   public int error_sym() {return 1;}
 
 
+  public CoopQAJob job;
 
-	public QueryParser (java.io.Reader input) {
+	public QueryParser (java.io.Reader input, CoopQAJob job) {
 		super(new QueryScanner(input));
+		this.job = job;
 	}
 	
-	public static void main(String args[]) throws Exception {
-		QueryParser p;
-		p = new QueryParser(new FileReader("../CQA/lib/test.txt"));
-		
-		Query q = (Query) p.parse().value;
-		System.out.println("Result: " + q);
+	public CoopQAJob getJob() {
+		return job;
 	}
-
 }
 
 /** Cup generated class to encapsulate user supplied action code.*/
@@ -150,7 +147,7 @@ class CUP$QueryParser$actions {
 		int strleft = ((java_cup.runtime.Symbol)CUP$QueryParser$stack.peek()).left;
 		int strright = ((java_cup.runtime.Symbol)CUP$QueryParser$stack.peek()).right;
 		String str = (String)((java_cup.runtime.Symbol) CUP$QueryParser$stack.peek()).value;
-		 t.add(SymTable.addSymbol(str, SymType.VARIABLE));RESULT=t; 
+		 t.add(parser.getJob().symTab().addSymbol(str, SymType.VARIABLE));RESULT=t; 
               CUP$QueryParser$result = parser.getSymbolFactory().newSymbol("tuple",0, ((java_cup.runtime.Symbol)CUP$QueryParser$stack.elementAt(CUP$QueryParser$top-2)), ((java_cup.runtime.Symbol)CUP$QueryParser$stack.peek()), RESULT);
             }
           return CUP$QueryParser$result;
@@ -165,7 +162,7 @@ class CUP$QueryParser$actions {
 		int strleft = ((java_cup.runtime.Symbol)CUP$QueryParser$stack.peek()).left;
 		int strright = ((java_cup.runtime.Symbol)CUP$QueryParser$stack.peek()).right;
 		String str = (String)((java_cup.runtime.Symbol) CUP$QueryParser$stack.peek()).value;
-		 t.add(SymTable.addSymbol(str, SymType.CONSTANT));RESULT=t; 
+		 t.add(parser.getJob().symTab().addSymbol(str, SymType.CONSTANT));RESULT=t; 
               CUP$QueryParser$result = parser.getSymbolFactory().newSymbol("tuple",0, ((java_cup.runtime.Symbol)CUP$QueryParser$stack.elementAt(CUP$QueryParser$top-2)), ((java_cup.runtime.Symbol)CUP$QueryParser$stack.peek()), RESULT);
             }
           return CUP$QueryParser$result;
@@ -177,7 +174,7 @@ class CUP$QueryParser$actions {
 		int strleft = ((java_cup.runtime.Symbol)CUP$QueryParser$stack.peek()).left;
 		int strright = ((java_cup.runtime.Symbol)CUP$QueryParser$stack.peek()).right;
 		String str = (String)((java_cup.runtime.Symbol) CUP$QueryParser$stack.peek()).value;
-		 Vector<Integer> tup = new Vector<Integer>(); tup.add(SymTable.addSymbol(str, SymType.VARIABLE)); RESULT=tup; 
+		 Vector<Integer> tup = new Vector<Integer>(); tup.add(parser.getJob().symTab().addSymbol(str, SymType.VARIABLE)); RESULT=tup; 
               CUP$QueryParser$result = parser.getSymbolFactory().newSymbol("tuple",0, ((java_cup.runtime.Symbol)CUP$QueryParser$stack.peek()), ((java_cup.runtime.Symbol)CUP$QueryParser$stack.peek()), RESULT);
             }
           return CUP$QueryParser$result;
@@ -189,7 +186,7 @@ class CUP$QueryParser$actions {
 		int strleft = ((java_cup.runtime.Symbol)CUP$QueryParser$stack.peek()).left;
 		int strright = ((java_cup.runtime.Symbol)CUP$QueryParser$stack.peek()).right;
 		String str = (String)((java_cup.runtime.Symbol) CUP$QueryParser$stack.peek()).value;
-		 Vector<Integer> tup = new Vector<Integer>(); tup.add(SymTable.addSymbol(str, SymType.CONSTANT)); RESULT=tup; 
+		 Vector<Integer> tup = new Vector<Integer>(); tup.add(parser.getJob().symTab().addSymbol(str, SymType.CONSTANT)); RESULT=tup; 
               CUP$QueryParser$result = parser.getSymbolFactory().newSymbol("tuple",0, ((java_cup.runtime.Symbol)CUP$QueryParser$stack.peek()), ((java_cup.runtime.Symbol)CUP$QueryParser$stack.peek()), RESULT);
             }
           return CUP$QueryParser$result;
@@ -216,7 +213,7 @@ class CUP$QueryParser$actions {
 		int tleft = ((java_cup.runtime.Symbol)CUP$QueryParser$stack.peek()).left;
 		int tright = ((java_cup.runtime.Symbol)CUP$QueryParser$stack.peek()).right;
 		Vector<Integer> t = (Vector<Integer>)((java_cup.runtime.Symbol) CUP$QueryParser$stack.peek()).value;
-		 Literal l = new Literal(); l.setID(SymTable.addSymbol(pred, SymType.PREDICATE)); l.setNegative(false); l.setMultiParams(t); RESULT=l; 
+		 Literal l = new Literal(parser.getJob()); l.setID(parser.getJob().symTab().addSymbol(pred, SymType.PREDICATE)); l.setNegative(false); l.setMultiParams(t); RESULT=l; 
               CUP$QueryParser$result = parser.getSymbolFactory().newSymbol("basic_literal",2, ((java_cup.runtime.Symbol)CUP$QueryParser$stack.elementAt(CUP$QueryParser$top-1)), ((java_cup.runtime.Symbol)CUP$QueryParser$stack.peek()), RESULT);
             }
           return CUP$QueryParser$result;
@@ -281,7 +278,7 @@ class CUP$QueryParser$actions {
 		int lleft = ((java_cup.runtime.Symbol)CUP$QueryParser$stack.peek()).left;
 		int lright = ((java_cup.runtime.Symbol)CUP$QueryParser$stack.peek()).right;
 		Literal l = (Literal)((java_cup.runtime.Symbol) CUP$QueryParser$stack.peek()).value;
-		 Query q = new Query(); q.add(l); RESULT=q; 
+		 Query q = new Query(parser.getJob()); q.add(l); RESULT=q; 
               CUP$QueryParser$result = parser.getSymbolFactory().newSymbol("query",4, ((java_cup.runtime.Symbol)CUP$QueryParser$stack.peek()), ((java_cup.runtime.Symbol)CUP$QueryParser$stack.peek()), RESULT);
             }
           return CUP$QueryParser$result;
