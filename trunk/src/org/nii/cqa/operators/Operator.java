@@ -11,17 +11,43 @@ import org.nii.cqa.base.*;
 
 public abstract class Operator {
 	// List of operator objects for external access
-	public static final Operator AI = new OperatorAI();
-	public static final Operator DC = new OperatorDC();
-	public static final Operator GR = new OperatorGR();
+	public Operator AI;
+	public Operator DC;
+	public Operator GR;
 	
 	public static final int DC_t = 0;
 	public static final int AI_t = 1;
 	public static final int GR_t = 2;
 	
 	// A global storage for all generated queries
-	protected static final QuerySet globalSet = new QuerySet();
+	protected QuerySet globalSet;
+	protected CoopQAJob job;
+
+	protected Operator(boolean init, CoopQAJob job) {
+		this.job = job;
+		
+		if (init) {
+			globalSet = new QuerySet();
+			AI = new OperatorAI(job);
+			DC = new OperatorDC(job);
+			GR = new OperatorGR(job);
+			
+			// Set the corresponding gloabl set
+			AI.globalSet = this.globalSet;
+			DC.globalSet = this.globalSet;
+			GR.globalSet = this.globalSet;
+			
+		}
+	}
 	
+	/**
+	 * Create a new operator
+	 * @return the new operator
+	 */
+	public static Operator create(CoopQAJob job) {
+		Operator op = new OperatorWrapper(job);
+		return op;
+	}
 	
 	/**
 	 * Returns a set of queries after performing
@@ -52,13 +78,13 @@ public abstract class Operator {
 		int type = getType(); // get the type of the operator
 		switch(type) {
 		case DC_t:
-			retSet.addOperator(DC);
+			retSet.addOperator(DC_t);
 			break;
 		case AI_t:
-			retSet.addOperator(AI);
+			retSet.addOperator(AI_t);
 			break;
 		case GR_t:
-			retSet.addOperator(GR);
+			retSet.addOperator(GR_t);
 			break;
 		}
 		
@@ -69,7 +95,7 @@ public abstract class Operator {
 	/**
 	 * Resets the shared set of all generated queries
 	 */
-	 public static void reset() {
+	 public void reset() {
 		 globalSet.clear();
 	 }
 	 
