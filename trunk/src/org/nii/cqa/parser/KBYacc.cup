@@ -5,8 +5,16 @@ import java.util.*;
 import java.io.*;
 
 parser code {:
-	public KBParser (java.io.Reader input) {
+
+	private CoopQAJob job;
+	
+	public KBParser (java.io.Reader input, job) {
 		super(new KBScanner(input));
+		this.job = job;
+	}
+	
+	public CoopQAJob getJob() {
+		return job;
 	}
 	
 	/* Test code */
@@ -40,11 +48,11 @@ kb ::= literal:l
 				k.add(c); RESULT=k; 
 			:}
 		| clause:c
-			{:	KnowledgeBase k = new KnowledgeBase();
+			{:	KnowledgeBase k = new KnowledgeBase(parser.getJob());
 				k.add(c); RESULT=k;
 			:}
 		| rule:r
-			{:	KnowledgeBase k = new KnowledgeBase();
+			{:	KnowledgeBase k = new KnowledgeBase(parser.getJob());
 				k.add(r); RESULT=k;
 			:}
 		| kb:k COMMA literal:l
@@ -84,7 +92,7 @@ literal ::= basic_literal:l
 		;
 		
 basic_literal ::= NONVAR:pred closedTuple:t
-			{: Literal l = new Literal(); l.setID(SymTable.addSymbol(pred, SymType.PREDICATE)); l.setNegative(false); l.setMultiParams(t); RESULT=l; :}
+			{: Literal l = new Literal(parser.getJob()); l.setID(parser.getJob().symTab().addSymbol(pred, SymType.PREDICATE)); l.setNegative(false); l.setMultiParams(t); RESULT=l; :}
 		;
 
 closedTuple ::= LPAREN tuple:t RPAREN
@@ -92,11 +100,11 @@ closedTuple ::= LPAREN tuple:t RPAREN
 			;
 
 tuple ::= NONVAR:str 
-			{: Vector<Integer> tup = new Vector<Integer>(); tup.add(SymTable.addSymbol(str, SymType.CONSTANT)); RESULT=tup; :}
+			{: Vector<Integer> tup = new Vector<Integer>(); tup.add(parser.getJob().symTab().addSymbol(str, SymType.CONSTANT)); RESULT=tup; :}
 		| VARIABLE:str 
-			{: Vector<Integer> tup = new Vector<Integer>(); tup.add(SymTable.addSymbol(str, SymType.VARIABLE)); RESULT=tup; :}
+			{: Vector<Integer> tup = new Vector<Integer>(); tup.add(parser.getJob().symTab().addSymbol(str, SymType.VARIABLE)); RESULT=tup; :}
 		| tuple:t COMMA NONVAR:str 
-			{: t.add(SymTable.addSymbol(str, SymType.CONSTANT));RESULT=t; :}
+			{: t.add(parser.getJob().symTab().addSymbol(str, SymType.CONSTANT));RESULT=t; :}
 		| tuple:t COMMA VARIABLE:str 
-			{: t.add(SymTable.addSymbol(str, SymType.VARIABLE));RESULT=t; :}
+			{: t.add(parser.getJob().symTab().addSymbol(str, SymType.VARIABLE));RESULT=t; :}
 		;	
