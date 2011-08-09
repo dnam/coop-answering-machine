@@ -9,6 +9,13 @@ import org.nii.cqa.web.shared.WebAnswerMap;
 
 public class AnswerMap extends HashMap<Integer, List<List<Integer>>>{
 
+	private CoopQAJob job;
+	
+	public AnswerMap(CoopQAJob job) {
+		super();
+		this.job = job;
+	}
+
 	/**
 	 * 
 	 */
@@ -30,7 +37,7 @@ public class AnswerMap extends HashMap<Integer, List<List<Integer>>>{
 				
 				Iterator<Integer> localIt = ans.iterator();
 				while (localIt.hasNext()) {
-					webAns.add(SymTable.getSym(localIt.next()));
+					webAns.add(job.symTab().getSym(localIt.next()));
 				}
 				
 				webAnsList.add(webAns);
@@ -64,7 +71,7 @@ public class AnswerMap extends HashMap<Integer, List<List<Integer>>>{
 				
 				Iterator<Integer> localIt = ans.iterator();
 				while (localIt.hasNext()) {
-					strAns.add(SymTable.getSym(localIt.next()));
+					strAns.add(job.symTab().getSym(localIt.next()));
 				}
 				
 				strAnsList.add(strAns);
