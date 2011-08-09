@@ -9,11 +9,13 @@ public class WebQuery implements Serializable {
 	private int id; // ID of a query, based on a global counter
 	private Vector<WebLiteral> litVector;
 	private Vector<String> listVar; // list of sorted variables (for mapping back)
+	private boolean skipped;
 	
 	public WebQuery() {
 		id = 0;
 		litVector = new Vector<WebLiteral>();
 		listVar = new Vector<String>();
+		skipped = false;
 	}
 	
 	public WebQuery(int id) {
@@ -33,12 +35,19 @@ public class WebQuery implements Serializable {
 		listVar.add(var);
 	}
 	
+	public void setSkipped(boolean skipped) {
+		this.skipped = skipped;
+	}
+	
 	/**
 	 * Extracts the answers string from ansMap
 	 * @param ansMap the answer map
 	 * @return the string of answers
 	 */
 	public String getAnsString(WebAnswerMap ansMap) {
+		if (skipped) {
+			return "[skipped]";			
+		}
 		Vector<Vector<String>> ret = ansMap.get(id);
 		
 		if (ret == null)
