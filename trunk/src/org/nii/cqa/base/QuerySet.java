@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.*;
 
 import org.nii.cqa.operators.*;
+import org.nii.cqa.web.shared.WebQuerySet;
 
 public class QuerySet extends HashSet<Query> implements Serializable {
 	/**
@@ -114,5 +115,29 @@ public class QuerySet extends HashSet<Query> implements Serializable {
 		}
 		
 		return bld.toString();
+	}
+	
+	/**
+	 * Must be used at root
+	 * @return the tree set
+	 */
+	public WebQuerySet webConvert() {
+		WebQuerySet webSet = new WebQuerySet(ops);
+		
+		// Convert the current set
+		Iterator<Query> it = this.iterator();
+		while(it.hasNext()) {
+			webSet.add(it.next().webConvert());
+		}
+		
+		// Add its children		
+		for (int i = 0; i < children.size(); i++) {
+			WebQuerySet curChild = children.get(i).webConvert();
+			curChild.setParent(webSet);
+			
+			webSet.addChild(curChild);
+		}
+		
+		return webSet;
 	}
 }

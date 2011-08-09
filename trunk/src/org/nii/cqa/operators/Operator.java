@@ -69,7 +69,7 @@ public abstract class Operator {
 	/**
 	 * Resets the shared set of all generated queries
 	 */
-	 public void reset() {
+	 public static void reset() {
 		 globalSet.clear();
 	 }
 	 

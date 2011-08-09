@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 
+import org.nii.cqa.web.shared.WebLiteral;
+
 public class Literal implements Comparable<Literal>, Serializable {
 	/**
 	 * 
@@ -370,5 +372,16 @@ public class Literal implements Comparable<Literal>, Serializable {
 		
 		theta.putAll(localTheta);		
 		return true;
+	}
+	
+	public WebLiteral webConvert() {
+		WebLiteral webLit = new WebLiteral();
+		webLit.setPred(SymTable.getSym(id));
+		webLit.setNegative(neg);
+		
+		for (int i = 0; i < params.size(); i++)
+			webLit.add(SymTable.getSym(params.get(i)));
+		
+		return webLit;
 	}
 }

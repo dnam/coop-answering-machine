@@ -118,8 +118,6 @@ class OperatorGR extends Operator {
 					setQ.add(newQuery);
 					globalSet.add(newQuery);
 				}
-				else
-					System.out.println("Dup: " + newQuery);
 			}
 		}
 		
