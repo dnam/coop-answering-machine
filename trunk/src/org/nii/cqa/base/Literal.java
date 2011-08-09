@@ -22,11 +22,13 @@ public class Literal implements Comparable<Literal>, Serializable {
 	private boolean neg;
 	private Vector<Integer> params;
 	private Integer hashval;
+	private CoopQAJob job;
 
 	// constructors
-	public Literal() {
-		params = new Vector<Integer>();
-		hashval = null;
+	public Literal(CoopQAJob job) {
+		this.params = new Vector<Integer>();
+		this.hashval = null;
+		this.job = job;
 	}
 
 	/**
@@ -82,7 +84,7 @@ public class Literal implements Comparable<Literal>, Serializable {
 		Vector<Integer> vars = new Vector<Integer>();
 		for(int i = 0; i < this.params.size(); i++)
 		{
-			if(SymTable.getTypeID(params.get(i)) == (SymType.VARIABLE))
+			if(job.symTab().getTypeID(params.get(i)) == (SymType.VARIABLE))
 				vars.add(params.get(i));
 			
 		}
@@ -98,7 +100,7 @@ public class Literal implements Comparable<Literal>, Serializable {
 
 	@Override
 	public Literal clone() {
-		Literal l = new Literal();
+		Literal l = new Literal(job);
 		l.id = this.id;
 		l.neg = this.neg;
 		l.params.addAll(this.params);
@@ -111,9 +113,9 @@ public class Literal implements Comparable<Literal>, Serializable {
 	public String toString() {
 		StringBuilder str = new StringBuilder();
 		str.append((neg)? "-" : "" );
-		str.append(SymTable.getSym(id) + "(");
+		str.append(job.symTab().getSym(id) + "(");
 		for (int i = 0; i < params.size(); i++) {
-			str.append(SymTable.getSym(params.get(i)));
+			str.append(job.symTab().getSym(params.get(i)));
 			if (i + 1 < params.size())
 				str.append(",");
 		}
@@ -129,10 +131,10 @@ public class Literal implements Comparable<Literal>, Serializable {
 		StringBuilder str = new StringBuilder();
 		
 		str.append((!neg)? "-" : "" );
-		str.append(SymTable.getSym(id) + "(");
+		str.append(job.symTab().getSym(id) + "(");
 		
 		for (int i = 0; i < params.size(); i++) {
-			str.append(SymTable.getSym(params.get(i)));
+			str.append(job.symTab().getSym(params.get(i)));
 			if (i + 1 < params.size())
 				str.append(", ");
 		}
@@ -158,7 +160,7 @@ public class Literal implements Comparable<Literal>, Serializable {
 		
 		for (int i = 0; i < params.size(); i++) {
 			int param = params.get(i);
-			if (SymTable.getTypeID(param) == SymType.CONSTANT)
+			if (job.symTab().getTypeID(param) == SymType.CONSTANT)
 				result = 37 * result + params.get(i);
 		}
 		
@@ -187,8 +189,8 @@ public class Literal implements Comparable<Literal>, Serializable {
 			int q = other.params.get(i);
 			
 			// Get the type
-			SymType pType = SymTable.getTypeID(p);
-			SymType qType = SymTable.getTypeID(q);
+			SymType pType = job.symTab().getTypeID(p);
+			SymType qType = job.symTab().getTypeID(q);
 			
 			// if they are of the same type
 			if (pType == qType) {
@@ -232,8 +234,8 @@ public class Literal implements Comparable<Literal>, Serializable {
 			int q = other.params.get(i);
 			
 			// Get the type
-			SymType pType = SymTable.getTypeID(p);
-			SymType qType = SymTable.getTypeID(q);
+			SymType pType = job.symTab().getTypeID(p);
+			SymType qType = job.symTab().getTypeID(q);
 			
 			// if they are of the same type
 			if (pType == qType && (p == q))
@@ -285,8 +287,8 @@ public class Literal implements Comparable<Literal>, Serializable {
 			int elem1 = this.params.get(i);
 			int elem2 = other.params.get(i);
 			
-			SymType type1 = SymTable.getTypeID(elem1);
-			SymType type2 = SymTable.getTypeID(elem2);
+			SymType type1 = job.symTab().getTypeID(elem1);
+			SymType type2 = job.symTab().getTypeID(elem2);
 			
 			if (type1 != type2) // different types 
 				return false;
@@ -346,8 +348,8 @@ public class Literal implements Comparable<Literal>, Serializable {
 			int elem1 = this.params.get(i);
 			int elem2 = other.params.get(i);
 			
-			SymType type1 = SymTable.getTypeID(elem1);
-			SymType type2 = SymTable.getTypeID(elem2);
+			SymType type1 = job.symTab().getTypeID(elem1);
+			SymType type2 = job.symTab().getTypeID(elem2);
 			
 			if (type1 != type2) // different types 
 				return false;
@@ -376,11 +378,11 @@ public class Literal implements Comparable<Literal>, Serializable {
 	
 	public WebLiteral webConvert() {
 		WebLiteral webLit = new WebLiteral();
-		webLit.setPred(SymTable.getSym(id));
+		webLit.setPred(job.symTab().getSym(id));
 		webLit.setNegative(neg);
 		
 		for (int i = 0; i < params.size(); i++)
-			webLit.add(SymTable.getSym(params.get(i)));
+			webLit.add(job.symTab().getSym(params.get(i)));
 		
 		return webLit;
 	}

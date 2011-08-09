@@ -39,8 +39,8 @@ public class QuerySet extends HashSet<Query> implements Serializable {
 		this.parent = parent;
 	}
 	
-	public void addOperator(Operator op) {
-		ops.add(op.getType());
+	public void addOperator(int opType) {
+		ops.add(opType);
 	}
 	
 	public void addAllOps(QuerySet other) {

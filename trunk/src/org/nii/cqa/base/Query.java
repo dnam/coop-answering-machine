@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import org.nii.cqa.CoopQA;
 import org.nii.cqa.parser.QueryParser;
 import org.nii.cqa.web.shared.WebQuery;
 
@@ -28,19 +29,24 @@ public class Query implements Serializable {
 	private Map<Integer, Integer> idCountMap;
 	private Vector<Integer> segVector; // segment vector
 	private Integer hashVal; // hash code of the object
+	private CoopQAJob job;
+	private boolean skipped; // skipped the query: not solve it
 	
 
-	public Query() {
-		id = SymTable.getQueryID();
-		litVector = new Vector<Literal>();
-		hashVal = null;
+	public Query(CoopQAJob job) {
+		this.litVector = new Vector<Literal>();
+		this.hashVal = null;
+		this.job = job;
+		this.id = job.symTab().getQueryID();
+		this.skipped = false;
+
 		
 		// For AI operators
 		idCountMap = new HashMap<Integer, Integer>();
 	}
 	
-	public Query(List<Literal> lVector) {
-		id = SymTable.getQueryID();
+	public Query(List<Literal> lVector, CoopQAJob job) {
+		id = job.symTab().getQueryID();
 		litVector = new Vector<Literal>(lVector);
 		hashVal = null;
 		
@@ -53,10 +59,10 @@ public class Query implements Serializable {
 	 * @return a  Query object parsed from inputFile
 	 * @throws Exception if any error occurs
 	 */
-	public static Query parse(String inputFile) throws Exception {
-		Query q = new Query();
+	public static Query parse(String inputFile, CoopQAJob job) throws Exception {
+		Query q = new Query(job);
 		
-		QueryParser p = new QueryParser(new FileReader(inputFile));
+		QueryParser p = new QueryParser(new FileReader(inputFile), job);
 		Query parsedQuery = (Query) p.parse().value;
 		
 		for (Literal l : parsedQuery.litVector) {
@@ -78,6 +84,14 @@ public class Query implements Serializable {
 	 */
 	public Iterator<Literal> iterator() {
 		return litVector.iterator();
+	}
+	
+	public void setSkipped(boolean skipped) {
+		this.skipped = skipped;
+	}
+	
+	public boolean isSkipped() {
+		return skipped;
 	}
 	
 	/**
@@ -281,7 +295,7 @@ public class Query implements Serializable {
 		
 		Iterator<Integer> varIt = this.getAllVars().iterator();
 		while(varIt.hasNext()) {
-			str.append(SymTable.getSym(varIt.next()));
+			str.append(job.symTab().getSym(varIt.next()));
 			ans_pred += "_";
 			if (varIt.hasNext()) {
 				str.append(", ");
@@ -380,7 +394,7 @@ public class Query implements Serializable {
 	
 	/********* Anti-Instantiation ****************/
 	public Query clone() {
-		Query q = new Query();
+		Query q = new Query(job);
 		for (int i = 0; i < this.litVector.size(); i++) {
 			q.add(this.litVector.get(i));
 		}
@@ -425,7 +439,7 @@ public class Query implements Serializable {
 		Iterator<Integer> it = idCountMap.keySet().iterator();
 		while(it.hasNext()) {
 			int id = it.next();
-			if (SymTable.getTypeID(id) == SymType.CONSTANT 
+			if (job.symTab().getTypeID(id) == SymType.CONSTANT 
 					||	idCountMap.get(id) > 1)
 				retSet.add(id);
 		}
@@ -445,7 +459,7 @@ public class Query implements Serializable {
 		int repCnt = idCountMap.get(id); // the id should exists in the map
 		
 		// if the variable occurs only twice, we only make one replacement
-		if (SymTable.getTypeID(id) == SymType.VARIABLE && repCnt == 2)
+		if (job.symTab().getTypeID(id) == SymType.VARIABLE && repCnt == 2)
 			repCnt = 1;
 		
 		for (int i = 0; i < litVector.size() && repCnt > 0; i++) {
@@ -560,8 +574,10 @@ public class Query implements Serializable {
 		
 		Vector<Integer> varList = getAllVars();
 		for (int i = 0; i < varList.size(); i++) {
-			webQuery.addVar(SymTable.getSym(varList.get(i)));
+			webQuery.addVar(job.symTab().getSym(varList.get(i)));
 		}
+		
+		webQuery.setSkipped(this.skipped);
 		
 		return webQuery;
 	}

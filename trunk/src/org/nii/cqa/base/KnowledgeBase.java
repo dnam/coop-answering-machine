@@ -8,38 +8,23 @@ import java.util.Vector;
 import org.nii.cqa.parser.KBParser;
 
 public class KnowledgeBase {
-	private static KnowledgeBase KB = null;
 	Vector<Formula> formulaList; // List of formulae
 	Vector<Rule> setSHRR; // list of SHRRs
 	
 	public KnowledgeBase() {
-		formulaList = new Vector<Formula>();
-		setSHRR = new Vector<Rule>();
-	}
-	
-	/**
-	 * @return the static knowleget base (universally accessible)
-	 * @throws IllegalAccessException
-	 */
-	public static KnowledgeBase get() throws IllegalAccessException {
-		if (KB == null)
-			throw new IllegalAccessException("KB uninitialized");
-		return KB;
+		this.formulaList = new Vector<Formula>();
+		this.setSHRR = new Vector<Rule>();
 	}
 	
 	/**
 	 * @param inputFile the input file for the knowledgebase
 	 * @throws Exception if parsing error occurs
 	 */
-	public static void init(String inputFile) throws Exception {
-		KB = new KnowledgeBase();
-
-		KBParser kbParser = new KBParser(new FileReader(inputFile));
-		KnowledgeBase kb = (KnowledgeBase) kbParser.parse().value;		
-		
-		KB.formulaList = kb.formulaList;
-		KB.setSHRR = kb.setSHRR;
+	public static KnowledgeBase parse(String inputFile, CoopQAJob job) throws Exception {
+		KBParser kbParser = new KBParser(new FileReader(inputFile), job);
+		return (KnowledgeBase) kbParser.parse().value;
 	}
+	
 	
 	/**
 	 * @param formu adds a formula
