@@ -13,17 +13,27 @@ import org.nii.cqa.base.*;
 import org.nii.cqa.base.KnowledgeBase;
 
 public class SolarConnector {
-	private static String SOLARPATH = "C:\\Users\\Nam\\workspace\\CQA\\lib\\solar2-build310.jar"; // solar path
-	private static File tmpDir; // tmp directory
-	private static int runCnt = 0;
-	private static int runTime = 2; // max: 2 minutes running time
+	private String SOLARPATH; // solar path
+	private File tmpDir; // tmp directory
+	private int runCnt = 0;
+	private int runTime = 2; // max: 2 minutes running time
+	private CoopQAJob job;
+	
+	public SolarConnector(CoopQAJob job) {
+		this.SOLARPATH = "C:\\Users\\Nam\\workspace\\CQA\\lib\\solar2-build310.jar"; // solar path
+		this.tmpDir = new File("/tmp");
+		this.runCnt = 0;
+		this.runTime = 0;
+		this.job = job;
+	}
+	
 	
 	/**
 	 * Sets the path for the connection
 	 * @param path the new path
 	 * @throws IllegalArgumentException if the path is invalid
 	 */
-	public static void setPath(String path) {
+	public void setPath(String path) {
 		File checkFile = new File(path);
 		if (!checkFile.exists())
 			throw new IllegalArgumentException("Invalid SOLAR path");
@@ -31,7 +41,7 @@ public class SolarConnector {
 		SOLARPATH = path;
 	}
 	
-	private static File getTmpDir() {
+	private File getTmpDir() {
 		if (tmpDir != null)
 			return tmpDir;
 		
@@ -50,8 +60,12 @@ public class SolarConnector {
 	 * Set the maximum running time for solar at each iteration
 	 * @param newTime the new time in minutes
 	 */
-	public static void setRunTime(int newTime) {
+	public void setRunTime(int newTime) {
 		runTime = newTime;
+	}
+	
+	public CoopQAJob getJob() {
+		return job;
 	}
 	
 	/**
@@ -60,16 +74,15 @@ public class SolarConnector {
 	 * @throws IOException 
 	 * @throws IllegalAccessException 
 	 */
-	private static String makeTPTP(Set<Query> querySet) 
+	private String makeTPTP(Set<Query> querySet) 
 		throws IOException, IllegalAccessException {
 		File tmpDir = getTmpDir();
 		
 		String newFilePath = tmpDir.getPath() + "/inputSOLAR" + runCnt++;
-
 		PrintWriter out = new PrintWriter(new FileWriter(newFilePath));
 		
 		// Write the knowlege base to file
-		KnowledgeBase.get().writeToFile(out);
+		job.kb().writeToFile(out);
 		
 		// Print an empty line
 		out.println();
@@ -90,7 +103,7 @@ public class SolarConnector {
 	 * @return a string of resulted consequences
 	 * @throws IOException
 	 */
-	private static Vector<String> execute(String inputPath) throws IOException {
+	private Vector<String> execute(String inputPath) throws IOException {
 		String tmpOutput = inputPath + ".tmp";
 		
 		Process solar = Runtime.getRuntime().exec("java -jar " + SOLARPATH + 
@@ -120,6 +133,7 @@ public class SolarConnector {
 			
 			return strVector;
 		}
+		
 		// Delete the tmp file
 		File tmpFile = new File(tmpOutput);
 		tmpFile.delete();
@@ -149,7 +163,7 @@ public class SolarConnector {
 	 * @param querySet set of Queries
 	 * @return a map <Query ID, List< Answer>
 	 */
-	public static Map<Integer, List<List<Integer>>> run(Set<Query> querySet) {
+	public Map<Integer, List<List<Integer>>> run(Set<Query> querySet) {
 		Vector<String> retVector = null;
 		try {
 			String tptpInput = makeTPTP(querySet);
@@ -182,7 +196,7 @@ public class SolarConnector {
 			StringTokenizer token = new StringTokenizer(ans, " ,");
 			Vector<Integer> ansList = new Vector<Integer>();
 			while(token.hasMoreTokens()) {
-				ansList.add(SymTable.getID(token.nextToken()));
+				ansList.add(job.symTab().getID(token.nextToken()));
 			}
 			queryAnsList.add(ansList);
 		}
@@ -190,20 +204,20 @@ public class SolarConnector {
 		return retMap;
 	}
 	
-	public static void main(String args[]) throws Exception {
-		KnowledgeBase.init("../CQA/lib/gen_kb.txt");
-		
-		Query q = Query.parse("../CQA/lib/gen_query.txt");
-		Set<Query> qSet = new HashSet<Query>(); 
-		qSet.add(q);
-		qSet.add(Query.parse("../CQA/lib/gen_query2.txt"));
-		
-		Map<Integer, List<List<Integer>>> ansList = run(qSet);
-		Iterator<Integer> it = ansList.keySet().iterator();
-		while(it.hasNext()) {
-			int id = it.next();
-			System.out.println("Query ID: " + id);
-			System.out.println(ansList.get(id));
-		}
-	}
+//	public static void main(String args[]) throws Exception {
+//		KnowledgeBase.init("../CQA/lib/gen_kb.txt");
+//		
+//		Query q = Query.parse("../CQA/lib/gen_query.txt");
+//		Set<Query> qSet = new HashSet<Query>(); 
+//		qSet.add(q);
+//		qSet.add(Query.parse("../CQA/lib/gen_query2.txt"));
+//		
+//		Map<Integer, List<List<Integer>>> ansList = get().run(qSet);
+//		Iterator<Integer> it = ansList.keySet().iterator();
+//		while(it.hasNext()) {
+//			int id = it.next();
+//			System.out.println("Query ID: " + id);
+//			System.out.println(ansList.get(id));
+//		}
+//	}
 }

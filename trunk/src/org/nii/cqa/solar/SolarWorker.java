@@ -11,12 +11,16 @@ public class SolarWorker implements Callable<AnswerMap> {
 	private Queue<Query> queue;
 	private volatile boolean finished;
 	private int CYCLE = 20;
+	private SolarConnector connector;
 	
-	public SolarWorker() {
+
+	public SolarWorker(SolarConnector connector) {
 		super();
+		this.connector = connector;
 		this.queue = new LinkedList<Query>();
 		this.finished = false;
 	}
+	
 
 	public synchronized void queue(QuerySet qSet) {
 		queue.addAll(qSet);
@@ -36,7 +40,8 @@ public class SolarWorker implements Callable<AnswerMap> {
 
 	@Override
 	public AnswerMap call() throws Exception {
-		AnswerMap ansMap = new AnswerMap();
+		System.out.println("SOLAR WORKER");
+		AnswerMap ansMap = new AnswerMap(connector.getJob());
 		while(true) {
 			int qSize = queue.size();
 			int wqSize = (CYCLE < qSize)? (qSize/CYCLE)*CYCLE : qSize;
@@ -56,13 +61,15 @@ public class SolarWorker implements Callable<AnswerMap> {
 				}
 				
 				// Run solar
-				ansMap.putAll(SolarConnector.run(qSet));
+				ansMap.putAll(connector.run(qSet));
 			}
 			
 			// If we're done
 			if (queue.isEmpty() && isFinished())
 				break;
 		}
+		
+		System.out.println("WORKER DONE");
 		return ansMap;
 	}
 }
