@@ -13,7 +13,7 @@ import org.nii.cqa.base.*;
 import org.nii.cqa.base.KnowledgeBase;
 
 public class SolarConnector {
-	private static String SOLARPATH = "../CQA/lib/solar2-build310.jar"; // solar path
+	private static String SOLARPATH = "C:\\Users\\Nam\\workspace\\CQA\\lib\\solar2-build310.jar"; // solar path
 	private static File tmpDir; // tmp directory
 	private static int runCnt = 0;
 	private static int runTime = 2; // max: 2 minutes running time
@@ -194,7 +194,7 @@ public class SolarConnector {
 		KnowledgeBase.init("../CQA/lib/gen_kb.txt");
 		
 		Query q = Query.parse("../CQA/lib/gen_query.txt");
-		Set qSet = new HashSet<Query>(); 
+		Set<Query> qSet = new HashSet<Query>(); 
 		qSet.add(q);
 		qSet.add(Query.parse("../CQA/lib/gen_query2.txt"));
 		

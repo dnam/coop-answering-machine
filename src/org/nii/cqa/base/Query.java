@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.nii.cqa.parser.QueryParser;
+import org.nii.cqa.web.shared.WebQuery;
 
 public class Query implements Serializable {
 	/**
@@ -548,5 +549,20 @@ public class Query implements Serializable {
 		
 		
 		return true;
+	}
+	
+	
+	public WebQuery webConvert() {
+		WebQuery webQuery = new WebQuery(id);
+		for (Literal l: litVector) {
+			webQuery.addLit(l.webConvert());
+		}
+		
+		Vector<Integer> varList = getAllVars();
+		for (int i = 0; i < varList.size(); i++) {
+			webQuery.addVar(SymTable.getSym(varList.get(i)));
+		}
+		
+		return webQuery;
 	}
 }
