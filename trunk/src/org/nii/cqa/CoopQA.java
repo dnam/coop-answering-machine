@@ -28,13 +28,20 @@ public class CoopQA {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
+		// Trying out init file
+		Properties pri = new Properties();
+		pri.setProperty("solarPath", "C:\\tmp\\solar2-build310.jar");
+		pri.store(new FileOutputStream("test.ini"), "nothing");
+		
+		
+		// Initializes the job
+		job.init("C:\\Users\\Nam\\workspace\\CQA\\lib\\gen_kb.txt", 
+				"C:\\tmp\\solar2-build310.jar", "C:\\tmp\\");
 		
 		// The root of the tree
-		Query q = Query.parse("../CQA/lib/gen_query.txt", job);
+		Query q = Query.parse("C:\\Users\\Nam\\workspace\\CQA\\lib\\gen_query.txt", job);
 		root.add(q);
-
-		// Initializes the job
-		job.init("../CQA/lib/gen_kb.txt");
+	
 
 		// A queue of QuerySet to process
 		Queue<QuerySet> workingQueue = new LinkedList<QuerySet>();
@@ -104,33 +111,33 @@ public class CoopQA {
 
 		System.out.println(root);
 		
-		
 		AnswerMap ans = future.get();
-
-		System.out.println("\n");
-		System.out.println("Answer set: " + ans.webConvert());
-		System.out.println("Done");
 		executor.shutdown();
 		
-		WebQuerySet newSet = new WebQuerySet();
-		try {
-			FileOutputStream fos = new FileOutputStream("test.tmp");
-			ObjectOutputStream oos = new ObjectOutputStream(fos);
-			WebQuerySet toWriteObj = root.webConvert();
-			toWriteObj.setAnsMap(ans.webConvert());
-			oos.writeObject(toWriteObj);
-
-			FileInputStream fin = new FileInputStream("test.tmp");
-			ObjectInputStream ois = new ObjectInputStream(fin);
-			newSet = (WebQuerySet) ois.readObject();
-		} catch (java.io.FileNotFoundException e) {
-			System.out.println(e.toString());
-		} catch (java.io.IOException e) {
-			System.out.println(e.toString());
-		}
-
+		System.out.println("\n");
+		System.out.println("Answer set: " + ans.webConvert());
+		System.out.println("SOLAR time: " + ans.getTime() + "s");
 		
-		System.out.println(newSet);
+//		
+//		WebQuerySet newSet = new WebQuerySet();
+//		try {
+//			FileOutputStream fos = new FileOutputStream("test.tmp");
+//			ObjectOutputStream oos = new ObjectOutputStream(fos);
+//			WebQuerySet toWriteObj = root.webConvert();
+//			toWriteObj.setAnsMap(ans.webConvert());
+//			oos.writeObject(toWriteObj);
+//
+//			FileInputStream fin = new FileInputStream("test.tmp");
+//			ObjectInputStream ois = new ObjectInputStream(fin);
+//			newSet = (WebQuerySet) ois.readObject();
+//		} catch (java.io.FileNotFoundException e) {
+//			System.out.println(e.toString());
+//		} catch (java.io.IOException e) {
+//			System.out.println(e.toString());
+//		}
+//
+//		
+//		System.out.println(newSet);
 		
 		
 	}

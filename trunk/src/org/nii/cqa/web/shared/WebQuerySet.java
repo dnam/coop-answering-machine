@@ -1,6 +1,5 @@
 package org.nii.cqa.web.shared;
 
-import java.awt.geom.QuadCurve2D;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Vector;
@@ -119,6 +118,20 @@ public class WebQuerySet extends Vector<WebQuery> implements Serializable {
 				bld += "\n\n";
 		}
 		return bld;
+	}
+	
+	public String printAll() {
+		StringBuilder builder = new StringBuilder();
+		printAll(builder);
+		
+		return builder.toString();
+	}
+	
+	private void printAll(StringBuilder bld) {
+		bld.append(printSelf());
+		for (int i = 0; i < children.size(); i++) {
+			children.get(i).printAll(bld);
+		}
 	}
 	
 	@Override

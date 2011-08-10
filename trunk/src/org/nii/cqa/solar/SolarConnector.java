@@ -10,21 +10,43 @@ import java.util.*;
 
 import org.nii.cqa.base.*;
 
-import org.nii.cqa.base.KnowledgeBase;
-
 public class SolarConnector {
 	private String SOLARPATH; // solar path
-	private File tmpDir; // tmp directory
-	private int runCnt = 0;
-	private int runTime = 2; // max: 2 minutes running time
+	private int maxRunTime = 2; // max: 2 minutes running time
 	private CoopQAJob job;
+	private long lastRunTime;
+	private File tmpDir;
+	private static double BILLION = ((double) (1000))*((double) (1000)) * (double) (1000);
 	
-	public SolarConnector(CoopQAJob job) {
-		this.SOLARPATH = "C:\\Users\\Nam\\workspace\\CQA\\lib\\solar2-build310.jar"; // solar path
-		this.tmpDir = new File("/tmp");
-		this.runCnt = 0;
-		this.runTime = 0;
+	public SolarConnector(CoopQAJob job,  String solarPath, String tmpDirPath) {
+		this.maxRunTime = 2;
 		this.job = job;
+		this.lastRunTime = 0;
+		
+		File solarFile = new File(solarPath);
+		if (!solarFile.exists() || !solarFile.isFile())
+			throw new IllegalArgumentException("Invalid SOLAR path");
+
+		SOLARPATH = solarPath;
+		
+		tmpDir = new File(tmpDirPath);
+		if (!tmpDir.exists() || !tmpDir.isDirectory())
+			throw new IllegalArgumentException("Invalid Temp Dir");
+	}
+	
+	public SolarConnector(CoopQAJob job,  String solarPath, File tmpDir) {
+		this.maxRunTime = 0;
+		this.job = job;
+		this.lastRunTime = 0;
+		
+		File solarFile = new File(solarPath);
+		if (!solarFile.exists() || !solarFile.isFile())
+			throw new IllegalArgumentException("Invalid SOLAR path");
+		SOLARPATH = solarPath;
+		
+		if (!tmpDir.exists() || !tmpDir.isDirectory())
+			throw new IllegalArgumentException("Invalid Temp Dir");
+		this.tmpDir = tmpDir;		
 	}
 	
 	
@@ -41,27 +63,12 @@ public class SolarConnector {
 		SOLARPATH = path;
 	}
 	
-	private File getTmpDir() {
-		if (tmpDir != null)
-			return tmpDir;
-		
-		tmpDir = new File("/tmp");
-		
-		if (tmpDir.exists())
-			return tmpDir;
-		
-		if (!tmpDir.mkdir())
-			throw new IllegalAccessError("Unable to create a tmp directory");
-		
-		return tmpDir;
-	}
-	
 	/**
 	 * Set the maximum running time for solar at each iteration
 	 * @param newTime the new time in minutes
 	 */
 	public void setRunTime(int newTime) {
-		runTime = newTime;
+		maxRunTime = newTime;
 	}
 	
 	public CoopQAJob getJob() {
@@ -76,10 +83,10 @@ public class SolarConnector {
 	 */
 	private String makeTPTP(Set<Query> querySet) 
 		throws IOException, IllegalAccessException {
-		File tmpDir = getTmpDir();
+		File tmpFile = File.createTempFile("SOLAR_TPTP", ".cqa", tmpDir);
+		tmpFile.deleteOnExit();
 		
-		String newFilePath = tmpDir.getPath() + "/inputSOLAR" + runCnt++;
-		PrintWriter out = new PrintWriter(new FileWriter(newFilePath));
+		PrintWriter out = new PrintWriter(new FileWriter(tmpFile));
 		
 		// Write the knowlege base to file
 		job.kb().writeToFile(out);
@@ -95,7 +102,7 @@ public class SolarConnector {
 		
 		out.close();
 				
-		return newFilePath;
+		return tmpFile.getCanonicalPath();
 	}
 	
 	/**
@@ -104,11 +111,16 @@ public class SolarConnector {
 	 * @throws IOException
 	 */
 	private Vector<String> execute(String inputPath) throws IOException {
-		String tmpOutput = inputPath + ".tmp";
+		File tmpOutputFile = File.createTempFile("solar_temp", ".tmp", tmpDir);
+		tmpOutputFile.deleteOnExit();
 		
-		Process solar = Runtime.getRuntime().exec("java -jar " + SOLARPATH + 
-				" -t " + runTime + "m -o " 
-				+ tmpOutput + " " + inputPath);
+		long before = System.nanoTime();
+		String cmd = "java -jar " + SOLARPATH + 
+		" -t " + maxRunTime + "m -o \"" 
+		+ tmpOutputFile.getAbsolutePath() + "\" " + "\"" + inputPath + "\"";
+		
+		System.out.println(cmd);
+		Process solar = Runtime.getRuntime().exec(cmd);
 		
 		int exitCode = 999;
 		try {
@@ -118,27 +130,22 @@ public class SolarConnector {
 			e.printStackTrace();
 		}
 		
+		lastRunTime = System.nanoTime() - before;
+		
+		System.out.println("Exit code: " + exitCode);
 		if (exitCode == 0 || exitCode == 100 || exitCode == 101 || exitCode == 102) {
 			Vector<String> strVector = new Vector<String>();
-			BufferedReader br = new BufferedReader(new FileReader(tmpOutput));
+			BufferedReader br = new BufferedReader(new FileReader(tmpOutputFile));
 			String line;
 			while((line = br.readLine()) != null)
 				strVector.add(line);
 			
 			br.close();
 			
-			// Delete the tmp file
-			File tmpFile = new File(tmpOutput);
-			tmpFile.delete();
-			
 			return strVector;
 		}
 		
-		// Delete the tmp file
-		File tmpFile = new File(tmpOutput);
-		tmpFile.delete();
-		
-		System.out.println("SOLAR returns an error: ");
+		System.err.println("SOLAR returns an error: ");
 		switch(exitCode) {
 		case 900:
 			System.err.println("PARSE ERROR");
@@ -163,44 +170,46 @@ public class SolarConnector {
 	 * @param querySet set of Queries
 	 * @return a map <Query ID, List< Answer>
 	 */
-	public Map<Integer, List<List<Integer>>> run(Set<Query> querySet) {
+	public AnswerMap run(Set<Query> querySet) {
 		Vector<String> retVector = null;
 		try {
 			String tptpInput = makeTPTP(querySet);
 			retVector = execute(tptpInput);
+
+			(new File(tptpInput)).delete();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		// Empty :-)
 		if (retVector == null)
 			return null;
-		
-		Map<Integer, List<List<Integer>>> retMap = 
-			new HashMap<Integer, List<List<Integer>>>();
+
+		AnswerMap retMap = new AnswerMap(job);
 		for (int i = 0; i < retVector.size(); i++) {
 			String line = retVector.get(i);
 			line = line.replace("conseq([+ans", "").replace("]).", "");
-			
+
 			String idStr = line.replaceAll("\\(.*\\)", "");
 			int id = Integer.parseInt(idStr);
-			
+
 			List<List<Integer>> queryAnsList = retMap.get(id);
 			if (queryAnsList == null) {
 				queryAnsList = new Vector<List<Integer>>();
 				retMap.put(id, queryAnsList);
 			}
-			
+
 			String ans = line.replaceAll("[[0-9]+\\(\\)]", "");
 			StringTokenizer token = new StringTokenizer(ans, " ,");
 			Vector<Integer> ansList = new Vector<Integer>();
-			while(token.hasMoreTokens()) {
+			while (token.hasMoreTokens()) {
 				ansList.add(job.symTab().getID(token.nextToken()));
 			}
 			queryAnsList.add(ansList);
 		}
-		
+
+		retMap.setTime(((double) lastRunTime)/ BILLION);
 		return retMap;
 	}
 	
