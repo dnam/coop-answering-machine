@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
-import org.nii.cqa.CoopQA;
 import org.nii.cqa.parser.QueryParser;
 import org.nii.cqa.web.shared.WebQuery;
 

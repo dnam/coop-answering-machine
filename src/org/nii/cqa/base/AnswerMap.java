@@ -8,19 +8,28 @@ import java.util.Vector;
 import org.nii.cqa.web.shared.WebAnswerMap;
 
 public class AnswerMap extends HashMap<Integer, List<List<Integer>>>{
-
+	private static final long serialVersionUID = -5333557672963251276L;
 	private CoopQAJob job;
+	private double time; // time to get this answer list
 	
 	public AnswerMap(CoopQAJob job) {
 		super();
+		
 		this.job = job;
+		this.time = 0;
 	}
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -5333557672963251276L;
 	
+	public void setTime(double time) {
+		this.time = time;
+	}
+	
+	public double getTime() {
+		return time;
+	}
+	
+	/**
+	 * Converts this answer map to the type used on the web
+	 */
 	public WebAnswerMap webConvert() {
 		WebAnswerMap webMap = new WebAnswerMap();
 		
@@ -45,6 +54,8 @@ public class AnswerMap extends HashMap<Integer, List<List<Integer>>>{
 			
 			webMap.put(id, webAnsList);
 		}
+		
+		webMap.setTime(time);
 		
 		return webMap;
 	}
@@ -82,6 +93,11 @@ public class AnswerMap extends HashMap<Integer, List<List<Integer>>>{
 		}
 		
 		return strMap.toString();
+	}
+	
+	public void putAll(AnswerMap other) {
+		super.putAll(other);		
+		this.time += other.time;
 	}
 
 }

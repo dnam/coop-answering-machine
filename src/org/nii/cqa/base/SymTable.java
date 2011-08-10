@@ -21,7 +21,6 @@ public class SymTable {
 	private int constCounter;
 	private int newVarCnt; // for generating new variable
 	private int queryCounter; // counter for query
-	private int ansCounter; // counter to prevent duplication of ans predicate
 	
 	public SymTable() {
 		GAP = 100000;
@@ -32,7 +31,6 @@ public class SymTable {
 		constCounter = GAP*2;
 		newVarCnt = 0;
 		queryCounter = 0;
-		ansCounter = 0;
 	}
 	/**
 	 * resets the symbol tablle
@@ -43,7 +41,6 @@ public class SymTable {
 		varCounter = GAP;
 		constCounter = GAP * 2;
 		queryCounter = 0;
-		ansCounter = 0;
 		symIdMap.clear();
 		idSymMap.clear();
 	}

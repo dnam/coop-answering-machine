@@ -1,5 +1,7 @@
 package org.nii.cqa.base;
 
+import java.io.File;
+
 import org.nii.cqa.operators.Operator;
 import org.nii.cqa.solar.SolarConnector;
 import org.nii.cqa.solar.SolarWorker;
@@ -10,51 +12,65 @@ import org.nii.cqa.solar.SolarWorker;
  *
  */
 public class CoopQAJob {
-	protected SymTable symTab;
-	protected KnowledgeBase kb;
-	protected SolarWorker worker;
-	protected SolarConnector connector;
-	protected Operator op;
+	private SymTable symTab;
+	private KnowledgeBase kb;
+	private SolarWorker worker;
+	private SolarConnector connector;
+	private Operator op;
+	private boolean initialized;
 	
 	public CoopQAJob() {
 		symTab = new SymTable();
 		op = Operator.create(this);
-		connector = new SolarConnector(this);
+		initialized = false;
+	}
+	
+	public void init(String kbPath, String solarPath, String tmpDir) 
+				throws IllegalArgumentException, Exception {
+		kb = KnowledgeBase.parse(kbPath, this);
+
+		// Setting up solar
+		connector = new SolarConnector(this, solarPath, tmpDir);
 		worker = new SolarWorker(connector);
-		kb = null;
+		
+		initialized = true;
 	}
-	
-	public void init(String path) throws Exception {
-		kb = KnowledgeBase.parse(path, this);		
+
+	public void init(String kbPath, String solarPath, File tmpDir)
+			throws IllegalArgumentException, Exception {
+		kb = KnowledgeBase.parse(kbPath, this);
+
+		// Setting up solar
+		connector = new SolarConnector(this, solarPath, tmpDir);
+		worker = new SolarWorker(connector);
+
+		initialized = true;
 	}
-	
+
 	public SymTable symTab() {
 		return symTab;
 	}
 	
 	public KnowledgeBase kb() {
-		if (kb == null)
+		if (!initialized)
 			throw new IllegalAccessError("Unitialized job");
 		
 		return kb;
 	}
 	
 	public Operator op() {
-		if (kb == null)
-			throw new IllegalAccessError("Unitialized job");
-		
 		return op;
 	}
 	
 	public SolarConnector con() {
-		if (kb == null)
+		if (!initialized)
 			throw new IllegalAccessError("Unitialized job");
 		
 		return connector;
 	}
 	
 	public SolarWorker worker() {
-		if (kb == null)
+		if (!initialized)
 			throw new IllegalAccessError("Unitialized job");
 		
 		return worker;
