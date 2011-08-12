@@ -7,10 +7,11 @@ package org.inouelab.coopqa.operators;
 
 import java.util.Iterator;
 
+import org.inouelab.coopqa.Env;
 import org.inouelab.coopqa.base.*;
 
 class OperatorAI extends Operator {
-	protected OperatorAI(CoopQAJob job) {
+	protected OperatorAI(Env job) {
 		super(false, job);
 	}
 	
@@ -25,7 +26,7 @@ class OperatorAI extends Operator {
 		
 		// Generate a new variable to replace
 		// should be different each time this method is called
-		int newVarID = job.symTab().generateVar();
+		int newVarID = env.symTab().generateVar();
 		while(idIt.hasNext()) {
 			int id = idIt.next();
 			Iterator<Query> itQu = query.replace(id, newVarID).iterator();

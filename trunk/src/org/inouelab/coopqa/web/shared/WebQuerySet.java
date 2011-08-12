@@ -9,7 +9,6 @@ public class WebQuerySet extends Vector<WebQuery> implements Serializable {
 	private Vector<Integer> ops; // Operator performed upon this set
 	private WebQuerySet parent;
 	private Vector<WebQuerySet> children;
-	private WebAnswerMap ansMap;
 	
 
 	public WebQuerySet() {
@@ -17,7 +16,6 @@ public class WebQuerySet extends Vector<WebQuery> implements Serializable {
 		this.ops = new Vector<Integer>();;
 		this.parent = null;
 		this.children = new Vector<WebQuerySet>();
-		this.ansMap = new WebAnswerMap();
 	}
 	
 	public WebQuerySet(Vector<Integer> ops) {
@@ -91,47 +89,6 @@ public class WebQuerySet extends Vector<WebQuery> implements Serializable {
 		}
 		
 		return bld;
-	}
-	
-	/**
-	 * Must be called at the root
-	 * @param other
-	 */
-	public void setAnsMap(WebAnswerMap other) {
-		this.ansMap = other;
-		for (int i = 0; i < children.size(); i++)
-			children.get(i).setAnsMap(other);
-	}
-	
-	/**
-	 * Prints the current set only (no children)
-	 */
-	public String printSelf() {
-		String bld = "";
-		
-		for (int i = 0; i < super.size(); i++) {
-			WebQuery q = super.get(i);
-			bld += ("Query: " + q + "\n");
-			bld += ("Answer(s):\n" + q.getAnsString(ansMap));
-			
-			if (i + 1 < super.size())
-				bld += "\n\n";
-		}
-		return bld;
-	}
-	
-	public String printAll() {
-		StringBuilder builder = new StringBuilder();
-		printAll(builder);
-		
-		return builder.toString();
-	}
-	
-	private void printAll(StringBuilder bld) {
-		bld.append(printSelf());
-		for (int i = 0; i < children.size(); i++) {
-			children.get(i).printAll(bld);
-		}
 	}
 	
 	@Override

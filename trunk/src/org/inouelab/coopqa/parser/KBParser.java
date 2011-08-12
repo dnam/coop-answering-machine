@@ -6,10 +6,10 @@
 
 package org.inouelab.coopqa.parser;
 
-import org.inouelab.coopqa.base.*;
+import java.util.Vector;
 
-import java.util.*;
-import java.io.*;
+import org.inouelab.coopqa.Env;
+import org.inouelab.coopqa.base.*;
 
 /** CUP v0.11a beta 20060608 generated parser.
   * @version Tue Jul 26 16:26:47 JST 2011
@@ -133,14 +133,14 @@ public class KBParser extends java_cup.runtime.lr_parser {
 
 
 
-  private CoopQAJob job;
-	public KBParser (java.io.Reader input, CoopQAJob job) {
+  private Env env;
+	public KBParser (java.io.Reader input, Env job) {
 		super(new KBScanner(input));
-		this.job = job;
+		this.env = job;
 	}
 	
-	public CoopQAJob getJob() {
-		return job;
+	public Env env() {
+		return env;
 	}
 
 }
@@ -178,7 +178,7 @@ class CUP$KBParser$actions {
 		int strleft = ((java_cup.runtime.Symbol)CUP$KBParser$stack.peek()).left;
 		int strright = ((java_cup.runtime.Symbol)CUP$KBParser$stack.peek()).right;
 		String str = (String)((java_cup.runtime.Symbol) CUP$KBParser$stack.peek()).value;
-		 t.add(parser.getJob().symTab().addSymbol(str, SymType.VARIABLE));RESULT=t; 
+		 t.add(parser.env().symTab().addSymbol(str, SymType.VARIABLE));RESULT=t; 
               CUP$KBParser$result = parser.getSymbolFactory().newSymbol("tuple",0, ((java_cup.runtime.Symbol)CUP$KBParser$stack.elementAt(CUP$KBParser$top-2)), ((java_cup.runtime.Symbol)CUP$KBParser$stack.peek()), RESULT);
             }
           return CUP$KBParser$result;
@@ -193,7 +193,7 @@ class CUP$KBParser$actions {
 		int strleft = ((java_cup.runtime.Symbol)CUP$KBParser$stack.peek()).left;
 		int strright = ((java_cup.runtime.Symbol)CUP$KBParser$stack.peek()).right;
 		String str = (String)((java_cup.runtime.Symbol) CUP$KBParser$stack.peek()).value;
-		 t.add(parser.getJob().symTab().addSymbol(str, SymType.CONSTANT));RESULT=t; 
+		 t.add(parser.env().symTab().addSymbol(str, SymType.CONSTANT));RESULT=t; 
               CUP$KBParser$result = parser.getSymbolFactory().newSymbol("tuple",0, ((java_cup.runtime.Symbol)CUP$KBParser$stack.elementAt(CUP$KBParser$top-2)), ((java_cup.runtime.Symbol)CUP$KBParser$stack.peek()), RESULT);
             }
           return CUP$KBParser$result;
@@ -205,7 +205,7 @@ class CUP$KBParser$actions {
 		int strleft = ((java_cup.runtime.Symbol)CUP$KBParser$stack.peek()).left;
 		int strright = ((java_cup.runtime.Symbol)CUP$KBParser$stack.peek()).right;
 		String str = (String)((java_cup.runtime.Symbol) CUP$KBParser$stack.peek()).value;
-		 Vector<Integer> tup = new Vector<Integer>(); tup.add(parser.getJob().symTab().addSymbol(str, SymType.VARIABLE)); RESULT=tup; 
+		 Vector<Integer> tup = new Vector<Integer>(); tup.add(parser.env().symTab().addSymbol(str, SymType.VARIABLE)); RESULT=tup; 
               CUP$KBParser$result = parser.getSymbolFactory().newSymbol("tuple",0, ((java_cup.runtime.Symbol)CUP$KBParser$stack.peek()), ((java_cup.runtime.Symbol)CUP$KBParser$stack.peek()), RESULT);
             }
           return CUP$KBParser$result;
@@ -217,7 +217,7 @@ class CUP$KBParser$actions {
 		int strleft = ((java_cup.runtime.Symbol)CUP$KBParser$stack.peek()).left;
 		int strright = ((java_cup.runtime.Symbol)CUP$KBParser$stack.peek()).right;
 		String str = (String)((java_cup.runtime.Symbol) CUP$KBParser$stack.peek()).value;
-		 Vector<Integer> tup = new Vector<Integer>(); tup.add(parser.getJob().symTab().addSymbol(str, SymType.CONSTANT)); RESULT=tup; 
+		 Vector<Integer> tup = new Vector<Integer>(); tup.add(parser.env().symTab().addSymbol(str, SymType.CONSTANT)); RESULT=tup; 
               CUP$KBParser$result = parser.getSymbolFactory().newSymbol("tuple",0, ((java_cup.runtime.Symbol)CUP$KBParser$stack.peek()), ((java_cup.runtime.Symbol)CUP$KBParser$stack.peek()), RESULT);
             }
           return CUP$KBParser$result;
@@ -244,7 +244,7 @@ class CUP$KBParser$actions {
 		int tleft = ((java_cup.runtime.Symbol)CUP$KBParser$stack.peek()).left;
 		int tright = ((java_cup.runtime.Symbol)CUP$KBParser$stack.peek()).right;
 		Vector<Integer> t = (Vector<Integer>)((java_cup.runtime.Symbol) CUP$KBParser$stack.peek()).value;
-		 Literal l = new Literal(parser.getJob()); l.setID(parser.getJob().symTab().addSymbol(pred, SymType.PREDICATE)); l.setNegative(false); l.setMultiParams(t); RESULT=l; 
+		 Literal l = new Literal(parser.env()); l.setID(parser.env().symTab().addSymbol(pred, SymType.PREDICATE)); l.setNegative(false); l.setMultiParams(t); RESULT=l; 
               CUP$KBParser$result = parser.getSymbolFactory().newSymbol("basic_literal",2, ((java_cup.runtime.Symbol)CUP$KBParser$stack.elementAt(CUP$KBParser$top-1)), ((java_cup.runtime.Symbol)CUP$KBParser$stack.peek()), RESULT);
             }
           return CUP$KBParser$result;

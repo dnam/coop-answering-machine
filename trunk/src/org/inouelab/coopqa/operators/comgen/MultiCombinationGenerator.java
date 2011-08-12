@@ -104,7 +104,6 @@ public class MultiCombinationGenerator<E>
 	
 	public static void main(String args[]) {
 		String alphabet = "abcdefghijklmnopqrstuvwxyz";
-		Vector<String> strVec = new Vector<String>();
 		List<List<Character>> charMultiList = new ArrayList<List<Character>>();
 		int[] kList = {2,3,1};
 		int start = 5;

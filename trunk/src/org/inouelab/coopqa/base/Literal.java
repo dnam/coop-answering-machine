@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 
+import org.inouelab.coopqa.Env;
 import org.inouelab.coopqa.web.shared.WebLiteral;
 
 public class Literal implements Comparable<Literal>, Serializable {
@@ -22,13 +23,13 @@ public class Literal implements Comparable<Literal>, Serializable {
 	private boolean neg;
 	private Vector<Integer> params;
 	private Integer hashval;
-	private CoopQAJob job;
+	private Env job;
 
 	// constructors
-	public Literal(CoopQAJob job) {
+	public Literal(Env env) {
 		this.params = new Vector<Integer>();
 		this.hashval = null;
-		this.job = job;
+		this.job = env;
 	}
 
 	/**
