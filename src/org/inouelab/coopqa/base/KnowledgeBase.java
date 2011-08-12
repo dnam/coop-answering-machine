@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.Vector;
 
+import org.inouelab.coopqa.Env;
 import org.inouelab.coopqa.parser.KBParser;
 
 public class KnowledgeBase {
@@ -20,7 +21,7 @@ public class KnowledgeBase {
 	 * @param inputFile the input file for the knowledgebase
 	 * @throws Exception if parsing error occurs
 	 */
-	public static KnowledgeBase parse(String inputFile, CoopQAJob job) throws Exception {
+	public static KnowledgeBase parse(String inputFile, Env job) throws Exception {
 		KBParser kbParser = new KBParser(new FileReader(inputFile), job);
 		return (KnowledgeBase) kbParser.parse().value;
 	}

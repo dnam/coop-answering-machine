@@ -8,33 +8,18 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
 
+import org.inouelab.coopqa.Env;
 import org.inouelab.coopqa.base.*;
 
 public class SolarConnector {
 	private String SOLARPATH; // solar path
 	private int maxRunTime = 2; // max: 2 minutes running time
-	private CoopQAJob job;
+	private Env job;
 	private long lastRunTime;
 	private File tmpDir;
 	private static double BILLION = ((double) (1000))*((double) (1000)) * (double) (1000);
 	
-	public SolarConnector(CoopQAJob job,  String solarPath, String tmpDirPath) {
-		this.maxRunTime = 2;
-		this.job = job;
-		this.lastRunTime = 0;
-		
-		File solarFile = new File(solarPath);
-		if (!solarFile.exists() || !solarFile.isFile())
-			throw new IllegalArgumentException("Invalid SOLAR path");
-
-		SOLARPATH = solarPath;
-		
-		tmpDir = new File(tmpDirPath);
-		if (!tmpDir.exists() || !tmpDir.isDirectory())
-			throw new IllegalArgumentException("Invalid Temp Dir");
-	}
-	
-	public SolarConnector(CoopQAJob job,  String solarPath, File tmpDir) {
+	public SolarConnector(Env job,  String solarPath, File tmpDir) {
 		this.maxRunTime = 0;
 		this.job = job;
 		this.lastRunTime = 0;
@@ -44,7 +29,7 @@ public class SolarConnector {
 			throw new IllegalArgumentException("Invalid SOLAR path");
 		SOLARPATH = solarPath;
 		
-		if (!tmpDir.exists() || !tmpDir.isDirectory())
+		if (tmpDir != null && (!tmpDir.exists() || !tmpDir.isDirectory()))
 			throw new IllegalArgumentException("Invalid Temp Dir");
 		this.tmpDir = tmpDir;		
 	}
@@ -71,7 +56,7 @@ public class SolarConnector {
 		maxRunTime = newTime;
 	}
 	
-	public CoopQAJob getJob() {
+	public Env getJob() {
 		return job;
 	}
 	
@@ -114,25 +99,23 @@ public class SolarConnector {
 		File tmpOutputFile = File.createTempFile("solar_temp", ".tmp", tmpDir);
 		tmpOutputFile.deleteOnExit();
 		
-		long before = System.nanoTime();
 		String cmd = "java -jar " + SOLARPATH + 
 		" -t " + maxRunTime + "m -o \"" 
 		+ tmpOutputFile.getAbsolutePath() + "\" " + "\"" + inputPath + "\"";
 		
-		System.out.println(cmd);
+		long before = System.nanoTime();
 		Process solar = Runtime.getRuntime().exec(cmd);
 		
 		int exitCode = 999;
 		try {
 			exitCode = solar.waitFor();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			throw new IOException("Unable to run SOLAR");
 		}
 		
 		lastRunTime = System.nanoTime() - before;
 		
-		System.out.println("Exit code: " + exitCode);
 		if (exitCode == 0 || exitCode == 100 || exitCode == 101 || exitCode == 102) {
 			Vector<String> strVector = new Vector<String>();
 			BufferedReader br = new BufferedReader(new FileReader(tmpOutputFile));

@@ -2,11 +2,12 @@ package org.inouelab.coopqa.operators;
 
 import java.util.*;
 
+import org.inouelab.coopqa.Env;
 import org.inouelab.coopqa.base.*;
 import org.inouelab.coopqa.operators.comgen.MultiCombinationGenerator;
 
 class OperatorGR extends Operator {
-	protected OperatorGR(CoopQAJob job) {
+	protected OperatorGR(Env job) {
 		super(false, job);
 	}
 	// Suppose we already have a knowledge base
@@ -18,7 +19,7 @@ class OperatorGR extends Operator {
 		if (query.isSkipped())
 			return retSet;
 
-		Iterator<Rule> itRule = job.kb().iteratorSHRR();
+		Iterator<Rule> itRule = env.kb().iteratorSHRR();
 		while(itRule.hasNext()) {
 			QuerySet set = doGR(query, itRule.next());
 			if (set != null)
@@ -109,7 +110,7 @@ class OperatorGR extends Operator {
 		// Produce segments of query
 		while (comGen.hasNext()) {
 			List<Literal> lVector = comGen.next();
-			Query subQ = new Query(lVector, job);
+			Query subQ = new Query(lVector, env);
 			if (subQ.subsumed(rVector)) {
 				Query newQuery = q.doGR(lVector, r.getFirstRight());
 				if (!globalSet.contains(newQuery)) {

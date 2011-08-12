@@ -1,0 +1,48 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<ui:style>
+		.important {
+			font-weight: bold;
+		}
+		
+		.error {
+			font-weight: bold;
+			color: red;
+		}
+		
+		.success {
+			font-weight: bold;
+			color: green;
+		}
+	</ui:style>
+	<g:VerticalPanel width="100%">
+		<g:Cell verticalAlignment="ALIGN_MIDDLE" height="100" horizontalAlignment="ALIGN_CENTER">
+			<g:HTMLPanel width="100%" height="">
+				<center>
+					<h1>Welcome to a Cooperative Query Answering Machine</h1>
+				</center>
+			</g:HTMLPanel>
+		</g:Cell>
+		<g:Cell height="" width="" horizontalAlignment="ALIGN_CENTER">
+				<g:VerticalPanel width="100%" horizontalAlignment="ALIGN_CENTER">
+					<g:FlexTable ui:field="formTable" height="100%" width="100%" />
+					<g:Cell horizontalAlignment="ALIGN_CENTER">
+						<g:SubmitButton ui:field="submitButton" text="Submit Job" width="120px" height="37px">
+						<b>Submit Request</b>
+					</g:SubmitButton>
+					</g:Cell>
+					<g:Label ui:field="errorLabel" styleName="{style.error}" />
+					<g:FlowPanel ui:field="successPanel">
+						<g:Label styleName="{style.success}">Successfully submitted the query for
+							processing... </g:Label>
+						<g:Hyperlink ui:field="successLink" styleName="{style.success}">
+							<u>
+								<i>Click here to Proceed</i>
+							</u>
+						</g:Hyperlink>
+					</g:FlowPanel>
+				</g:VerticalPanel>
+		</g:Cell>
+	</g:VerticalPanel>
+</ui:UiBinder> 

@@ -3,13 +3,10 @@ package org.inouelab.coopqa.base;
 import java.io.Serializable;
 import java.util.*;
 
-import org.inouelab.coopqa.operators.*;
+import org.inouelab.coopqa.web.shared.Operator;
 import org.inouelab.coopqa.web.shared.WebQuerySet;
 
 public class QuerySet extends HashSet<Query> implements Serializable {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 10L;
 	private Vector<Integer> ops; // Operator performed upon this set
 	private QuerySet parent;
@@ -73,6 +70,34 @@ public class QuerySet extends HashSet<Query> implements Serializable {
 			return null;
 		
 		return this.ops.lastElement();
+	}
+	
+	public String getOpStr() {
+		String bld = new String();
+		if (ops.size() == 0) {
+			bld +=  ("()");
+		}
+		else {
+			for (int i = ops.size() - 1; i >= 0; i--) {
+				int op = ops.get(i);
+				switch(op) {
+				case Operator.AI_t:
+					bld += ("AI");
+					break;
+				case Operator.DC_t:
+					bld += ("DC");
+					break;
+				case Operator.GR_t:
+					bld += ("GR");
+					break;
+				}
+				
+				if (i > 0)
+					bld += (".");
+			}
+		}
+		
+		return bld;
 	}
 	
 	@Override

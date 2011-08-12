@@ -1,12 +1,12 @@
 package org.inouelab.coopqa.operators;
 
-import org.inouelab.coopqa.base.CoopQAJob;
+import org.inouelab.coopqa.Env;
 import org.inouelab.coopqa.base.Query;
 import org.inouelab.coopqa.base.QuerySet;
 
 class OperatorWrapper extends Operator {
 
-	protected OperatorWrapper(CoopQAJob job) {
+	protected OperatorWrapper(Env job) {
 		super(true, job);
 	}
 

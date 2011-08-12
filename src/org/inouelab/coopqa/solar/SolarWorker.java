@@ -8,18 +8,23 @@ import org.inouelab.coopqa.base.Query;
 import org.inouelab.coopqa.base.QuerySet;
 
 public class SolarWorker implements Callable<AnswerMap> {
+	private static final int DEFAULT_CYCLE = 20;
 	private Queue<Query> queue;
 	private volatile boolean finished;
-	private int CYCLE = 20;
+	private int cycleSize;
 	private SolarConnector connector;	
 
 	public SolarWorker(SolarConnector connector) {
+		this(connector, DEFAULT_CYCLE);
+	}
+	
+	public SolarWorker(SolarConnector connector, int cycle) {
 		super();
 		this.connector = connector;
 		this.queue = new LinkedList<Query>();
 		this.finished = false;
+		this.cycleSize = cycle;
 	}
-	
 
 	public synchronized void queue(QuerySet qSet) {
 		queue.addAll(qSet);
@@ -42,18 +47,18 @@ public class SolarWorker implements Callable<AnswerMap> {
 		AnswerMap ansMap = new AnswerMap(connector.getJob());
 		while(true) {
 			int qSize = queue.size();
-			int wqSize = (CYCLE < qSize)? (qSize/CYCLE)*CYCLE : qSize;
+			int wqSize = (cycleSize < qSize)? (qSize/cycleSize)*cycleSize : qSize;
 			Queue<Query> workingQueue = new LinkedList<Query>();
 			for (int i = 0; i < wqSize; i++)
 				workingQueue.offer(this.dequeue());
 			
 			// Now solve the queue
-			int cycles = (wqSize/CYCLE == 0)? 1 : wqSize/CYCLE;
+			int cycles = (wqSize/cycleSize == 0)? 1 : wqSize/cycleSize;
 			for (int i = 0; i < cycles; i++) {
 				QuerySet qSet = new QuerySet();
 				wqSize = workingQueue.size();
 				
-				int qSetSize = (CYCLE < wqSize)? CYCLE : wqSize;
+				int qSetSize = (cycleSize < wqSize)? cycleSize : wqSize;
 				for (int j = 0; j < qSetSize; j++) {
 					qSet.add(workingQueue.remove());
 				}

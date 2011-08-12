@@ -5,17 +5,18 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.Vector;
 
+import org.inouelab.coopqa.Env;
 import org.inouelab.coopqa.web.shared.WebAnswerMap;
 
 public class AnswerMap extends HashMap<Integer, List<List<Integer>>>{
 	private static final long serialVersionUID = -5333557672963251276L;
-	private CoopQAJob job;
+	private Env job;
 	private double time; // time to get this answer list
 	
-	public AnswerMap(CoopQAJob job) {
+	public AnswerMap(Env env) {
 		super();
 		
-		this.job = job;
+		this.job = env;
 		this.time = 0;
 	}
 	
@@ -54,9 +55,7 @@ public class AnswerMap extends HashMap<Integer, List<List<Integer>>>{
 			
 			webMap.put(id, webAnsList);
 		}
-		
-		webMap.setTime(time);
-		
+				
 		return webMap;
 	}
 	

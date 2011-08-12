@@ -7,6 +7,7 @@ package org.inouelab.coopqa.operators;
 
 import java.util.Iterator;
 
+import org.inouelab.coopqa.Env;
 import org.inouelab.coopqa.base.*;
 
 public abstract class Operator {
@@ -21,10 +22,10 @@ public abstract class Operator {
 	
 	// A global storage for all generated queries
 	protected QuerySet globalSet;
-	protected CoopQAJob job;
+	protected Env env;
 
-	protected Operator(boolean init, CoopQAJob job) {
-		this.job = job;
+	protected Operator(boolean init, Env job) {
+		this.env = job;
 		
 		if (init) {
 			globalSet = new QuerySet();
@@ -44,7 +45,7 @@ public abstract class Operator {
 	 * Create a new operator
 	 * @return the new operator
 	 */
-	public static Operator create(CoopQAJob job) {
+	public static Operator create(Env job) {
 		Operator op = new OperatorWrapper(job);
 		return op;
 	}

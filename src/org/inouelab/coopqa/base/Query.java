@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import org.inouelab.coopqa.Env;
 import org.inouelab.coopqa.parser.QueryParser;
 import org.inouelab.coopqa.web.shared.WebQuery;
 
@@ -28,15 +29,15 @@ public class Query implements Serializable {
 	private Map<Integer, Integer> idCountMap;
 	private Vector<Integer> segVector; // segment vector
 	private Integer hashVal; // hash code of the object
-	private CoopQAJob job;
+	private Env job;
 	private boolean skipped; // skipped the query: not solve it
 	
 
-	public Query(CoopQAJob job) {
+	public Query(Env env) {
 		this.litVector = new Vector<Literal>();
 		this.hashVal = null;
-		this.job = job;
-		this.id = job.symTab().getQueryID();
+		this.job = env;
+		this.id = env.symTab().getQueryID();
 		this.skipped = false;
 
 		
@@ -44,7 +45,7 @@ public class Query implements Serializable {
 		idCountMap = new HashMap<Integer, Integer>();
 	}
 	
-	public Query(List<Literal> lVector, CoopQAJob job) {
+	public Query(List<Literal> lVector, Env job) {
 		id = job.symTab().getQueryID();
 		litVector = new Vector<Literal>(lVector);
 		hashVal = null;
@@ -58,7 +59,7 @@ public class Query implements Serializable {
 	 * @return a  Query object parsed from inputFile
 	 * @throws Exception if any error occurs
 	 */
-	public static Query parse(String inputFile, CoopQAJob job) throws Exception {
+	public static Query parse(String inputFile, Env job) throws Exception {
 		Query q = new Query(job);
 		
 		QueryParser p = new QueryParser(new FileReader(inputFile), job);
@@ -131,7 +132,50 @@ public class Query implements Serializable {
 			idCountMap.put(id, cnt);
 		}
 	}
-
+	
+	/**
+	 * Extracts the answers string from ansMap
+	 * @param ansMap the answer map
+	 * @return the string of answers
+	 */
+	public String getAnswerString(AnswerMap ansMap) {
+		if (skipped) {
+			return "[skipped]";			
+		}
+		
+		List<List<Integer>> ret = ansMap.get(id);
+		Vector<Integer> listVar = getAllVars();
+		
+		if (ret == null)
+			return "[no answer]";
+		
+		String retStr = "";
+		Iterator<List<Integer>> ansIt = ret.iterator();
+		while(ansIt.hasNext()) {
+			Vector<Integer> ansVector = new Vector<Integer>();
+			ansVector.addAll(ansIt.next());
+			
+			retStr += "[";
+			
+			// For error reporting
+			if (ansVector.size() != listVar.size())
+				return "[FATAL ERROR: ansVector's size is different from listVar in Query]";
+			
+			for (int j = 0; j < ansVector.size(); j++) {
+				retStr += (job.symTab().getSym(listVar.get(j))+ "->" + job.symTab().getSym(ansVector.get(j)));
+				if (j + 1 < ansVector.size())
+					retStr += ", ";
+			}
+			
+			retStr += "]";
+			
+			if (ansIt.hasNext())
+				retStr += "\n";
+		}
+		
+		return retStr;
+	}
+	
 	
 	/**
 	 * @param litVector a vector of literal to swap
