@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.*;
 
@@ -34,6 +36,26 @@ public class SolarConnector {
 	private static double BILLION = ((double) (1000)) * ((double) (1000))
 			* (double) (1000);
 	private static int SOLAR_OPTION_ERROR = 902; // check with SOLAR's ExitCode
+	
+	class StreamGobler extends Thread {
+		InputStream is;
+		
+		StreamGobler(InputStream is) {
+			this.is = is;
+		}
+		
+		public void run() {
+			try {
+				InputStreamReader isr = new InputStreamReader(is);
+				BufferedReader br = new BufferedReader(isr);
+				
+				while(br.readLine() != null);
+			}
+			catch(IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
 	/**
 	 * This connector will perfrom the following task: <br />
@@ -138,12 +160,30 @@ public class SolarConnector {
 		File tmpOutputFile = File.createTempFile("solar_temp", ".tmp", tmpDir);
 		tmpOutputFile.deleteOnExit();
 
-		String cmd = "java -jar " + SOLARPATH + " -t " + maxTimePerCycle
-				+ "m -o " + tmpOutputFile.getCanonicalPath() + " "
-				+ inputFile.getCanonicalPath();
+		String[] cmdArgs = {"java", "-jar", 
+							SOLARPATH, // solar's jar file
+							"-t", maxTimePerCycle + "m", // maximum execution time
+							"-o", tmpOutputFile.getCanonicalPath(), // output file 
+							inputFile.getCanonicalPath()};
 
 		long before = System.nanoTime();
-		Process solar = Runtime.getRuntime().exec(cmd);
+		Process solar = Runtime.getRuntime().exec(cmdArgs);
+		
+		// We must exhaust the output or deadlock
+		StreamGobler outputGobler = new StreamGobler(solar.getInputStream());
+		StreamGobler errorGobler = new StreamGobler(solar.getErrorStream());
+		
+		// Kick start the gobler
+		outputGobler.start();
+		errorGobler.start();
+		
+		// Wait for the gobler to finish
+		try {
+			errorGobler.join();
+			outputGobler.join();
+		} catch (InterruptedException e) {
+			throw new IOException(e.getMessage());
+		}
 
 		int exitCode = 999;
 		try {
@@ -249,10 +289,22 @@ public class SolarConnector {
 	 * @return <i>true</i> if SOLAR works, <i>false</i> otherwise
 	 */
 	public boolean checkSOLAR() {
-		String cmd = "java -jar " + SOLARPATH + " -#***&";
+		String[] cmdArgs = {"java", "-jar", SOLARPATH};
 		Process solar;
 		try {
-			solar = Runtime.getRuntime().exec(cmd);
+			solar = Runtime.getRuntime().exec(cmdArgs);
+
+			// We must exhaust the output or deadlock
+			StreamGobler outputGobler = new StreamGobler(solar.getInputStream());
+			StreamGobler errorGobler = new StreamGobler(solar.getErrorStream());
+			
+			// Kick start the gobler
+			outputGobler.start();
+			errorGobler.start();
+			
+			// Wait for the gobler to finish
+			outputGobler.join();
+			errorGobler.join();
 			
 			int exitCode = solar.waitFor();
 			
