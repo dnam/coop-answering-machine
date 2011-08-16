@@ -17,8 +17,16 @@ public class Options {
 	private static final String SOLARPATH = "solar2-build310.jar";
 	private static final String TMPDIR = "tmpDir";
 	private static final String CYCLESIZE = "cycleSize";
+	private static final String CYCLETIME = "cycleTime";
+	
 
-
+	/**
+	 * This <code>Options</code> object will parse command-line
+	 * arguments and pass it to the environment. It also initializes
+	 * the {@link Env} object.
+	 * @param env the current environment
+	 * @see Env
+	 */
 	public Options(Env env) {
 		this.env = env;
 		this.queryFile = null;
@@ -27,6 +35,7 @@ public class Options {
 		this.tmpDir = null;
 		this.solar = SOLAR_DEFAULT;
 		this.cycleSize = 20;
+		this.maxTimePerCycle = 2;
 		this.savedSettings = false;
 		this.limit = Integer.MAX_VALUE;
 
@@ -44,6 +53,10 @@ public class Options {
 			String cycleStr = props.getProperty(CYCLESIZE);
 			if (cycleStr == null || (this.cycleSize = Integer.parseInt(props.getProperty(CYCLESIZE))) == 0)
 				this.cycleSize = 20;
+			
+			String cycleTimeStr = props.getProperty(CYCLETIME);
+			if (cycleTimeStr == null || (this.maxTimePerCycle = Integer.parseInt(cycleTimeStr)) <= 0)
+				this.maxTimePerCycle = 2;
 			
 			in.close();
 
@@ -63,7 +76,7 @@ public class Options {
 	    out.println("  -o  [FILE]    Output the result to a file");
 	    out.println("  -t  [PATH]    Specify the temporary folder");
 	    out.println("  -s            Save the above settings** to coopqa.ini");
-	    //out.println("  -div         divides a problem into sub problems if possible");
+	    out.println("  -ct Nm        Maximum number of minutes for solving a cycle");
 	    out.println();
 	    out.println("NOTE:");
 	    out.println("* The number of generated queries will not be exactly N");
@@ -77,7 +90,7 @@ public class Options {
 	}
 
 	/**
-	 * Save the options to file
+	 * Save the options to a file when user specified '-s' paramenter
 	 */
 	private void save() {
 		if (!savedSettings)
@@ -90,7 +103,9 @@ public class Options {
 			if (tmpDir != null)
 				props.put(TMPDIR, tmpDir);
 			props.put(CYCLESIZE, cycleSize + "");
+			props.put(CYCLETIME, maxTimePerCycle + "");
 			
+			// Store comments
 			props.store(out, "CoopQA settings saved at " + getDateTime());
 			
 			out.close();
@@ -104,12 +119,12 @@ public class Options {
 		}
 	}
 	
-	private String getDateTime() {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        Date date = new Date();
-        return dateFormat.format(date);
-    }
-
+	/**
+	 * Performs the intialization upon the current environment
+	 * @throws IllegalArgumentException
+	 * @throws Exception
+	 * @see Env#init()
+	 */
 	private void initEnv() throws IllegalArgumentException, Exception {
 		env.setKbFile(kbFile);
 		env.setQueryFile(queryFile);
@@ -118,10 +133,17 @@ public class Options {
 		env.setSolarPath(solar);
 		env.setTmpDir(tmpDir);
 		env.setLimitVal(limit);
+		env.setMaxTimePerCycle(maxTimePerCycle);
 		
 		env.init();
 	}
 	
+	/**
+	 * @param args list of user-input arguments received in main
+	 * @throws IllegalArgumentException if the arguments are invalid
+	 * @throws Exception if we are unable to initialize the environment
+	 * @see Env#init()
+	 */
 	public void init(String[] args) throws IllegalArgumentException, Exception {
 		for (int i = 0; i < args.length; i++) {
 			String op = args[i];
@@ -168,6 +190,9 @@ public class Options {
 			} else if (op.equals("-l")) {
 				if (opVal == null || (limit = Integer.parseInt(opVal)) <= 0)
 					throw new IllegalArgumentException("Limit must be a positive value");
+			} else if (op.equals("-ct")) {
+				if (opVal == null || (maxTimePerCycle = Integer.parseInt(opVal)) <= 0)
+					throw new IllegalArgumentException("Time limit must be a postive value");
 			}
 			else {
 				throw new IllegalArgumentException("Invalid syntax");
@@ -186,8 +211,17 @@ public class Options {
 		// Save the environment
 		save();
 	}
+	
+	/**
+	 * @return a spring representing the current time
+	 */
+	private static String getDateTime() {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        Date date = new Date();
+        return dateFormat.format(date);
+    }
 
-	public static boolean isValidFileName(String name) {
+	private static boolean isValidFileName(String name) {
 		if (name == null)
 			return false;
 
@@ -222,5 +256,6 @@ public class Options {
 	private String 		tmpDir;
 	private boolean 	savedSettings;
 	private int			cycleSize;
+	private int 		maxTimePerCycle;
 	private int 		limit;
 }

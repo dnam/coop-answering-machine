@@ -6,6 +6,10 @@ import org.inouelab.coopqa.base.QuerySet;
 
 class OperatorWrapper extends Operator {
 
+	/**
+	 * Constructs a wrapper for {@link Operator}
+	 * @param job
+	 */
 	protected OperatorWrapper(Env job) {
 		super(true, job);
 	}

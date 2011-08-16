@@ -103,13 +103,22 @@ public class QueryParser extends java_cup.runtime.lr_parser {
   public int error_sym() {return 1;}
 
 
-  public Env env;
-
-	public QueryParser (java.io.Reader input, Env job) {
+    public Env env;
+    
+    /**
+     * Constructs a parser for {@link org.inouelab.coopqa.base.Query}
+     * from a given reader and environment
+     * @param input The input stream
+     * @param env The environment
+     */
+	public QueryParser (java.io.Reader input, Env env) {
 		super(new QueryScanner(input));
-		this.env = job;
+		this.env = env;
 	}
 	
+	/**
+	 * @return the environment of the parser
+	 */
 	public Env env() {
 		return env;
 	}

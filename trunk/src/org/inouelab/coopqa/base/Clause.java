@@ -3,9 +3,13 @@ package org.inouelab.coopqa.base;
 import java.util.Iterator;
 import java.util.Vector;
 
+/**
+ * An object representing a clause in a knowledge base
+ * @see KnowledgeBase
+ * @see Formula
+ */
 public class Clause extends Formula {
-	// A clause is a disjuction of literals
-	private Vector<Literal> litVector;
+	private Vector<Literal> litVector; // A clause is a disjuction of literals
 	
 	public Clause() {
 		super(true);
@@ -13,8 +17,8 @@ public class Clause extends Formula {
 	}
 	
 	/**
-	 * @param literal the new literal
 	 * adds a literal to the clause
+	 * @param literal the new {@link Literal}
 	 */
 	public void add(Literal literal) {	
 		if (litVector.contains(literal)) // Remove duplicates
@@ -24,7 +28,7 @@ public class Clause extends Formula {
 	}
 	
 	/**
-	 * @return Iterator to iterate the literal
+	 * @return Iterator to iterate the literal list
 	 */
 	public Iterator<Literal> iterator() {
 		return litVector.iterator();

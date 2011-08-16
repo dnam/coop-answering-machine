@@ -112,7 +112,7 @@ class OperatorGR extends Operator {
 			List<Literal> lVector = comGen.next();
 			Query subQ = new Query(lVector, env);
 			if (subQ.subsumed(rVector)) {
-				Query newQuery = q.doGR(lVector, r.getFirstRight());
+				Query newQuery = q.replaceLiterals(lVector, r.getFirstRight());
 				if (!globalSet.contains(newQuery)) {
 					setQ.add(newQuery);
 					globalSet.add(newQuery);

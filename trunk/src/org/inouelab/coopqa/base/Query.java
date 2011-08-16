@@ -1,11 +1,6 @@
-/**
- * @author Maheen Bakhtyar
- * Description: The Query Class 
- */
 package org.inouelab.coopqa.base;
 
 import java.io.FileReader;
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,53 +11,75 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.inouelab.coopqa.Env;
+import org.inouelab.coopqa.operators.Operator;
 import org.inouelab.coopqa.parser.QueryParser;
+import org.inouelab.coopqa.solar.SolarConnector;
 import org.inouelab.coopqa.web.shared.WebQuery;
 
-public class Query implements Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 22L;
+/**
+ * A class represents a query in disjucntive normal form (DNF)
+ * It provides methods for:
+ * - Checking equivalence (see {@link Query#equals(Object))
+ * - Checking subsumption (see {@link Query#subsumed(Vector))
+ * 
+ * @author Maheen Bakhtyar
+ * @author Nam Dang 
+ */
+public class Query {
 	private int id; // ID of a query, based on a global counter
-	private Vector<Literal> litVector;
+	private Vector<Literal> litVector; // vector of literals
 	private Map<Integer, Integer> idCountMap;
 	private Vector<Integer> segVector; // segment vector
 	private Integer hashVal; // hash code of the object
-	private Env job;
+	private Env env;
 	private boolean skipped; // skipped the query: not solve it
 	
 
+	/**
+	 * @param env The environment of this job
+	 */
 	public Query(Env env) {
+		this.id = env.symTab().getQueryID();
 		this.litVector = new Vector<Literal>();
 		this.hashVal = null;
-		this.job = env;
-		this.id = env.symTab().getQueryID();
+		this.env = env;
 		this.skipped = false;
-
 		
 		// For AI operators
 		idCountMap = new HashMap<Integer, Integer>();
 	}
-	
-	public Query(List<Literal> lVector, Env job) {
-		id = job.symTab().getQueryID();
-		litVector = new Vector<Literal>(lVector);
-		hashVal = null;
+
+	/**
+	 * Constructs the query from a vector of literals
+	 * @param lVector literal vector
+	 * @param env The environment of this job
+	 */
+	public Query(List<Literal> lVector, Env env) {
+		this.id = env.symTab().getQueryID();
+		this.litVector = new Vector<Literal>(lVector);
+		this.hashVal = null;
+		this.env = env;
+		this.id = env.symTab().getQueryID();
+		this.skipped = false;
 		
 		// For AI operators
-		idCountMap = new HashMap<Integer, Integer>();
+		this.idCountMap = new HashMap<Integer, Integer>();
 	}
 	
 	/**
+	 * A static method to parse a query from an input file
+	 * with respect to a given environment.
 	 * @param inputFile the path of the input file
-	 * @return a  Query object parsed from inputFile
-	 * @throws Exception if any error occurs
+	 * @param env The environment of the job
+	 * @return the Query object parsed from inputFile
+	 * @throws Exception if parsing error occurs
+	 * @see QueryParser#QueryParser(java.io.Reader, Env)
+	 * @see QueryParser#parse()
 	 */
-	public static Query parse(String inputFile, Env job) throws Exception {
-		Query q = new Query(job);
+	public static Query parse(String inputFile, Env env) throws Exception {
+		Query q = new Query(env);
 		
-		QueryParser p = new QueryParser(new FileReader(inputFile), job);
+		QueryParser p = new QueryParser(new FileReader(inputFile), env);
 		Query parsedQuery = (Query) p.parse().value;
 		
 		for (Literal l : parsedQuery.litVector) {
@@ -72,24 +89,31 @@ public class Query implements Serializable {
 		return q;
 	}
 	
-	/**
-	 * @return the unique id of this query
-	 */
 	public int getID() {
 		return this.id;
 	}
 	
 	/**
-	 * @return Iterator to iterate the literal list
+	 * @return the iterator of literal vector
 	 */
 	public Iterator<Literal> iterator() {
 		return litVector.iterator();
 	}
 	
+	/**
+	 * @param skipped <code>true</code> if this query is not included
+	 * 					in GR operations
+	 * 				  <code>false</code> otherwise
+	 */
 	public void setSkipped(boolean skipped) {
 		this.skipped = skipped;
 	}
 	
+	/**
+	 * @return <code>true</code> if the querey is not included in
+	 * 			GR operations
+	 * 			<code>false</code> otherwise
+	 */
 	public boolean isSkipped() {
 		return skipped;
 	}
@@ -111,7 +135,6 @@ public class Query implements Serializable {
 	}
 
 	/**
-	 * adds a literal to the query
 	 * @param literal the literal to add
 	 */
 	public void add(Literal literal) {	
@@ -134,8 +157,11 @@ public class Query implements Serializable {
 	}
 	
 	/**
-	 * Extracts the answers string from ansMap
-	 * @param ansMap the answer map
+	 * Extracts the answer string corresponding to
+	 * this query from ansMap.
+	 * This method is done by looking up the query id in
+	 * the map and convert the answer list to a string
+	 * @param ansMap the answer map to look up into
 	 * @return the string of answers
 	 */
 	public String getAnswerString(AnswerMap ansMap) {
@@ -162,7 +188,7 @@ public class Query implements Serializable {
 				return "[FATAL ERROR: ansVector's size is different from listVar in Query]";
 			
 			for (int j = 0; j < ansVector.size(); j++) {
-				retStr += (job.symTab().getSym(listVar.get(j))+ "->" + job.symTab().getSym(ansVector.get(j)));
+				retStr += (env.symTab().getSym(listVar.get(j))+ "->" + env.symTab().getSym(ansVector.get(j)));
 				if (j + 1 < ansVector.size())
 					retStr += ", ";
 			}
@@ -179,6 +205,8 @@ public class Query implements Serializable {
 	
 	/**
 	 * @param litVector a vector of literal to swap
+	 * @param i index of the first element
+	 * @param j index of the second element
 	 */
 	private static void swap(Vector<Literal> litVector, int i, int j) {
 		Literal tmp = litVector.get(i);
@@ -186,6 +214,15 @@ public class Query implements Serializable {
 		litVector.set(j, tmp);
 	}
 	
+	/**
+	 * Check the equivalence between two queries.
+	 * Two queries are defined to be equivalent if:
+	 * There is an inversible substitution <code>theta</code> that:
+	 * 		- <code>(thisQuery)(theta) == otherQuery</code>
+	 * 		- <code>(otherQuery)(inverse-theta) == thisQuery</code>
+	 * @param obj the object to check equivalence
+	 * @see Literal#equals(Object)
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (!(obj instanceof Query))
@@ -319,7 +356,8 @@ public class Query implements Serializable {
 	
 	
 	/**
-	 * Converts the query into TPTP topclause
+	 * Converts the query into TPTP topclause for SOLAR input
+	 * @see SolarConnector
 	 */
 	public String toTopClause() {
 		StringBuilder str = new StringBuilder();
@@ -338,7 +376,7 @@ public class Query implements Serializable {
 		
 		Iterator<Integer> varIt = this.getAllVars().iterator();
 		while(varIt.hasNext()) {
-			str.append(job.symTab().getSym(varIt.next()));
+			str.append(env.symTab().getSym(varIt.next()));
 			ans_pred += "_";
 			if (varIt.hasNext()) {
 				str.append(", ");
@@ -354,6 +392,9 @@ public class Query implements Serializable {
 		return str.toString();
 	}		
 	
+	/**
+	 * @return the string of this query in CoopQA format
+	 */
 	@Override
 	public String toString() {
 		Iterator<Literal> it = litVector.iterator();
@@ -396,12 +437,12 @@ public class Query implements Serializable {
 		return litVector.size();
 	}
 
-	/********* Dropping condition ****************/
+	/***************** DR OPERTAOR ****************/
 	/**
-	 * @param i
-	 *            the index to drop the literal. Assume that i < query.size()
-	 *            index starts from 0 to (size - 1);
-	 * @return a new query by dropping the specified literal
+	 * @param i   	the index to drop the literal. Assume that <code>i</code>
+	 * 				ranges from 0 to <code>(size() -1)</code>
+	 * @return 		a new query by dropping the specified literal
+	 * @see Operator#GR
 	 */
 	public Query dropAt(int i) {
 		Query q = this.clone();
@@ -411,9 +452,9 @@ public class Query implements Serializable {
 	}
 	
 	/**
-	 * removes a literal at a certain index
-	 * @param idx the index
-	 * @return the removed literal
+	 * Removes a literal at a certain index
+	 * @param 	idx the index
+	 * @return 	the removed literal
 	 */
 	public Literal remove(int idx) {
 		if (idx >= litVector.size() || idx < 0)
@@ -435,13 +476,18 @@ public class Query implements Serializable {
 		return l;
 	}
 	
-	/********* Anti-Instantiation ****************/
+	/********************** AI OPERATOR ****************/
+	
+	/**
+	 * Creates a clone of this query
+	 */
 	public Query clone() {
-		Query q = new Query(job);
+		Query q = new Query(env);
 		for (int i = 0; i < this.litVector.size(); i++) {
 			q.add(this.litVector.get(i));
 		}
 		q.hashVal = this.hashVal;
+		q.skipped = this.skipped;
 		
 		return q;
 	}
@@ -474,7 +520,8 @@ public class Query implements Serializable {
 	
 	/**
 	 * Returns a set of possible constants and variables for
-	 * Anti-instantiation
+	 * AI operator
+	 * @see Operator#AI
 	 */
 	public Set<Integer> extractSet() {
 		Set<Integer> retSet = new HashSet<Integer>();
@@ -482,7 +529,7 @@ public class Query implements Serializable {
 		Iterator<Integer> it = idCountMap.keySet().iterator();
 		while(it.hasNext()) {
 			int id = it.next();
-			if (job.symTab().getTypeID(id) == SymType.CONSTANT 
+			if (env.symTab().getTypeID(id) == SymType.CONSTANT 
 					||	idCountMap.get(id) > 1)
 				retSet.add(id);
 		}
@@ -491,18 +538,19 @@ public class Query implements Serializable {
 	}
 	
 	/**
-	 * Return a set of queries by replacing a 
+	 * Returns a set of queries by replacing each occurrence of a given
 	 * constant and/or variable with a new one
-	 * @param id the id of the const/var to be replaced
+	 * @param id 	 the id of the const/var to be replaced
 	 * @param newVar the id of the new variable
-	 * @return a new set of queries contaning newVar
+	 * @return 		 a new set of queries containing newVar
+	 * @see			 Operator#AI
 	 */
 	public Set<Query> replace(int id, int newVar) {
 		Set<Query> retSet = new HashSet<Query>();
 		int repCnt = idCountMap.get(id); // the id should exists in the map
 		
 		// if the variable occurs only twice, we only make one replacement
-		if (job.symTab().getTypeID(id) == SymType.VARIABLE && repCnt == 2)
+		if (env.symTab().getTypeID(id) == SymType.VARIABLE && repCnt == 2)
 			repCnt = 1;
 		
 		for (int i = 0; i < litVector.size() && repCnt > 0; i++) {
@@ -534,12 +582,15 @@ public class Query implements Serializable {
 	/****************** GR OPERATOR *********************/
 	
 	/**
-	 * matches the current query with the left side of
-	 * the given rule.
+	 * Replaces a set of literals in a query with the left side of a
+	 * rule
+	 * @param litSet set of literals to be replaced
+	 * @param ruleLS the left side of the rule
 	 * @return a set of resulted queries after substitution
+	 * @see Operator#GR
 	 */
-	public Query doGR(List<Literal> other, Literal replacement) {
-		Iterator<Literal> it = other.iterator();
+	public Query replaceLiterals(List<Literal> litSet, Literal ruleLS) {
+		Iterator<Literal> it = litSet.iterator();
 
 		// Now the query
 		Query q = this.clone();
@@ -547,7 +598,7 @@ public class Query implements Serializable {
 			q.remove(it.next());
 		
 		// Add the replacement
-		q.add(replacement);
+		q.add(ruleLS);
 		
 		return q;
 	}
@@ -589,10 +640,10 @@ public class Query implements Serializable {
 	/**
 	 * Check if the current query is subsumed by the other Query
 	 * That is to say: there exists a substitution theta such
-	 * that: (other Query) (theta) := thisQuery
-	 * @param other the other query in form of vector of literals
-	 * @return true if the other query subsumes this query
-	 * 			false otherwise
+	 * that: <code>(other Query) (theta) := thisQuery</code>
+	 * @param 	other the other query in form of vector of literals
+	 * @return  <code>true</code> if the other query subsumes this query
+	 * 			<code>false</code> otherwise
 	 */
 	public boolean subsumed(Vector<Literal> other) {
 		if (this.size() != other.size())
@@ -608,7 +659,11 @@ public class Query implements Serializable {
 		return true;
 	}
 	
-	
+	/**
+	 * Converts a {@link QuerySet} to a {@link WebQuerySet} object.
+	 * @return a {@link WebQuerySet} object
+	 * @see WebQuerySet
+	 */
 	public WebQuery webConvert() {
 		WebQuery webQuery = new WebQuery(id);
 		for (Literal l: litVector) {
@@ -617,7 +672,7 @@ public class Query implements Serializable {
 		
 		Vector<Integer> varList = getAllVars();
 		for (int i = 0; i < varList.size(); i++) {
-			webQuery.addVar(job.symTab().getSym(varList.get(i)));
+			webQuery.addVar(env.symTab().getSym(varList.get(i)));
 		}
 		
 		webQuery.setSkipped(this.skipped);

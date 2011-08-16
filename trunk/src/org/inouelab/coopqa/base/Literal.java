@@ -1,9 +1,3 @@
-/**
- * @author Maheen Bakhtyar
- * Description: Stores the unique ID, literal being negative or not and the parameters of the literal.  
- * Contains methods to access literal details and fetching the name of the literal from the symbol table based on the ID. 
- */
-
 package org.inouelab.coopqa.base;
 
 import java.io.Serializable;
@@ -14,22 +8,24 @@ import java.util.Vector;
 import org.inouelab.coopqa.Env;
 import org.inouelab.coopqa.web.shared.WebLiteral;
 
+/**
+ * @author Maheen Bakhtyar
+ * A class representing a <code>literal</code> in first-order logic.
+ * 
+ * Stores the unique ID, literal being negative or not 
+ * and the parameters of the literal.  
+ * Contains methods to access literal details and fetching
+ * the name of the literal from the symbol table based on the ID.
+ * 
+ * @see Query
+ * @see Clause
+ * @see Rule
+ */
 public class Literal implements Comparable<Literal>, Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 87L;
-	private int id;
-	private boolean neg;
-	private Vector<Integer> params;
-	private Integer hashval;
-	private Env job;
-
-	// constructors
 	public Literal(Env env) {
 		this.params = new Vector<Integer>();
 		this.hashval = null;
-		this.job = env;
+		this.env = env;
 	}
 
 	/**
@@ -41,9 +37,17 @@ public class Literal implements Comparable<Literal>, Serializable {
 		hashval = null;
 	}
 
+	/**
+	 * @param neg <code>true</code> if the literal is negative
+	 * 			  <code>false</code> otherwise
+	 */
 	public void setNegative(boolean neg) {
 		this.neg = neg;
 		hashval = null;
+	}	
+
+	public boolean isNegative() {
+		return neg;
 	}
 
 	/**
@@ -69,9 +73,6 @@ public class Literal implements Comparable<Literal>, Serializable {
 		return id;
 	}
 
-	public boolean isNegative() {
-		return neg;
-	}
 	
 	public int getParamAt(int i) {
 		return this.params.get(i);
@@ -85,7 +86,7 @@ public class Literal implements Comparable<Literal>, Serializable {
 		Vector<Integer> vars = new Vector<Integer>();
 		for(int i = 0; i < this.params.size(); i++)
 		{
-			if(job.symTab().getTypeID(params.get(i)) == (SymType.VARIABLE))
+			if(env.symTab().getTypeID(params.get(i)) == (SymType.VARIABLE))
 				vars.add(params.get(i));
 			
 		}
@@ -101,7 +102,7 @@ public class Literal implements Comparable<Literal>, Serializable {
 
 	@Override
 	public Literal clone() {
-		Literal l = new Literal(job);
+		Literal l = new Literal(env);
 		l.id = this.id;
 		l.neg = this.neg;
 		l.params.addAll(this.params);
@@ -114,9 +115,9 @@ public class Literal implements Comparable<Literal>, Serializable {
 	public String toString() {
 		StringBuilder str = new StringBuilder();
 		str.append((neg)? "-" : "" );
-		str.append(job.symTab().getSym(id) + "(");
+		str.append(env.symTab().getSym(id) + "(");
 		for (int i = 0; i < params.size(); i++) {
-			str.append(job.symTab().getSym(params.get(i)));
+			str.append(env.symTab().getSym(params.get(i)));
 			if (i + 1 < params.size())
 				str.append(",");
 		}
@@ -132,10 +133,10 @@ public class Literal implements Comparable<Literal>, Serializable {
 		StringBuilder str = new StringBuilder();
 		
 		str.append((!neg)? "-" : "" );
-		str.append(job.symTab().getSym(id) + "(");
+		str.append(env.symTab().getSym(id) + "(");
 		
 		for (int i = 0; i < params.size(); i++) {
-			str.append(job.symTab().getSym(params.get(i)));
+			str.append(env.symTab().getSym(params.get(i)));
 			if (i + 1 < params.size())
 				str.append(", ");
 		}
@@ -154,14 +155,15 @@ public class Literal implements Comparable<Literal>, Serializable {
 	}
 	
 	/**
-	 * @return the hash value of the literal
+	 * Computes the hash value of this literal
+	 * @return the hash value
 	 */
 	private int computeHash() {
 		int result = 11 * id + ((neg)? -7:5);
 		
 		for (int i = 0; i < params.size(); i++) {
 			int param = params.get(i);
-			if (job.symTab().getTypeID(param) == SymType.CONSTANT)
+			if (env.symTab().getTypeID(param) == SymType.CONSTANT)
 				result = 37 * result + params.get(i);
 		}
 		
@@ -190,8 +192,8 @@ public class Literal implements Comparable<Literal>, Serializable {
 			int q = other.params.get(i);
 			
 			// Get the type
-			SymType pType = job.symTab().getTypeID(p);
-			SymType qType = job.symTab().getTypeID(q);
+			SymType pType = env.symTab().getTypeID(p);
+			SymType qType = env.symTab().getTypeID(q);
 			
 			// if they are of the same type
 			if (pType == qType) {
@@ -235,8 +237,8 @@ public class Literal implements Comparable<Literal>, Serializable {
 			int q = other.params.get(i);
 			
 			// Get the type
-			SymType pType = job.symTab().getTypeID(p);
-			SymType qType = job.symTab().getTypeID(q);
+			SymType pType = env.symTab().getTypeID(p);
+			SymType qType = env.symTab().getTypeID(q);
 			
 			// if they are of the same type
 			if (pType == qType && (p == q))
@@ -271,6 +273,7 @@ public class Literal implements Comparable<Literal>, Serializable {
 	 * 
 	 * @return 0 or a positive value if the two are equivalent
 	 * 			-1 if not
+	 * @see Query#
 	 */
 	public boolean isEquivalent(Literal other, Map<Integer, Integer> theta) {
 		if (this.neg != other.neg || this.id != other.id)
@@ -288,8 +291,8 @@ public class Literal implements Comparable<Literal>, Serializable {
 			int elem1 = this.params.get(i);
 			int elem2 = other.params.get(i);
 			
-			SymType type1 = job.symTab().getTypeID(elem1);
-			SymType type2 = job.symTab().getTypeID(elem2);
+			SymType type1 = env.symTab().getTypeID(elem1);
+			SymType type2 = env.symTab().getTypeID(elem2);
 			
 			if (type1 != type2) // different types 
 				return false;
@@ -328,6 +331,7 @@ public class Literal implements Comparable<Literal>, Serializable {
 	 * @param theta the substitution
 	 * @return true if the current literal subsume the others,
 	 * 			false otherwise
+	 * @see Query#subsumed(Vector)
 	 */
 	public boolean subsume(Literal other, Map<Integer, Integer> theta) {
 		if (this.neg != other.neg || this.id != other.id)
@@ -349,8 +353,8 @@ public class Literal implements Comparable<Literal>, Serializable {
 			int elem1 = this.params.get(i);
 			int elem2 = other.params.get(i);
 			
-			SymType type1 = job.symTab().getTypeID(elem1);
-			SymType type2 = job.symTab().getTypeID(elem2);
+			SymType type1 = env.symTab().getTypeID(elem1);
+			SymType type2 = env.symTab().getTypeID(elem2);
 			
 			if (type1 != type2) // different types 
 				return false;
@@ -379,12 +383,22 @@ public class Literal implements Comparable<Literal>, Serializable {
 	
 	public WebLiteral webConvert() {
 		WebLiteral webLit = new WebLiteral();
-		webLit.setPred(job.symTab().getSym(id));
+		webLit.setPred(env.symTab().getSym(id));
 		webLit.setNegative(neg);
 		
 		for (int i = 0; i < params.size(); i++)
-			webLit.add(job.symTab().getSym(params.get(i)));
+			webLit.add(env.symTab().getSym(params.get(i)));
 		
 		return webLit;
 	}
+	
+	private int id;
+	private boolean neg;
+	private Vector<Integer> params;
+	private Integer hashval;
+	private Env env;
+	
+	private static final long serialVersionUID = 87L;
+
+
 }

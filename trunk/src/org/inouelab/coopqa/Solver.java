@@ -1,3 +1,4 @@
+
 package org.inouelab.coopqa;
 
 import java.util.LinkedList;
@@ -13,11 +14,18 @@ import org.inouelab.coopqa.base.Result;
 import org.inouelab.coopqa.operators.Operator;
 import org.inouelab.coopqa.solar.SolarWorker;
 
+/**
+ * @author Nam Dang
+ * This is a class that provides a result based on given
+ * <code>Env</code> (environment) object.
+ * @see Env
+ */
 public class Solver {
 	/**
-	 * @param env The given environment
-	 * @return the result object
+	 * @param env An initialized <code>Env</code> object
+	 * @return a <code>Result</code> object
 	 * @throws Exception if any error occurs
+	 * @see Env#init()
 	 */
 	public static Result run(Env env) throws Exception {
 		Result result = new Result();
