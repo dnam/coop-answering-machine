@@ -1,13 +1,28 @@
-/**
- * Description: a fomula is a clause or is a rule
- */
+
 package org.inouelab.coopqa.base;
 
+/**
+ * A wrapper object for a formula object in
+ * a knowledge base.
+ * A fomula is either a clause or is a rule.
+ * @see KnowledgeBase
+ * @see Clause
+ * @see Rule
+ */
 public abstract class Formula {
 	private final boolean isClause;
 	
-	protected Formula(boolean val) {
-		isClause = val;
+	/**
+	 * Constructor of a formula.
+	 * This constructor also determines whether
+	 * this Formula is a {@link Clause} or a {@link Rule}
+	 * @param isClause	<i>true</i> if this formula is a {@link Clause}
+	 * 				   	<i>false</i> if this formula is a {@link Rule}
+	 * @see Rule#Rule()
+	 * @see Clause#Clause()
+	 */
+	protected Formula(boolean isClause) {
+		this.isClause = isClause;
 	}
 	
 	

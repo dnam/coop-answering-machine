@@ -6,11 +6,22 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
 
+import org.inouelab.coopqa.solar.SolarConnector;
+
+/**
+ * A class representing a rule in the knowledge base.
+ * The left and right side are represented as a vector
+ * of Literal 
+ * @author Nam Dang
+ */
 public class Rule extends Formula {
 	private Vector<Literal> leftSide;
 	private Vector<Literal> rightSide; 
 	private int trackSHRR; // tracking if the rule is SHRR
 	
+	/**
+	 * Creates an empty rule with empty left side and right side
+	 */
 	public Rule() {
 		super(false); // not a clause
 		leftSide = new Vector<Literal>();
@@ -18,6 +29,11 @@ public class Rule extends Formula {
 		trackSHRR = -1; // unchecked
 	}
 	
+	/**
+	 * Creates a rule with given left side and right side
+	 * @param left the left side
+	 * @param right the right side
+	 */
 	public Rule(Vector<Literal> left, Vector<Literal> right) {
 		super(false); // not a clause
 		leftSide = new Vector<Literal>();
@@ -35,6 +51,10 @@ public class Rule extends Formula {
 		}
 	}
 	
+	/**
+	 * Adds a new literal to the left
+	 * @param lit the literal to be added
+	 */
 	public void addLeft(Literal lit) {
 		if (leftSide.contains(lit)) // Remove duplicates
 			return;
@@ -46,6 +66,10 @@ public class Rule extends Formula {
 		Collections.sort(leftSide);
 	}
 	
+	/**
+	 * Adds a new literal to the right
+	 * @param lit the literal to add
+	 */
 	public void addRight(Literal lit) {
 		if(rightSide.contains(lit))
 			return;
@@ -58,16 +82,28 @@ public class Rule extends Formula {
 		Collections.sort(rightSide);
 	}
 	
+	/**
+	 * Extracts the left side of the rule
+	 * @return a {@link Vector} of {@link Literal}
+	 */
 	public Vector<Literal> extractLeft() {
 		Vector<Literal> ret = new Vector<Literal>();
 		ret.addAll(leftSide);
 		return ret;
 	}
 	
+	/**
+	 * Gets the first element of the right side
+	 * @return a {@link Literal}
+	 */
 	public Literal getFirstRight() {
 		return rightSide.get(0);
 	}
 	
+	/**
+	 * Checks if the rule is a Single-headed Ranged-restricted
+	 * rule or not
+	 */
 	private void checkSHRR() {
 		if (trackSHRR != -1)
 			return;
@@ -100,6 +136,10 @@ public class Rule extends Formula {
 		return;
 	}
 	
+	/**
+	 * @return <i>true</i> if this is a SHRR rule
+	 * 			<i>false</i> otherwise
+	 */
 	public boolean isSHRR() {
 		//if (trackSHRR == -1)
 			checkSHRR();
@@ -107,6 +147,9 @@ public class Rule extends Formula {
 		return (trackSHRR == 1);
 	}
 	
+	/**
+	 * @return a {@link String} representingn the rule in CoopQA format
+	 */
 	@Override
 	public String toString() {
 		Iterator<Literal> it = leftSide.iterator();
@@ -130,6 +173,10 @@ public class Rule extends Formula {
 		return str.toString();
 	}
 	
+	/**
+	 * @return a {@link String} in TPTP format for SOLAR
+	 * @see SolarConnector
+	 */
 	public String toTPTP() {
 		StringBuilder str = new StringBuilder();
 		Iterator<Literal> it = leftSide.iterator();

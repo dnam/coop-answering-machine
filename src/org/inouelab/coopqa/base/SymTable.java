@@ -1,15 +1,15 @@
-/**
- * Description: Stores the mapping of symbols (predicate, constant, variable) to a unique integer
- * as identifier. This symbol table should be made global with respect to a given knowledge base (KB)
- * and a query Q(X).
- * @author: Nam Dang
- */
-
 package org.inouelab.coopqa.base;
 
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Stores the mapping of symbols (predicate, constant, 
+ * variable) to a unique integer  * as identifier. This symbol table
+ * should is shared with respect to a given knowledge base (KB)
+ * and a query Q(X).
+ * @author: Nam Dang
+ */
 public class SymTable { 
 	// each type's id is seperated by GAP
 	// predicate: 0-99,999, variable: 100,000-199,999, constant: 200,000~
@@ -22,6 +22,9 @@ public class SymTable {
 	private int newVarCnt; // for generating new variable
 	private int queryCounter; // counter for query
 	
+	/**
+	 * Constructs a symbol table with
+	 */
 	public SymTable() {
 		GAP = 100000;
 		symIdMap = new HashMap<String, Integer>();
@@ -33,7 +36,7 @@ public class SymTable {
 		queryCounter = 0;
 	}
 	/**
-	 * resets the symbol tablle
+	 * Resets a symbol table
 	 */
 	public void reset() {
 		newVarCnt = 0;
@@ -46,7 +49,7 @@ public class SymTable {
 	}
 	
 	/**
-	 * if the symbol already exists, returns its current id
+	 * If the symbol already exists, returns its current id
 	 * the matching is case-sensitive
 	 * @param sym a new symbol
 	 * @param type of the new symbol
@@ -83,7 +86,7 @@ public class SymTable {
 	
 	
 	/**
-	 * Finds the id of a symbol
+	 * Finds the id of a symbol string
 	 * @param symStr the string of the symbol
 	 * @return the id if found
 	 * 			-1 otherwise
@@ -97,8 +100,8 @@ public class SymTable {
 	/**
 	 * Finds the type of a symbol
 	 * @param symStr the symbol
-	 * @return the type of the symbol
-	 * 			INVALID if not found
+	 * @return {@link SymType} value of the symbol if found<br />
+	 * 			{@link SymType#INVALID} if not found
 	 */
 	public SymType getTypeSym(String symStr) {
 		int id = getID(symStr);
@@ -110,7 +113,7 @@ public class SymTable {
 	 * Finds the type of an identifier
 	 * we do not check if the id exists or not
 	 * @param id the id to look up
- 	 * @return SymType the type of the id
+ 	 * @return {@link SymType} value the type of the id
  	 */
 	public SymType getTypeID(int id) {
 		if (id/GAP == 0)
@@ -124,8 +127,8 @@ public class SymTable {
 	/**
 	 * Checks if the table contains a symbol
 	 * @param symStr the symbol
-	 * @return true if the table contains the symbol
-	 * 			false otherwise
+	 * @return	<i>true</i> if the table contains the symbol<br/>
+	 * 			<i>false</i> otherwise
 	 */
 	public boolean hasSym(String symStr) {
 		return symIdMap.containsKey(symStr);
@@ -134,7 +137,8 @@ public class SymTable {
 	/**
 	 * Checks if the table contains an identifier
 	 * @param id the identifier
-	 * @return true if id exists, false otherwise
+	 * @return 	<i>true</i> if id exists<br />
+	 * 			<i>false</i> otherwise
 	 */
 	public boolean hasID(int id) {
 		return idSymMap.containsKey(id);

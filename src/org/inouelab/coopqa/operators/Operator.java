@@ -1,8 +1,3 @@
-/**
- * @author Nam Dang
- * Description: This operator class provide access to all possible operators.
- * 				Operators could be access in the form: Operator.[OP's acronym]
- */
 package org.inouelab.coopqa.operators;
 
 import java.util.Iterator;
@@ -10,28 +5,64 @@ import java.util.Iterator;
 import org.inouelab.coopqa.Env;
 import org.inouelab.coopqa.base.*;
 
+/**
+ * This operator class provide access to all possible operators.<br />
+ * <br/>
+ * List of Operators:<br />
+ * <ul>
+ * <li>Operator.AI : Anti-instantiation operator</li>
+ * <li>Operator.DC : Dropping Condition operator</li>
+ * <li>Operator.GR : Goal Replacement operator</li>
+ * </ul>
+ * The operators could be differentiated with {@link #getType()}
+ * <br />
+ * In order to use this class, user should call the static
+ * method {@link #create(Env)}
+ * 
+ * @author Nam Dang
+ */
 public abstract class Operator {
+	/** Type of DC operator. 
+	 * @see Operator#DC */
+	public static final int DC_t = 0;
+	/** Type of AI operator. 
+	 * @see Operator#AI */
+	public static final int AI_t = 1;
+	/** Type of GR operator. 
+	 * @see Operator#GR */
+	public static final int GR_t = 2;
+	
 	// List of operator objects for external access
-	public Operator AI;
+	/** Anti-instantiation operator */
+	public Operator AI; 
+	/** Dropping condition operator	*/
 	public Operator DC;
+	/** Goal replacement operator */
 	public Operator GR;
 	
-	public static final int DC_t = 0;
-	public static final int AI_t = 1;
-	public static final int GR_t = 2;
 	
 	// A global storage for all generated queries
 	protected QuerySet globalSet;
-	protected Env env;
+	protected Env 		env;
 
-	protected Operator(boolean init, Env job) {
-		this.env = job;
+	/**
+	 * A constructor for the operator class. 
+	 * <code>init</code> differentiates if this is a generalized class,
+	 * or a sub-class of <code>Operator</code>.
+	 * If you plan to extends <code>Operator</code>, make sure
+	 * to set <code>init</code> as <i>false</i> in your constructor.
+	 * @param init if <i>true</i>, we initialize the sub-operators,
+	 * 			otherwise, we skip them.
+	 * @param env the {@link Env} environment object
+	 */
+	protected Operator(boolean init, Env env) {
+		this.env = env;
 		
 		if (init) {
 			globalSet = new QuerySet();
-			AI = new OperatorAI(job);
-			DC = new OperatorDC(job);
-			GR = new OperatorGR(job);
+			AI = new OperatorAI(env);
+			DC = new OperatorDC(env);
+			GR = new OperatorGR(env);
 			
 			// Set the corresponding gloabl set
 			AI.globalSet = this.globalSet;
@@ -42,18 +73,25 @@ public abstract class Operator {
 	}
 	
 	/**
-	 * Create a new operator
+	 * A static class to create a new wrapper operator
+	 * for accessing sub-operators (which cannot be accessed directly).
+	 * @param env the environment object
 	 * @return the new operator
 	 */
-	public static Operator create(Env job) {
-		Operator op = new OperatorWrapper(job);
+	public static Operator create(Env env) {
+		Operator op = new OperatorWrapper(env);
 		return op;
 	}
 	
 	/**
 	 * Returns a set of queries after performing
-	 * DC upon every queries given in inSet
+	 * a generalization operation upon every queries
+	 * given in inSet
 	 * @param inSet the input set of queries
+	 * @return the result set
+	 * @see Operator#AI
+	 * @see Operator#DC
+	 * @see Operator#GR
 	 */
 	public QuerySet run(QuerySet inputSet) {
 		Iterator<Query> it = inputSet.iterator();
@@ -90,11 +128,11 @@ public abstract class Operator {
 		}
 		
 		return retSet;
-	}
-	
+	}	
 	
 	/**
-	 * Resets the shared set of all generated queries
+	 * Reset the operator to run generalization
+	 * operations again
 	 */
 	 public void reset() {
 		 globalSet.clear();
@@ -106,7 +144,10 @@ public abstract class Operator {
 	abstract QuerySet perform(Query query);
 	
 	/**
-	 * @return the type: 0= DC, 1=AI, 2=GR
+	 * @return the type of the operator
+	 * @see Operator#AI_t
+	 * @see Operator#DC_t
+	 * @see Operator#GR_t
 	 */
 	public abstract int getType();
 }

@@ -14,13 +14,13 @@ public class CoopQA {
 	public static void main(String[] args) {
 		Env env = new Env(); // a new environment
 		Options options = new Options(env);
-
-		options.printHelp(); // if you need to see the usage
+		
+//		options.printHelp(); // if you need to see the usage
 		try {
 			String[] testArgs = { "-kb",
 					"C:\\Users\\Nam\\workspace\\CQA\\lib\\gen_kb.txt", 
 					"-q",
-					"C:\\Users\\Nam\\workspace\\CQA\\lib\\gen_query.txt" };
+					"C:\\Users\\Nam\\workspace\\CQA\\lib\\gen_query.txt"};
 			options.init(testArgs);
 //			options.init(args);
 
@@ -28,18 +28,18 @@ public class CoopQA {
 
 			// The root of the tree
 			Result ret = Solver.run(env);
+			
+			env.con().checkSOLAR();
 
 			System.out.println(ret.printAll());
 		}
 		catch (IllegalArgumentException e) {
-			System.out.println("ERROR:");
-			System.out.println(e.getMessage());
+			System.out.println("ERROR: " + e.getMessage());
 			options.printHelp();
 			
 		}
 		catch (Exception e) {
-			System.out.println("ERROR:");
-			e.printStackTrace();
+			System.out.println("ERROR: " + e.getMessage());
 			options.printHelp();
 		}
 

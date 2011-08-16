@@ -131,14 +131,22 @@ public class KBParser extends java_cup.runtime.lr_parser {
   /** <code>error</code> Symbol index. */
   public int error_sym() {return 1;}
 
-
-
-  private Env env;
-	public KBParser (java.io.Reader input, Env job) {
+  	private Env env;
+  	
+  	/**
+  	 * Constructs a parser from a given {@link java.io.Reader}
+  	 * input and an environment.
+  	 * @param input the {@link java.io.Reader} input
+  	 * @param env the environment of the task
+  	 */
+	public KBParser (java.io.Reader input, Env env) {
 		super(new KBScanner(input));
-		this.env = job;
+		this.env = env;
 	}
 	
+	/**
+	 * @return the environment of the parser
+	 */
 	public Env env() {
 		return env;
 	}
