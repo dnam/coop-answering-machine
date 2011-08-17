@@ -101,7 +101,7 @@ public class Env {
 		catch (Exception e) {
 			throw new Exception("Unable to parse the knowlege base file");
 		}
-		System.out.println("Knowldge Base initialized");
+		System.out.println("INIT: Knowldge Base initialized");
 
 		// Setting up solar
 		File tmpDirFile = null;
@@ -115,7 +115,7 @@ public class Env {
 			throw new IllegalAccessError("Cannot execute SOLAR. Please check the path again");
 		}
 		else
-			System.out.println("SOlAR CONNECTED");
+			System.out.println("INIT: SOlAR CONNECTED");
 		
 		initialized = true;
 	}
