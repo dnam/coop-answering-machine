@@ -35,7 +35,8 @@ public class SolarConnector {
 	private File tmpDir;
 	private static double BILLION = ((double) (1000)) * ((double) (1000))
 			* (double) (1000);
-	private static int SOLAR_OPTION_ERROR = 902; // check with SOLAR's ExitCode
+	private static int SOLAR_DEFAULT_CODE = 902; // check with SOLAR's ExitCode
+	private static int LINUX_SOLAR_CODE = 134; // check with SOLAR's ExitCode
 	
 	class StreamGobler extends Thread {
 		InputStream is;
@@ -165,9 +166,12 @@ public class SolarConnector {
 							"-t", maxTimePerCycle + "m", // maximum execution time
 							"-o", tmpOutputFile.getCanonicalPath(), // output file 
 							inputFile.getCanonicalPath()};
+		
+		ProcessBuilder pb = new ProcessBuilder(cmdArgs);
+
 
 		long before = System.nanoTime();
-		Process solar = Runtime.getRuntime().exec(cmdArgs);
+		Process solar = pb.start();
 		
 		// We must exhaust the output or deadlock
 		StreamGobler outputGobler = new StreamGobler(solar.getInputStream());
@@ -290,27 +294,41 @@ public class SolarConnector {
 	 */
 	public boolean checkSOLAR() {
 		String[] cmdArgs = {"java", "-jar", SOLARPATH};
+		
+		int okExitCode = SOLAR_DEFAULT_CODE;
+		
+		String currentOS = System.getProperty("os.name", "generic").toLowerCase();
+		
+		// Fix for linux. Somehow it returns a diferrent code 
+		if (currentOS.indexOf("linux") > -1)
+			okExitCode = LINUX_SOLAR_CODE;
+		else if (currentOS.indexOf("windows") < 0) {
+			System.out.println("WARNING: Skip checking for SOLAR in this OS. " +
+					"Please verify SOLAR by yourself.");
+			return true;
+		}
+		
 		Process solar;
 		try {
-			solar = Runtime.getRuntime().exec(cmdArgs);
+			ProcessBuilder pb = new ProcessBuilder(cmdArgs);
+			solar = pb.start();
 
 			// We must exhaust the output or deadlock
 			StreamGobler outputGobler = new StreamGobler(solar.getInputStream());
 			StreamGobler errorGobler = new StreamGobler(solar.getErrorStream());
 			
 			// Kick start the gobler
-			outputGobler.start();
 			errorGobler.start();
+			outputGobler.start();
+			
+			int exitCode = solar.waitFor();
 			
 			// Wait for the gobler to finish
 			outputGobler.join();
 			errorGobler.join();
 			
-			int exitCode = solar.waitFor();
-			
-			if (exitCode != SOLAR_OPTION_ERROR) {
+			if (exitCode != okExitCode)
 				return false;
-			}
 			
 			return true;
 			

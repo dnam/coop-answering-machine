@@ -76,7 +76,7 @@ public class Options {
 	    out.println("  -o  [FILE]    Output the result to a file");
 	    out.println("  -t  [PATH]    Specify the temporary folder");
 	    out.println("  -s            Save the above settings** to coopqa.ini");
-	    out.println("  -ct Nm        Maximum number of minutes for solving a cycle");
+	    out.println("  -ct N         Maximum number of minutes for solving a cycle");
 	    out.println();
 	    out.println("NOTE:");
 	    out.println("* The number of generated queries will not be exactly N");
