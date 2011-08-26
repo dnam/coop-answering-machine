@@ -1,6 +1,10 @@
 package org.inouelab.coopqa.base;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -89,6 +93,22 @@ public class Query {
 		return q;
 	}
 	
+	public static Query parseString(String inputString, Env env) throws Exception {
+		Query q = new Query(env);
+
+		InputStream is = new ByteArrayInputStream(inputString.getBytes());
+		BufferedReader br = new BufferedReader(new InputStreamReader(is));
+		QueryParser p = new QueryParser(br, env);
+
+		Query parsedQuery = (Query) p.parse().value;
+
+		for (Literal l : parsedQuery.litVector) {
+			q.add(l);
+		}
+
+		return q;
+	}
+
 	public int getID() {
 		return this.id;
 	}
@@ -313,7 +333,7 @@ public class Query {
 						swap(other.litVector, i, j);
 						
 						// Store the swap
-						swapCache.set(i, j); // set the swap of other at i by j
+						swapCache.set(i, j); // we swapped i by j
 						
 						// Store the old theta into the cache
 						thetaCache.set(i, tmpTheta);
@@ -322,8 +342,10 @@ public class Query {
 						succeed = true;
 						break;
 					}
+					else
+						theta = tmpTheta; // restore the old theta
 					
-					// otherwise, try matching with the next literal
+					// try matching with the next literal
 				}
 				
 				if (succeed) { // successful
@@ -442,7 +464,7 @@ public class Query {
 	 * @param i   	the index to drop the literal. Assume that <code>i</code>
 	 * 				ranges from 0 to <code>(size() -1)</code>
 	 * @return 		a new query by dropping the specified literal
-	 * @see Operator#GR
+	 * @see Operator#DC
 	 */
 	public Query dropAt(int i) {
 		Query q = this.clone();
@@ -645,7 +667,7 @@ public class Query {
 	 * @return  <code>true</code> if the other query subsumes this query
 	 * 			<code>false</code> otherwise
 	 */
-	public boolean subsumed(Vector<Literal> other) {
+	public boolean subsumed(List<Literal> other) {
 		if (this.size() != other.size())
 			return false;
 		
@@ -678,5 +700,10 @@ public class Query {
 		webQuery.setSkipped(this.skipped);
 		
 		return webQuery;
+	}
+	
+	//TODO: remove
+	public Vector<Literal> getLitVector() {
+		return litVector;
 	}
 }
