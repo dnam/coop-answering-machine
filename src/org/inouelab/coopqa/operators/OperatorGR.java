@@ -37,7 +37,7 @@ class OperatorGR extends Operator {
 			qVector.add(it.next());
 		Collections.sort(qVector);
 		
-		Vector<Literal> rVector = r.extractLeft();
+		List<Literal> rVector = r.extractLeft();
 		Collections.sort(rVector);
 		
 		// Create segments of Rule
