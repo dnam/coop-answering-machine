@@ -1,13 +1,18 @@
 
 package org.inouelab.coopqa.base;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.Vector;
 
 import org.inouelab.coopqa.Env;
 import org.inouelab.coopqa.parser.KBParser;
+import org.inouelab.coopqa.parser.QueryParser;
 import org.inouelab.coopqa.solar.SolarConnector;
 
 /**
@@ -37,6 +42,14 @@ public class KnowledgeBase {
 	public static KnowledgeBase parse(String inputFile, Env env) throws Exception {
 		KBParser kbParser = new KBParser(new FileReader(inputFile), env);
 		return (KnowledgeBase) kbParser.parse().value;
+	}
+	
+	public static KnowledgeBase parseString(String inputString, Env env) throws Exception {
+		InputStream is = new ByteArrayInputStream(inputString.getBytes());
+		BufferedReader br = new BufferedReader(new InputStreamReader(is));
+		KBParser parser = new KBParser(br, env);
+
+		return (KnowledgeBase) parser.parse().value;
 	}
 	
 	
