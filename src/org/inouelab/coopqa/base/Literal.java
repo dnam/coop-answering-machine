@@ -10,10 +10,10 @@ import org.inouelab.coopqa.web.shared.WebLiteral;
 
 /**
  * @author Maheen Bakhtyar
+ * @author Nam Dang <br />
  * A class representing a <code>literal</code> in first-order logic.
- * 
  * Stores the unique ID, literal being negative or not 
- * and the parameters of the literal.  
+ * and the parameters of the literal.<br />  
  * Contains methods to access literal details and fetching
  * the name of the literal from the symbol table based on the ID.
  * 
@@ -22,18 +22,29 @@ import org.inouelab.coopqa.web.shared.WebLiteral;
  * @see Rule
  */
 public class Literal implements Comparable<Literal>, Serializable {
-	public Literal(Env env) {
-		this.params = new Vector<Integer>();
+	public Literal(Env env, Vector<Integer> paramList) {
+		this.params = new int[paramList.size()];
+		for (int i = 0; i < paramList.size(); i++)
+			this.params[i] = paramList.get(i);
+		
+		this.hashval = null;
+		this.env = env;
+	}
+	
+	public Literal(Env env, int[] params) {
+		this.params = new int[params.length];
+		System.arraycopy(params, 0, this.params, 0, params.length);
+		
 		this.hashval = null;
 		this.env = env;
 	}
 
 	/**
-	 * Sets the id of the literal's predicate
-	 * @param id the id of predicate
+	 * Sets the pred of the literal's predicate
+	 * @param pred the pred of predicate
 	 */
 	public void setID(int id) {
-		this.id = id;
+		this.pred = id;
 		hashval = null;
 	}
 
@@ -49,33 +60,24 @@ public class Literal implements Comparable<Literal>, Serializable {
 	public boolean isNegative() {
 		return neg;
 	}
-
-	/**
-	 * Sets multiple parameters of the literal
-	 * @param params the list of params
-	 */
-	public void setMultiParams(Vector<Integer> params) {
-		this.params.addAll(params);
-		hashval = null;
-	}
-
+	
 	/**
 	 * Sets a parameter at a specified index
 	 * @param i the index
-	 * @param value the new parameter id
+	 * @param value the new parameter pred
 	 */
 	public void setParamAt(int i, int value) {
-		this.params.set(i, value);
+		params[i] = value;
 		hashval = null;
 	}
 	
 	public int getID() {
-		return id;
+		return pred;
 	}
 
 	
 	public int getParamAt(int i) {
-		return this.params.get(i);
+		return params[i];
 	}
 
 	/**
@@ -84,10 +86,10 @@ public class Literal implements Comparable<Literal>, Serializable {
 	 */
 	public Vector<Integer> getAllVars() {
 		Vector<Integer> vars = new Vector<Integer>();
-		for(int i = 0; i < this.params.size(); i++)
+		for(int i = 0; i < params.length; i++)
 		{
-			if(env.symTab().getTypeID(params.get(i)) == (SymType.VARIABLE))
-				vars.add(params.get(i));
+			if(env.symTab().getTypeID(params[i]) == (SymType.VARIABLE))
+				vars.add(params[i]);
 			
 		}
 		return vars;
@@ -97,15 +99,14 @@ public class Literal implements Comparable<Literal>, Serializable {
 	 * @return the number of parameters
 	 */
 	public int paramSize() {
-		return this.params.size();
+		return params.length;
 	}
 
 	@Override
 	public Literal clone() {
-		Literal l = new Literal(env);
-		l.id = this.id;
+		Literal l = new Literal(this.env, this.params);
+		l.pred = this.pred;
 		l.neg = this.neg;
-		l.params.addAll(this.params);
 		l.hashval = this.hashval;
 		
 		return l;
@@ -115,10 +116,10 @@ public class Literal implements Comparable<Literal>, Serializable {
 	public String toString() {
 		StringBuilder str = new StringBuilder();
 		str.append((neg)? "-" : "" );
-		str.append(env.symTab().getSym(id) + "(");
-		for (int i = 0; i < params.size(); i++) {
-			str.append(env.symTab().getSym(params.get(i)));
-			if (i + 1 < params.size())
+		str.append(env.symTab().getSym(pred) + "(");
+		for (int i = 0; i < params.length; i++) {
+			str.append(env.symTab().getSym(params[i]));
+			if (i + 1 < params.length)
 				str.append(",");
 		}
 		str.append(")");
@@ -133,11 +134,11 @@ public class Literal implements Comparable<Literal>, Serializable {
 		StringBuilder str = new StringBuilder();
 		
 		str.append((!neg)? "-" : "" );
-		str.append(env.symTab().getSym(id) + "(");
+		str.append(env.symTab().getSym(pred) + "(");
 		
-		for (int i = 0; i < params.size(); i++) {
-			str.append(env.symTab().getSym(params.get(i)));
-			if (i + 1 < params.size())
+		for (int i = 0; i < params.length; i++) {
+			str.append(env.symTab().getSym(params[i]));
+			if (i + 1 < params.length)
 				str.append(", ");
 		}
 		str.append(")");
@@ -159,12 +160,12 @@ public class Literal implements Comparable<Literal>, Serializable {
 	 * @return the hash value
 	 */
 	private int computeHash() {
-		int result = 11 * id + ((neg)? -7:5);
+		int result = 11 * pred + ((neg)? -7:5);
 		
-		for (int i = 0; i < params.size(); i++) {
-			int param = params.get(i);
+		for (int i = 0; i < params.length; i++) {
+			int param = params[i];
 			if (env.symTab().getTypeID(param) == SymType.CONSTANT)
-				result = 37 * result + params.get(i);
+				result = 37 * result + params[i];
 		}
 		
 		return result;
@@ -180,16 +181,16 @@ public class Literal implements Comparable<Literal>, Serializable {
 	 */
 	@Override
 	public int compareTo(Literal other) {
-		int thisID = (this.neg)? -this.id : this.id;
-		int otherID = (other.neg)? -other.id : other.id;
+		int thisID = (this.neg)? -this.pred : this.pred;
+		int otherID = (other.neg)? -other.pred : other.pred;
 		if (thisID != otherID)
 			return (thisID - otherID);		
 		
 		// Now they are of the same predicate
-		int n = this.params.size();
+		int n = this.params.length;
 		for (int i = 0; i < n; i++) {
-			int p = this.params.get(i);
-			int q = other.params.get(i);
+			int p = this.params[i];
+			int q = other.params[i];
 			
 			// Get the type
 			SymType pType = env.symTab().getTypeID(p);
@@ -225,16 +226,16 @@ public class Literal implements Comparable<Literal>, Serializable {
 		
 		Literal other = (Literal) obj;
 		
-		int thisID = (this.neg)? -this.id : this.id;
-		int otherID = (other.neg)? -other.id : other.id;
+		int thisID = (this.neg)? -this.pred : this.pred;
+		int otherID = (other.neg)? -other.pred : other.pred;
 		if (thisID != otherID)
 			return false;		
 		
 		// Now they are of the same predicate
-		int n = this.params.size();
+		int n = this.params.length;
 		for (int i = 0; i < n; i++) {
-			int p = this.params.get(i);
-			int q = other.params.get(i);
+			int p = this.params[i];
+			int q = other.params[i];
 			
 			// Get the type
 			SymType pType = env.symTab().getTypeID(p);
@@ -276,7 +277,7 @@ public class Literal implements Comparable<Literal>, Serializable {
 	 * @see Query#
 	 */
 	public boolean isEquivalent(Literal other, Map<Integer, Integer> theta) {
-		if (this.neg != other.neg || this.id != other.id)
+		if (this.neg != other.neg || this.pred != other.pred)
 			return false;
 		
 		if (theta == null)
@@ -284,12 +285,12 @@ public class Literal implements Comparable<Literal>, Serializable {
 
 		
 		// assertion. for debugging
-		assert this.params.size() == other.params.size();
+		assert this.params.length == other.params.length;
 		
-		int n = this.params.size();
+		int n = this.params.length;
 		for (int i = 0; i < n; i++) {
-			int elem1 = this.params.get(i);
-			int elem2 = other.params.get(i);
+			int elem1 = this.params[i];
+			int elem2 = other.params[i];
 			
 			SymType type1 = env.symTab().getTypeID(elem1);
 			SymType type2 = env.symTab().getTypeID(elem2);
@@ -327,6 +328,40 @@ public class Literal implements Comparable<Literal>, Serializable {
 	}
 	
 	/**
+	 * If this literal subsumes the other, 
+	 * @param other
+	 * @return returns the subsumption rule
+	 */
+	public Map<Integer, Integer> getSubRule(Literal other) {
+		if (this.neg != other.neg || this.pred != other.pred)
+			return null;
+		
+		Map<Integer, Integer> newRules = new HashMap<Integer, Integer>();
+		int n = this.params.length;
+		for (int i = 0; i < n; i++) {
+			int elem1 = this.params[i];
+			int elem2 = other.params[i];
+			
+			SymType type1 = env.symTab().getTypeID(elem1);
+			SymType type2 = env.symTab().getTypeID(elem2);
+			
+			if (type1 != type2) // different types 
+				return null;
+			
+			if (type1 == SymType.CONSTANT) {
+				if (elem1 != elem2) // constant mismatched
+					return null;
+				continue; // matched constant
+			}
+			
+			// Otherwise, we have new rule
+			newRules.put(elem1, elem2);
+		}
+		
+		return newRules;
+	}
+	
+	/**
 	 * @param other the other literal the check against
 	 * @param theta the substitution
 	 * @return true if the current literal subsume the others,
@@ -334,11 +369,11 @@ public class Literal implements Comparable<Literal>, Serializable {
 	 * @see Query#subsumed(Vector)
 	 */
 	public boolean subsume(Literal other, Map<Integer, Integer> theta) {
-		if (this.neg != other.neg || this.id != other.id)
+		if (this.neg != other.neg || this.pred != other.pred)
 			return false;
 		
 		// check size
-		if (this.params.size() != other.params.size())
+		if (this.params.length != other.params.length)
 			throw new IllegalStateException("invalid input: two literals" +
 					" must be of the same size");
 		
@@ -348,10 +383,10 @@ public class Literal implements Comparable<Literal>, Serializable {
 		// Main code		
 		Map<Integer, Integer> localTheta = new HashMap<Integer, Integer>(theta);
 		
-		int n = this.params.size();
+		int n = this.params.length;
 		for (int i = 0; i < n; i++) {
-			int elem1 = this.params.get(i);
-			int elem2 = other.params.get(i);
+			int elem1 = this.params[i];
+			int elem2 = other.params[i];
 			
 			SymType type1 = env.symTab().getTypeID(elem1);
 			SymType type2 = env.symTab().getTypeID(elem2);
@@ -382,23 +417,23 @@ public class Literal implements Comparable<Literal>, Serializable {
 	}
 	
 	public WebLiteral webConvert() {
-		WebLiteral webLit = new WebLiteral();
-		webLit.setPred(env.symTab().getSym(id));
-		webLit.setNegative(neg);
+		// Convert the params into an array of String
+		String[] webParams = new String[params.length];
+		for (int i = 0; i < params.length; i++)
+			webParams[i] = env.symTab().getSym(params[i]);
 		
-		for (int i = 0; i < params.size(); i++)
-			webLit.add(env.symTab().getSym(params.get(i)));
+		WebLiteral webLit = new WebLiteral(webParams);
+		webLit.setPred(env.symTab().getSym(pred));
+		webLit.setNegative(neg);
 		
 		return webLit;
 	}
 	
-	private int id;
-	private boolean neg;
-	private Vector<Integer> params;
-	private Integer hashval;
-	private Env env;
+	private int 		pred;
+	private boolean 	neg;
+	private int[] 		params;
+	private Integer 	hashval;
+	private Env 		env;
 	
 	private static final long serialVersionUID = 87L;
-
-
 }
