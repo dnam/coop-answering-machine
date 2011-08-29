@@ -12,6 +12,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
  */
 @RemoteServiceRelativePath("service")
 public interface CQAService extends RemoteService {
-	String submitJob(String queryFile, String kbFile) throws ServerErrorException;
+	String submitFileJob(String queryFile, String kbFile) throws ServerErrorException;
+	String submitTextJob(String queryString, String kbString) throws ServerErrorException;
 	WebResult getResult(String id) throws JobNotFinishedException, ServerErrorException;
 }

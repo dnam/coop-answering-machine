@@ -44,19 +44,15 @@ public class CQAUpload extends UploadAction {
 	public String executeAction(HttpServletRequest request,
 			List<FileItem> sessionFiles) throws UploadActionException {
 		String response = "";
-		int cont = 0;
 			
 		for (FileItem item : sessionFiles) {
 			if (false == item.isFormField()) {
-				cont++;
 				try {				
 					File file = File.createTempFile("upload-", ".cqa", tmpDir);
 					item.write(file);
 
 					// / Send a customized message to the client.
-					response += file.getName();
-					System.out.println("File: " + file.getName());
-
+					response = file.getName();
 				} catch (Exception e) {
 					throw new UploadActionException(e);
 				}

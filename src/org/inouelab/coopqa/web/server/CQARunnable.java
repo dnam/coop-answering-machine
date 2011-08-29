@@ -12,7 +12,12 @@ import org.inouelab.coopqa.Solver;
 import org.inouelab.coopqa.base.Result;
 import org.inouelab.coopqa.web.shared.WebResult;
 
-
+/**
+ * The class for the background thread that performs the
+ * solving in the server side
+ * @author Nam Dang
+ *
+ */
 class CQARunnable implements Runnable {
 	private String queryFile;
 	private String kbFile;
@@ -22,8 +27,6 @@ class CQARunnable implements Runnable {
 	
 	public CQARunnable(String queryFile, String kbFile, String resultFile, 
 			File tmpDir, File retDir, String solarPath) {
-		
-		
 		try {
 			this.queryFile = (new File(tmpDir, queryFile)).getCanonicalPath();
 		} catch (IOException e) {
@@ -84,6 +87,7 @@ class CQARunnable implements Runnable {
 			File tmpFile = new File (retDir, resultFile + ".tmp");
 			tmpFile.renameTo(retFile);
 		} catch (Exception e) {
+			e.printStackTrace();
 			makeErrorFile(resultFile, e.getMessage());
 		}
 	}

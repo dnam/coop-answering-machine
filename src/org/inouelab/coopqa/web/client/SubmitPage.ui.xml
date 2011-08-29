@@ -4,6 +4,7 @@
 	<ui:style>
 		.important {
 			font-weight: bold;
+			font-size: 16px;
 		}
 		
 		.error {
@@ -17,32 +18,65 @@
 		}
 	</ui:style>
 	<g:VerticalPanel width="100%">
-		<g:Cell verticalAlignment="ALIGN_MIDDLE" height="100" horizontalAlignment="ALIGN_CENTER">
-			<g:HTMLPanel width="100%" height="">
+		<g:Cell verticalAlignment="ALIGN_MIDDLE" height="100"
+			horizontalAlignment="ALIGN_CENTER">
+			<g:HTMLPanel width="80%">
 				<center>
 					<h1>Welcome to a Cooperative Query Answering Machine</h1>
 				</center>
 			</g:HTMLPanel>
 		</g:Cell>
-		<g:Cell height="" width="" horizontalAlignment="ALIGN_CENTER">
-				<g:VerticalPanel width="100%" horizontalAlignment="ALIGN_CENTER">
-					<g:FlexTable ui:field="formTable" height="100%" width="100%" />
-					<g:Cell horizontalAlignment="ALIGN_CENTER">
-						<g:SubmitButton ui:field="submitButton" text="Submit Job" width="120px" height="37px">
+		<g:Cell width="60%">
+			<g:VerticalPanel ui:field="fileSubmit" width="100%"
+			horizontalAlignment="ALIGN_CENTER">
+				<g:FlexTable ui:field="formTable" width="100%" />
+			</g:VerticalPanel>
+		</g:Cell>
+
+		<!-- File submission -->
+		<g:Cell width="60%">
+			<g:VerticalPanel ui:field="textSubmit" width="100%"
+			horizontalAlignment="ALIGN_CENTER" >
+			<g:Cell verticalAlignment="ALIGN_BOTTOM" height="30">
+				<g:Label styleName="{style.important}">Knowledge Base
+					(COOPQA format):</g:Label>
+			</g:Cell>
+			<g:TextArea ui:field="kbBox" width="90%" height="200px" />
+			<g:Cell verticalAlignment="ALIGN_BOTTOM" height="45">
+				<g:Label styleName="{style.important}">Query:</g:Label>
+			</g:Cell>
+			<g:TextArea ui:field="queryBox" width="90%" height="50px" />
+		</g:VerticalPanel>
+		</g:Cell>
+		<g:Cell horizontalAlignment="ALIGN_CENTER" height="40" verticalAlignment="ALIGN_MIDDLE">
+			<g:Hyperlink ui:field="switchLink" styleName="{style.success}">
+			Switch to File Mode
+			</g:Hyperlink>
+		</g:Cell>
+
+		<!-- Plain text input -->
+		<g:Cell height="" width="60%" horizontalAlignment="ALIGN_CENTER">
+			<g:VerticalPanel width="100%" horizontalAlignment="ALIGN_CENTER">
+
+
+				<g:Cell horizontalAlignment="ALIGN_CENTER" width="" height="60px"
+					verticalAlignment="ALIGN_MIDDLE">
+					<g:SubmitButton ui:field="submitButton" text="Submit Job"
+						width="120px" height="40px">
 						<b>Submit Request</b>
 					</g:SubmitButton>
-					</g:Cell>
-					<g:Label ui:field="errorLabel" styleName="{style.error}" />
-					<g:FlowPanel ui:field="successPanel">
-						<g:Label styleName="{style.success}">Successfully submitted the query for
-							processing... </g:Label>
-						<g:Hyperlink ui:field="successLink" styleName="{style.success}">
-							<u>
-								<i>Click here to Proceed</i>
-							</u>
-						</g:Hyperlink>
-					</g:FlowPanel>
-				</g:VerticalPanel>
+				</g:Cell>
+				<g:Label ui:field="errorLabel" styleName="{style.error}" />
+				<g:FlowPanel ui:field="successPanel">
+					<g:Label styleName="{style.success}">Successfully submitted the query for
+						processing... </g:Label>
+					<g:Hyperlink ui:field="successLink" styleName="{style.success}">
+						<u>
+							<i>Click here to Proceed</i>
+						</u>
+					</g:Hyperlink>
+				</g:FlowPanel>
+			</g:VerticalPanel>
 		</g:Cell>
 	</g:VerticalPanel>
 </ui:UiBinder> 
