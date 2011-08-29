@@ -32,6 +32,9 @@ public class Env {
 		symTab = new SymTable();
 		op = Operator.create(this);
 		initialized = false;
+		maxTimePerCycle = 2;
+		cycleSize = 20;
+		limitVal = Integer.MAX_VALUE;
 	}
 
 	/**
