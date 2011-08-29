@@ -35,7 +35,7 @@ public class TreePage extends Composite {
 
 	private static TreePageUiBinder uiBinder = GWT
 			.create(TreePageUiBinder.class);
-	private final CQAServiceAsync cqaService = GWT.create(CQAService.class);
+	private final ServiceAsync cqaService = GWT.create(Service.class);
 
 	@UiField
 	VerticalPanel panel;

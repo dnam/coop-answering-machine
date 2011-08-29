@@ -2,18 +2,20 @@ package org.inouelab.coopqa.web.server;
 
 import java.io.File;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import gwtupload.server.UploadAction;
 import gwtupload.server.exceptions.UploadActionException;
 
 import org.apache.commons.fileupload.FileItem;
 
-public class CQAUpload extends UploadAction {
+public class UploadService extends UploadAction {
 
 	/**
 	 * 
@@ -40,6 +42,7 @@ public class CQAUpload extends UploadAction {
 	 *             In the case of error
 	 * 
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public String executeAction(HttpServletRequest request,
 			List<FileItem> sessionFiles) throws UploadActionException {
@@ -53,6 +56,19 @@ public class CQAUpload extends UploadAction {
 
 					// / Send a customized message to the client.
 					response = file.getName();
+					
+					// Store the file to the session information
+					HttpSession session = request.getSession(true);
+					
+					List<String> fileList = new ArrayList<String>();
+					if (!session.isNew()) {
+						List<String> tmpList = (List<String>) session.getAttribute("files");
+						if (tmpList != null)
+							fileList = tmpList;
+					}
+					fileList.add(response);
+					
+					session.setAttribute("files", fileList);
 				} catch (Exception e) {
 					throw new UploadActionException(e);
 				}

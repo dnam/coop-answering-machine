@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -16,8 +17,9 @@ import java.util.concurrent.Executors;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpSession;
 
-import org.inouelab.coopqa.web.client.CQAService;
+import org.inouelab.coopqa.web.client.Service;
 import org.inouelab.coopqa.web.shared.JobNotFinishedException;
 import org.inouelab.coopqa.web.shared.ServerErrorException;
 import org.inouelab.coopqa.web.shared.WebResult;
@@ -26,10 +28,12 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 /**
  * The server side implementation of the RPC service.
+ * @see Service
  */
-@SuppressWarnings("serial")
-public class CQAServiceImpl extends RemoteServiceServlet
-				implements CQAService {
+public class ServiceImpl extends RemoteServiceServlet
+				implements Service {
+	
+	private static final long serialVersionUID = -7245865837979234374L;
 	private ExecutorService executor;
 	private File tmpDir;
 	private File retDir;
@@ -56,7 +60,7 @@ public class CQAServiceImpl extends RemoteServiceServlet
 			}
 			catch (IOException e) {
 				e.printStackTrace();
-				throw new ServerErrorException("Unexpected error occured when trying to read the error file.");
+				throw new ServerErrorException("unexpected error occured when trying to read the error file.");
 			}
 			finally {
 				if (scan != null)
@@ -68,7 +72,7 @@ public class CQAServiceImpl extends RemoteServiceServlet
 		
 		// Unable to locate the job
 		if (!tmpFile.exists() && !resultFile.exists())
-			throw new ServerErrorException("Job does not exist. If you have just submitted the job, please try again in a few minutes.");
+			throw new ServerErrorException("job does not exist. If you have just submitted the job, please try again in a few minutes.");
 		
 		// Tmp File exists but result file does not: unfinished job
 		if (tmpFile.exists() && !resultFile.exists())
@@ -83,22 +87,60 @@ public class CQAServiceImpl extends RemoteServiceServlet
 			result = (WebResult) ois.readObject();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-			throw new ServerErrorException("Unable to read the result file. Please try again later.");
+			throw new ServerErrorException("unable to read the result file. Please try again later.");
 		}
 		catch (ClassNotFoundException e) {
 			e.printStackTrace();
-			throw new ServerErrorException("Invalid file format. Contact the administrator.");
+			throw new ServerErrorException("invalid file format. Contact the administrator.");
 		} catch (IOException e) {
 			e.printStackTrace();
-			throw new ServerErrorException("Invalid file format. Contact the administrator.");
+			throw new ServerErrorException("invalid file format. Contact the administrator.");
 		}
 		
 		return result;
+	}
+	
+	/**
+	 * Method to perform job submission.
+	 * Used by {@link #submitFileJob(String, String)} and {@link #submitTextJob(String, String)}
+	 * @param queryFile the query file
+	 * @param kbFile the knowledge base file
+	 * @return the job id
+	 * @throws ServerErrorException if error occurs
+	 */
+	private String submitJob(String queryFile, String kbFile) throws ServerErrorException {
+		// Generate a result file
+		String resultID; 
+		File mainFile, tmpFile;
+
+		try {
+			do {
+				resultID = nextFilename();
+				mainFile = new File(retDir, resultID);
+				tmpFile = new File(retDir, resultID + ".tmp");
+				System.out.println( mainFile.getCanonicalPath());
+			} while (!tmpFile.createNewFile() || !mainFile.createNewFile());
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new ServerErrorException("unable to create temp files for the job");
+		}
+		mainFile.delete(); // delete the main file
+
+		// Submit the job
+		executor.submit(new RunnableSolver(queryFile, kbFile, resultID, tmpDir, retDir, solarPath));
+		
+		// Return the result ID
+		return resultID;
 	}
 
 	@Override
 	public String submitTextJob(String queryString, String kbString)
 			throws ServerErrorException {
+		if (queryString == null || kbString == null)
+			throw new ServerErrorException("invalid input");
+		
+		if (queryString.length() == 0)
+			throw new ServerErrorException("empty query");
 		// Save the query and the knowledge base to tmp files
 		try {
 			File queryFile = File.createTempFile("text-", ".cqa", tmpDir);
@@ -115,43 +157,60 @@ public class CQAServiceImpl extends RemoteServiceServlet
 			out.write(kbString);
 			out.close();
 			
-			return submitFileJob(queryFile.getName(), kbFile.getName());			
+			return submitJob(queryFile.getName(), kbFile.getName());			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			throw new ServerErrorException("IOException on server's side: " + e.getMessage());
 		}
 	}
 	
 	@Override
-	public String submitFileJob(String queryFile, String kbFile)
+	public String submitFileJob(String queryFileName, String kbFileName)
 			throws ServerErrorException {	
-		System.out.println("Job submission: " + queryFile + " and " + kbFile);
-
-		// Generate a result file
-		String resultID; 
-		File mainFile, tmpFile;
-
-		try {
-			do {
-				resultID = nextFilename();
-				mainFile = new File(retDir, resultID);
-				tmpFile = new File(retDir, resultID + ".tmp");
-				System.out.println( mainFile.getCanonicalPath());
-			} while (!tmpFile.createNewFile() || !mainFile.createNewFile());
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new ServerErrorException("Unable to create temp files for the job");
-		}
-		mainFile.delete(); // delete the main file
-
-		// Submit the job
-		executor.submit(new CQARunnable(queryFile, kbFile, resultID, tmpDir, retDir, solarPath));
+		if (queryFileName == null || kbFileName == null)
+			throw new ServerErrorException("Please upload the files first");
 		
-		// Return the result ID
-		return resultID;
+		// First checking the validity of the submission
+		HttpSession session = this.getThreadLocalRequest().getSession(true);
+		List<String> fileList = (List<String>) session.getAttribute("files");
+		if(fileList == null || !fileList.contains(queryFileName) || !fileList.contains(kbFileName))
+			throw new ServerErrorException("Invalid submission. Please upload the files first");
+		
+		// Reset the ression
+		session.removeAttribute("files");
+		
+		return submitJob(queryFileName, kbFileName);			
 	}
 	
+	@Override
+	public void removeFile(String fileName)
+			throws ServerErrorException {
+		// First checking the validity of the submission
+		HttpSession session = this.getThreadLocalRequest().getSession(true);
+		List<String> fileList = (List<String>) session.getAttribute("files");
+		if(fileList == null || 
+				(fileName != null && !fileList.contains(fileName)))
+			throw new ServerErrorException("Invalid request. File not submitted");
+		
+		if (fileName != null) {
+			// Store back to the session
+			fileList.remove(fileName);
+			session.setAttribute("files", fileList);
+			
+			try {
+				System.out.println("Trying to delete: " + (new File(tmpDir, fileName)).getCanonicalPath() );
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			(new File(tmpDir, fileName)).delete();
+		}
+	}
+	
+	/**
+	 * Generates a random file name
+	 * @return the next unique file name
+	 */
 	public static String nextFilename() {
 		return  (UUID.randomUUID().toString());
 	}
@@ -161,6 +220,12 @@ public class CQAServiceImpl extends RemoteServiceServlet
 		executor.shutdown();
 	}
 
+	/**
+	 * Intializes the environment:
+	 * - Create a threadpool for  background processing of jobs
+	 * - Setting up temp directory and result directory
+	 * - Setting up SOLAR
+	 */
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
@@ -168,7 +233,7 @@ public class CQAServiceImpl extends RemoteServiceServlet
 		ServletContext context = config.getServletContext();
 		
 		executor = Executors.newFixedThreadPool(100);
-		System.out.println("Initialized executor with a pool of 100");
+		System.out.println("Initialized thread executor with a pool of 100");
 		
 		String tmpDirPath = context.getInitParameter("tmpDir");
 		if (tmpDirPath == null)
@@ -201,8 +266,8 @@ public class CQAServiceImpl extends RemoteServiceServlet
 			System.out.println("RetDir: " + retDir.getCanonicalPath());
 			System.out.println("SolarPath: " + solarPath);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			throw new ServletException(e.getMessage());
 		}
 		
 	}

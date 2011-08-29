@@ -8,6 +8,8 @@ import gwtupload.client.SingleUploader;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.MouseUpEvent;
+import com.google.gwt.event.dom.client.MouseUpHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.History;
@@ -26,15 +28,26 @@ import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
+/**
+ * SubmitPage class that provides the interface
+ * for submitting a job
+ * @author Nam Dang
+ *
+ */
 public class SubmitPage extends Composite   {
-	private static CoopQAUiBinder uiBinder = GWT.create(CoopQAUiBinder.class);
-	private final CQAServiceAsync cqaSrv = GWT.create(CQAService.class);
+	/* Simple default examples */
 	private static final String sampleKB = "ill(pete, cough), \n" +
-										"ill(marry, flu),\n" +
-										"treat(pete, medi),\n" +
-										"ill(X, cough) -> treat(X, medi)";
+											"ill(marry, flu),\n" +
+											"treat(pete, medi),\n" +
+											"ill(X, cough) -> treat(X, medi)";
 	private static final String sampleQuery = "ill(X, flu) & ill(X, cough)";
 
+	// Binders
+	private static CoopQAUiBinder uiBinder = GWT.create(CoopQAUiBinder.class);
+	private final ServiceAsync cqaSrv = GWT.create(Service.class);
+	
+	
+	// UiField objects
 	@UiField
 	SubmitButton submitButton;
 	@UiField
@@ -71,22 +84,15 @@ public class SubmitPage extends Composite   {
 	interface CoopQAUiBinder extends UiBinder<Widget, SubmitPage> {
 	}
 
+	/**
+	 * Constructor of the submission page
+	 */
 	public SubmitPage() {
 		initWidget(uiBinder.createAndBindUi(this));
-		switchMode(false);
-		
-		kbBox.setText(sampleKB);
-		queryBox.setText(sampleQuery);
-		
-		queryResetButton = new Button("Reset");
-		kbResetButton = new Button("Reset");
 		
 		Window.setTitle("Cooperative Query Answering - Job Submission");
-
-		// Hide the success panel
-		successPanel.setVisible(false);
-
-		errorLabel.setVisible(false);
+				
+		// Setting up for error and success notification
 		errorLabel.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -94,16 +100,23 @@ public class SubmitPage extends Composite   {
 			}
 		});
 		
-		queryResetButton.addClickHandler(new ClickHandler() {
+		// Timer for error message
+		autohideTimer = new Timer() {
 			@Override
-			public void onClick(ClickEvent event) {
-				removeQueryFile();
+			public void run() {
+				errorLabel.setVisible(false);
+				this.cancel();
 			}
-		});
+
+		};
+				
+		// Query and KB file text input
+		kbBox.setText(sampleKB);
+		queryBox.setText(sampleQuery);
 		
+		// Query and KB file upload
 		queryUploader = new SingleUploader();
 		queryUploader.addOnFinishUploadHandler(new IUploader.OnFinishUploaderHandler() {
-
 					@Override
 					public void onFinish(IUploader uploader) {
 						IUploadStatus.Status status = uploader.getStatus();
@@ -133,17 +146,9 @@ public class SubmitPage extends Composite   {
 		queryUploader.setAutoSubmit(true);
 		queryUploader.setSize("100%", "100%");
 		queryUploader.setServletPath("CoopQA/upload");
-
-		kbResetButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				removeKBFile();
-			}
-		});
 		
 		kbUploader = new SingleUploader();
 		kbUploader.addOnFinishUploadHandler(new IUploader.OnFinishUploaderHandler() {
-
 					@Override
 					public void onFinish(IUploader uploader) {
 						IUploadStatus.Status status = uploader.getStatus();
@@ -171,8 +176,25 @@ public class SubmitPage extends Composite   {
 				});
 		kbUploader.setAutoSubmit(true);
 		kbUploader.setServletPath("CoopQA/upload");
-
-		// Add form table
+		
+		// Upload reset buttons
+		queryResetButton = new Button("Reset");	
+		queryResetButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				resetQueryUploadForm();
+			}
+		});
+		
+		kbResetButton = new Button("Reset");		
+		kbResetButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				resetKBUploadForm();
+			}
+		});
+		
+		// Add the two uploaders to a form table
 		formTable.setWidget(0, 0, new Label("CQA Query File: "));
 		formTable.setWidget(0, 1, queryUploader);
 		formTable.setWidget(1, 0, new Label("CQA Knowledge base File: "));
@@ -181,17 +203,6 @@ public class SubmitPage extends Composite   {
 		formTable.getCellFormatter().setWidth(0, 1, "60%");
 		formTable.getCellFormatter().setHorizontalAlignment(0, 0, HasHorizontalAlignment.ALIGN_RIGHT);
 		formTable.getCellFormatter().setHorizontalAlignment(1, 0, HasHorizontalAlignment.ALIGN_RIGHT);
-		// Further options
-
-		// Timer for error message
-		autohideTimer = new Timer() {
-			@Override
-			public void run() {
-				errorLabel.setVisible(false);
-				this.cancel();
-			}
-
-		};
 		
 		// Submit handler
 		submitButton.addClickHandler(new ClickHandler() {
@@ -200,16 +211,23 @@ public class SubmitPage extends Composite   {
 				if (History.getToken().equals("file")) {
 					submitButton.setEnabled(false);
 					queryResetButton.setVisible(false);
-					kbResetButton.setVisible(false);
-					submitFile();
+					kbResetButton.setVisible(false);					
+					submitFileMode();
 				}
-				else
-					submitText();
+				else {
+					submitTextMode();
+				}
 			}
 		});
+		
+		// First switch to text input mode
+		switchMode(false);
 	}
 	
-	public void submitText() {
+	/**
+	 * Submits the query and knowledge base as String
+	 */
+	private void submitTextMode() {
 		String queryString = queryBox.getText();
 		String kbString = kbBox.getText();
 		
@@ -226,7 +244,6 @@ public class SubmitPage extends Composite   {
 		}
 		
 		cqaSrv.submitTextJob(queryString, kbString, new AsyncCallback<String>() {
-
 			@Override
 			public void onFailure(Throwable caught) {
 				showError(caught.getMessage());
@@ -244,13 +261,19 @@ public class SubmitPage extends Composite   {
 		});		
 	}
 	
-	public void submitFile() {
+	/**
+	 * Submits with files
+	 */
+	private void submitFileMode() {
 		if (!checkFormData())
 			return;
 		
 		cqaSrv.submitFileJob(queryPath, kbPath, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
+				kbPath = null;
+				queryPath = null;
+				
 				submitButton.setEnabled(false);
 				successPanel.setVisible(true);
 				switchLink.setVisible(false);
@@ -265,8 +288,18 @@ public class SubmitPage extends Composite   {
 		});
 	}
 	
-	public void switchMode(boolean newFileMod) {
-		if (newFileMod) { // change to file mode
+	/**
+	 * Switching between file mode and text input mode
+	 * @param toFileMode <i>true</i> to switch to file mode<br/>
+	 * 					<i>false</i> to switch to text input mode
+	 */
+	public void switchMode(boolean toFileMode) {
+		successPanel.setVisible(false); // Hide the success panel		
+		errorLabel.setVisible(false); // hide error
+		
+		if (toFileMode) { // change to file mode
+			removeSubmittedFiles();
+			
 			fileSubmit.setVisible(true);
 			textSubmit.setVisible(false);
 			switchLink.setText("Switch to Text Mode");
@@ -283,7 +316,12 @@ public class SubmitPage extends Composite   {
 		}
 	}
 
-	// Perform data check on the form
+	/**
+	 * Perform validity checking on the form.
+	 * Also set the appropriate error message
+	 * @return <i>true</i> if the data is valid<br />
+	 * 			<i>false</i> if not
+	 */
 	public boolean checkFormData() {
 		if (queryPath == null) {
 			showError("Query file not uploaded yet");
@@ -298,30 +336,67 @@ public class SubmitPage extends Composite   {
 		return true;
 	}
 	
+	/**
+	 * Remove the submitted files
+	 */
 	private void removeSubmittedFiles() {
-		removeQueryFile();
-		removeKBFile();
+		resetQueryUploadForm();
+		resetKBUploadForm();
 	}
 	
-	private void removeQueryFile() {
+	/**
+	 * Remove the uploaded query file
+	 */
+	private void resetQueryUploadForm() {
 		if (queryPath != null) {
-			submitButton.setEnabled(false);
-			queryUploader.reset();
-			queryPath = null;
-			formTable.setWidget(0, 1, queryUploader);
+			// Remove the two files
+			cqaSrv.removeFile(queryPath, new AsyncCallback<Void>() {
+				@Override
+				public void onSuccess(Void result) {
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					showError("could not delete the query file: " + caught.getMessage());
+				}
+			});		
 		}
+		
+		submitButton.setEnabled(false);
+		queryUploader.reset();
+		queryPath = null;
+		formTable.setWidget(0, 1, queryUploader);
 	}
 	
-	private void removeKBFile() {
+	/**
+	 * Remove the uploaded knowledge base file
+	 */
+	private void resetKBUploadForm() {
 		if (kbPath != null) {
-			submitButton.setEnabled(false);
-			kbUploader.reset();
-			kbPath = null;
-			formTable.setWidget(1, 1, kbUploader);
+			// Remove the two files
+			cqaSrv.removeFile(kbPath, new AsyncCallback<Void>() {
+				
+				@Override
+				public void onSuccess(Void result) {
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					showError("could not delete the kb file: " + caught.getMessage());
+				}
+			});			
 		}
+		
+		submitButton.setEnabled(false);
+		kbUploader.reset();
+		kbPath = null;
+		formTable.setWidget(1, 1, kbUploader);			
 	}
 
-	// Shows an error messages
+	/**
+	 * Shows an error messages
+	 * @param msg the message to show
+	 */
 	public void showError(String msg) {
 		autohideTimer.cancel(); // cancel the current timer
 		errorLabel.setText("ERROR: " + msg);

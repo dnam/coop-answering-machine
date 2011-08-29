@@ -14,18 +14,29 @@ import org.inouelab.coopqa.web.shared.WebResult;
 
 /**
  * The class for the background thread that performs the
- * solving in the server side
+ * solving in the server side in the background.
+ * The server will spawn a thread to execute this class
  * @author Nam Dang
- *
  */
-class CQARunnable implements Runnable {
+class RunnableSolver implements Runnable {
 	private String queryFile;
 	private String kbFile;
 	private String resultFile;
 	private Env env;
 	private File retDir;
 	
-	public CQARunnable(String queryFile, String kbFile, String resultFile, 
+	/**
+	 * Constructor for the RunnableSolver object.
+	 * If error occurs, it will save the error to the
+	 * error file of the name <b>"result id".error</b>.
+	 * @param queryFile The query file's name in <code>tmpDir</code>
+	 * @param kbFile The knowledgebase's name in <code>tmpDir</code>
+	 * @param resultFile The result file to save to <code>retDir</code>
+	 * @param tmpDir Temporary directory
+	 * @param retDir Result directory
+	 * @param solarPath Path to SOLAR
+	 */
+	public RunnableSolver(String queryFile, String kbFile, String resultFile, 
 			File tmpDir, File retDir, String solarPath) {
 		try {
 			this.queryFile = (new File(tmpDir, queryFile)).getCanonicalPath();
@@ -90,8 +101,14 @@ class CQARunnable implements Runnable {
 			e.printStackTrace();
 			makeErrorFile(resultFile, e.getMessage());
 		}
+		finally {
+			clean();
+		}
 	}
 	
+	/**
+	 * Clean up after the execution
+	 */
 	public void clean() {
 		if (queryFile != null)
 			(new File(queryFile)).delete();
@@ -100,6 +117,11 @@ class CQARunnable implements Runnable {
 			(new File(kbFile)).delete();
 	}
 	
+	/**
+	 * Save the error message to <b>resultFile</b>.<i>error</i>
+	 * @param resultFile the result file
+	 * @param errorMsg the error message
+	 */
 	public void makeErrorFile(String resultFile, String errorMsg)  {
 		// Delete the result file and tmp file
 		(new File(retDir, resultFile)).delete();		
@@ -114,7 +136,7 @@ class CQARunnable implements Runnable {
 			out.write(errorMsg);
 			file.close();
 		} catch (IOException e) {
-			System.err.println("IO exception under CQARunnable: " + e.getMessage());
+			System.err.println("IO exception under RunnableSolver: " + e.getMessage());
 		}
 		finally {
 			clean();
