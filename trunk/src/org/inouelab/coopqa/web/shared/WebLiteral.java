@@ -1,17 +1,22 @@
 package org.inouelab.coopqa.web.shared;
 
 import java.io.Serializable;
-import java.util.Vector;
 
 public class WebLiteral implements Serializable {
 	private static final long serialVersionUID = 87L;
 	private String pred;
 	private boolean neg;
-	private Vector<String> params;
+	private String[] params;
+	
+	public WebLiteral() {
+		this.params = null;
+	}
 
 	// constructors
-	public WebLiteral() {
-		params = new Vector<String>();
+	public WebLiteral(String[] params) {
+		this.params = new String[params.length];
+		for (int i = 0; i < params.length; i++)
+			this.params[i] = params[i];
 	}
 
 	/**
@@ -25,19 +30,14 @@ public class WebLiteral implements Serializable {
 	public void setNegative(boolean neg) {
 		this.neg = neg;
 	}
-
-	public void add(String param) {
-		params.add(param);
-	}
-	
 	@Override
 	public String toString() {
 		String str = new String();
 		str += ((neg)? "-" : "" );
 		str += (pred + "(");
-		for (int i = 0; i < params.size(); i++) {
-			str += (params.get(i));
-			if (i + 1 < params.size())
+		for (int i = 0; i < params.length; i++) {
+			str += (params[i]);
+			if (i + 1 < params.length)
 				str += (",");
 		}
 		str += (")");

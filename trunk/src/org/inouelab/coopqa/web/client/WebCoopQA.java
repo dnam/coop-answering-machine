@@ -20,7 +20,6 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.VerticalPanel;
 
 
 /**
@@ -30,36 +29,30 @@ class WebCoopQA implements EntryPoint, ValueChangeHandler<String>  {
 
 	private final SubmitPage uploadForm = new SubmitPage();
 	public void onModuleLoad() {
-		if (History.getToken().length() != 0) {
-			changePage(History.getToken());
-			return;
-		}
-		
 		History.addValueChangeHandler(this);
-		
-		final VerticalPanel vp = new VerticalPanel();
-		
-		vp.setWidth("100%");
-		RootPanel.get().add(uploadForm);
+		changePage(History.getToken());
 	}
 	
 	public void changePage(String token) {
-		final TreePage tree = new TreePage(token);
-		RootPanel.get().clear();
-		RootPanel.get().add(tree);
-	}
-
-	@Override
-	public void onValueChange(ValueChangeEvent<String> event) {
-		if (event.getValue().length() != 0) {
-			changePage(History.getToken());
-			return;
+		if (token.length() != 0 && !token.equals("file")) {
+			final TreePage tree = new TreePage(token);
+			RootPanel.get().clear();
+			RootPanel.get().add(tree);
 		}
 		else
 		{
 			RootPanel.get().clear();
 			RootPanel.get().add(uploadForm);
+			if (token.equals("file"))
+				uploadForm.switchMode(true);
+			else
+				uploadForm.switchMode(false);
 		}
+	}
+
+	@Override
+	public void onValueChange(ValueChangeEvent<String> event) {
+		changePage(event.getValue());
 	}
 
 }

@@ -1,9 +1,11 @@
 package org.inouelab.coopqa.web.server;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.Scanner;
@@ -35,7 +37,8 @@ public class CQAServiceImpl extends RemoteServiceServlet
 
 	@Override
 	public WebResult getResult(String id) throws JobNotFinishedException, ServerErrorException {
-
+		id = id.replace("/", "").replace("\\", "").replace(".", "");
+		
 		// Test if tmp file exists or not
 		File tmpFile = new File(retDir, id + ".tmp");		
 		File resultFile = new File(retDir, id);
@@ -44,11 +47,9 @@ public class CQAServiceImpl extends RemoteServiceServlet
 		// if error file exists
 		if (errorFile.exists()) {
 			String ret = "";
-			
 			Scanner scan = null;
 			try {
 				scan = new Scanner(new FileReader(errorFile));
-				
 				while (scan.hasNextLine()) {
 					ret += scan.nextLine();
 				}
@@ -96,7 +97,34 @@ public class CQAServiceImpl extends RemoteServiceServlet
 	}
 
 	@Override
-	public String submitJob(String queryFile, String kbFile)
+	public String submitTextJob(String queryString, String kbString)
+			throws ServerErrorException {
+		// Save the query and the knowledge base to tmp files
+		try {
+			File queryFile = File.createTempFile("text-", ".cqa", tmpDir);
+			File kbFile = File.createTempFile("text-", ".cqa", tmpDir);
+			
+			if (!queryFile.exists() || !kbFile.exists())
+				throw new ServerErrorException("Unable to create temporary file(s)");
+			
+			BufferedWriter out = new BufferedWriter(new FileWriter(queryFile));
+			out.write(queryString);
+			out.close();
+			
+			out = new BufferedWriter(new FileWriter(kbFile));
+			out.write(kbString);
+			out.close();
+			
+			return submitFileJob(queryFile.getName(), kbFile.getName());			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new ServerErrorException("IOException on server's side: " + e.getMessage());
+		}
+	}
+	
+	@Override
+	public String submitFileJob(String queryFile, String kbFile)
 			throws ServerErrorException {	
 		System.out.println("Job submission: " + queryFile + " and " + kbFile);
 

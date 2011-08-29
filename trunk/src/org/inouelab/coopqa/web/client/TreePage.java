@@ -17,7 +17,9 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -47,29 +49,29 @@ public class TreePage extends Composite {
 	public TreePage(String id) {
 		initWidget(uiBinder.createAndBindUi(this));
 		textResult = new TextArea();
+		textResult.setSize("80%", "300px");
+		textResult.setReadOnly(true);
+
 		this.id = id.replace("/", "").replace("\\", "").replace(".", "");
-		
+
 		load();
 	}
-	
+
 	private void load() {
 		Window.setTitle("Job: " + id);
 		panel.clear();
 		result = null;
-		
-		textResult.setSize("80%", "300px");
-		textResult.setReadOnly(true);
 
-		panel.add(new HTML("<center><h1>Job ID: " + id + "</h1></center>"));
-		
-		
+		panel.add(new HTML("<center><h1>Job ID: <b><i>" + id
+				+ "</i></b></h1></center>"));
+
 		// First retrieve the query from the server
 		cqaService.getResult(id, new AsyncCallback<WebResult>() {
 
 			@Override
 			public void onSuccess(WebResult ret) {
 				result = ret;
-							
+
 				// Load the graph
 				VisualizationUtils.loadVisualizationApi(new Runnable() {
 					@Override
@@ -82,43 +84,45 @@ public class TreePage extends Composite {
 			@Override
 			public void onFailure(Throwable caught) {
 				if (caught instanceof JobNotFinishedException) {
-					panel.add(new HTML("<div style='color:red; font-weight: bold;'><h2>Job not finished. Please refresh later.</h2></div>"));
+					panel.add(new HTML(
+							"<div style='color:red; font-weight: bold;'><h2>Job not finished. Please refresh later.</h2></div>"));
 					Anchor link = new Anchor("Refresh");
 					link.addClickHandler(new ClickHandler() {
-						
+
 						@Override
 						public void onClick(ClickEvent event) {
-							load();					
+							load();
 						}
 					});
-					
+
 					panel.add(link);
-				}
-				else if (caught instanceof ServerErrorException) {
-					panel.add(new HTML("<div style='color:red; font-weight: bold;'><h2><b>ERROR:</b> " + caught.getMessage() + " </h2></div>"));
+				} else if (caught instanceof ServerErrorException) {
+					panel.add(new HTML(
+							"<div style='color:red; font-weight: bold;'><h2><b>ERROR:</b> "
+									+ caught.getMessage() + " </h2></div>"));
 					Anchor link = new Anchor("Refresh");
 					link.addClickHandler(new ClickHandler() {
-						
+
 						@Override
 						public void onClick(ClickEvent event) {
-							load();					
+							load();
 						}
 					});
-					
+
 					panel.add(link);
-				}
-				else {
-					panel.add(new HTML("<div style='color:red; font-weight: bold;'><h2>Unable to locate the job id.<br />" +
-							"If you have just submitted the job, please check back in a few minutes.</h2></div>"));
+				} else {
+					panel.add(new HTML(
+							"<div style='color:red; font-weight: bold;'><h2>Unable to locate the job id.<br />"
+									+ "If you have just submitted the job, please check back in a few minutes.</h2></div>"));
 					Anchor link = new Anchor("Go back");
 					link.addClickHandler(new ClickHandler() {
-						
+
 						@Override
 						public void onClick(ClickEvent event) {
-							History.back();						
+							History.back();
 						}
 					});
-					
+
 					panel.add(link);
 				}
 			}
@@ -161,7 +165,8 @@ public class TreePage extends Composite {
 		OrgChart treeChart = new OrgChart(data, options);
 
 		// Now add the handler
-		TreeSelection selectionHandler = new TreeSelection(treeChart, setVect, result, textResult);
+		TreeSelection selectionHandler = new TreeSelection(treeChart, setVect,
+				result, textResult);
 		treeChart.addSelectHandler(selectionHandler);
 
 		// Add to the panel
@@ -169,8 +174,20 @@ public class TreePage extends Composite {
 
 		// Text area
 		panel.add(new Label());
-		panel.add(new Label("Queries and answers:"));
+
+		FlowPanel titlePanel = new FlowPanel();
+		titlePanel.add(new Label("Queries and answers "));
+		Anchor anchor = new Anchor("View all");
+		anchor.addClickHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent event) {
+				textResult.setText(result.printAll());
+			}
+		});
+		titlePanel.add(anchor);
+
+		panel.add(titlePanel);
 		panel.add(textResult);
-		
 	}
 }

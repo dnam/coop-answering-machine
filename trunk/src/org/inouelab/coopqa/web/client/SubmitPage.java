@@ -10,6 +10,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -21,11 +22,18 @@ import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SubmitButton;
+import com.google.gwt.user.client.ui.TextArea;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class SubmitPage extends Composite   {
 	private static CoopQAUiBinder uiBinder = GWT.create(CoopQAUiBinder.class);
 	private final CQAServiceAsync cqaSrv = GWT.create(CQAService.class);
+	private static final String sampleKB = "ill(pete, cough), \n" +
+										"ill(marry, flu),\n" +
+										"treat(pete, medi),\n" +
+										"ill(X, cough) -> treat(X, medi)";
+	private static final String sampleQuery = "ill(X, flu) & ill(X, cough)";
 
 	@UiField
 	SubmitButton submitButton;
@@ -38,26 +46,45 @@ public class SubmitPage extends Composite   {
 	FlowPanel successPanel;
 	@UiField
 	Hyperlink successLink;
-	private final Button queryResetButton = new Button("Reset");
-	private final Button kbResetButton = new Button("Reset");
-	private SingleUploader queryUploader;
-	private SingleUploader kbUploader;
-	private Timer autohideTimer;
-	private String queryPath, kbPath;
+	
+	@UiField
+	TextArea kbBox;
+	@UiField
+	TextArea queryBox;
+	
+	@UiField
+	VerticalPanel textSubmit;
+	@UiField
+	VerticalPanel fileSubmit;
+	
+	@UiField
+	Hyperlink switchLink;
+	
+	private final Button 		queryResetButton;
+	private final Button 		kbResetButton;
+	private SingleUploader 		queryUploader;
+	private SingleUploader 		kbUploader;
+	private Timer 				autohideTimer;
+	private String 				queryPath;
+	private String				kbPath;
 
 	interface CoopQAUiBinder extends UiBinder<Widget, SubmitPage> {
 	}
 
 	public SubmitPage() {
 		initWidget(uiBinder.createAndBindUi(this));
+		switchMode(false);
+		
+		kbBox.setText(sampleKB);
+		queryBox.setText(sampleQuery);
+		
+		queryResetButton = new Button("Reset");
+		kbResetButton = new Button("Reset");
 		
 		Window.setTitle("Cooperative Query Answering - Job Submission");
 
 		// Hide the success panel
 		successPanel.setVisible(false);
-		
-		// Disable the submit button
-		submitButton.setEnabled(false);
 
 		errorLabel.setVisible(false);
 		errorLabel.addClickHandler(new ClickHandler() {
@@ -70,10 +97,7 @@ public class SubmitPage extends Composite   {
 		queryResetButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				submitButton.setEnabled(false);
-				queryUploader.reset();
-				queryPath = null;
-				formTable.setWidget(0, 1, queryUploader);
+				removeQueryFile();
 			}
 		});
 		
@@ -113,10 +137,7 @@ public class SubmitPage extends Composite   {
 		kbResetButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				submitButton.setEnabled(false);
-				kbUploader.reset();
-				kbPath = null;
-				formTable.setWidget(1, 1, kbUploader);
+				removeKBFile();
 			}
 		});
 		
@@ -174,26 +195,65 @@ public class SubmitPage extends Composite   {
 		
 		// Submit handler
 		submitButton.addClickHandler(new ClickHandler() {
-			
 			@Override
 			public void onClick(ClickEvent event) {
-				submitButton.setEnabled(false);
-				queryResetButton.setVisible(false);
-				kbResetButton.setVisible(false);
-				submit();
+				if (History.getToken().equals("file")) {
+					submitButton.setEnabled(false);
+					queryResetButton.setVisible(false);
+					kbResetButton.setVisible(false);
+					submitFile();
+				}
+				else
+					submitText();
 			}
 		});
 	}
 	
-	public void submit() {
+	public void submitText() {
+		String queryString = queryBox.getText();
+		String kbString = kbBox.getText();
+		
+		if (kbString.length() == 0) {
+			showError("Please enter the knowledge base");
+			kbBox.setFocus(true);
+			return;
+		}
+		
+		if (queryString.length() == 0) {
+			showError("Please enter the query");
+			queryBox.setFocus(true);
+			return;
+		}
+		
+		cqaSrv.submitTextJob(queryString, kbString, new AsyncCallback<String>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				showError(caught.getMessage());
+			}
+
+			@Override
+			public void onSuccess(String result) {
+				submitButton.setEnabled(false);
+				kbBox.setEnabled(false);
+				queryBox.setEnabled(false);
+				successPanel.setVisible(true);
+				switchLink.setVisible(false);
+				successLink.setTargetHistoryToken(result);
+			}
+		});		
+	}
+	
+	public void submitFile() {
 		if (!checkFormData())
 			return;
 		
-		cqaSrv.submitJob(queryPath, kbPath, new AsyncCallback<String>() {
+		cqaSrv.submitFileJob(queryPath, kbPath, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
 				submitButton.setEnabled(false);
 				successPanel.setVisible(true);
+				switchLink.setVisible(false);
 				successLink.setTargetHistoryToken(result);
 			}
 			
@@ -203,6 +263,24 @@ public class SubmitPage extends Composite   {
 				submitButton.setEnabled(true);
 			}
 		});
+	}
+	
+	public void switchMode(boolean newFileMod) {
+		if (newFileMod) { // change to file mode
+			fileSubmit.setVisible(true);
+			textSubmit.setVisible(false);
+			switchLink.setText("Switch to Text Mode");
+			switchLink.setTargetHistoryToken("");
+			submitButton.setEnabled(false);
+		}
+		else { // change to text mode			
+			removeSubmittedFiles();
+			fileSubmit.setVisible(false);
+			textSubmit.setVisible(true);
+			switchLink.setText("Switch to File Mode");
+			switchLink.setTargetHistoryToken("file");
+			submitButton.setEnabled(true);
+		}
 	}
 
 	// Perform data check on the form
@@ -218,6 +296,29 @@ public class SubmitPage extends Composite   {
 		}
 
 		return true;
+	}
+	
+	private void removeSubmittedFiles() {
+		removeQueryFile();
+		removeKBFile();
+	}
+	
+	private void removeQueryFile() {
+		if (queryPath != null) {
+			submitButton.setEnabled(false);
+			queryUploader.reset();
+			queryPath = null;
+			formTable.setWidget(0, 1, queryUploader);
+		}
+	}
+	
+	private void removeKBFile() {
+		if (kbPath != null) {
+			submitButton.setEnabled(false);
+			kbUploader.reset();
+			kbPath = null;
+			formTable.setWidget(1, 1, kbUploader);
+		}
 	}
 
 	// Shows an error messages
