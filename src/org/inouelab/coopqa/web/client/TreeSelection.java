@@ -28,18 +28,27 @@ import org.inouelab.coopqa.web.shared.WebResult;
 
 ;
 /**
- * Demo for SelectHandler that can be applied to any Selectable visualization.
+ * Handling selection event of the TreePage
+ * Display appropriate result in the textbox
+ * @see TreePage
  */
 class TreeSelection extends SelectHandler {
 	private final Selectable treeChart;
 	private final Vector<WebQuerySet> setVec;
 	private final WebResult result;
-	private final TextArea text;
+	private final TextArea textBox;
 
-	TreeSelection(Selectable viz, Vector<WebQuerySet> setVec, WebResult result, TextArea text) {
-		this.treeChart = viz;
+	/**
+	 * 
+	 * @param treeChart the {@link TreePage} object
+	 * @param setVec the {@link WebQuerySet} {@link Vector}
+	 * @param result the {@link WebResult} object
+	 * @param textArea the result box
+	 */
+	TreeSelection(Selectable treeChart, Vector<WebQuerySet> setVec, WebResult result, TextArea textArea) {
+		this.treeChart = treeChart;
 		this.setVec = setVec;
-		this.text = text;
+		this.textBox = textArea;
 		this.result = result;
 	}
 
@@ -49,7 +58,7 @@ class TreeSelection extends SelectHandler {
 
 		for (int i = 0; i < s.length(); ++i) {
 			if (s.get(i).isRow()) {
-				text.setText(result.printQuerySet(setVec.get(s.get(i).getRow())));
+				textBox.setText(result.printQuerySet(setVec.get(s.get(i).getRow())));
 			}
 		}
 	}

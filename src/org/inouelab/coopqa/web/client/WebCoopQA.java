@@ -28,6 +28,7 @@ import com.google.gwt.user.client.ui.RootPanel;
 class WebCoopQA implements EntryPoint, ValueChangeHandler<String>  {
 
 	private final SubmitPage uploadForm = new SubmitPage();
+	
 	public void onModuleLoad() {
 		History.addValueChangeHandler(this);
 		changePage(History.getToken());
