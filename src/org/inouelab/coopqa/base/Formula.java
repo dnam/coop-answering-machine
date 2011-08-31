@@ -25,29 +25,48 @@ public abstract class Formula {
 		this.isClause = isClause;
 	}
 	
-	
-	public boolean isClause() {
+	/**
+	 * @return <code>true</code> if this Formula is a clause
+	 */
+	public final boolean isClause() {
 		return isClause;
 	}
 	
-	public boolean isRule() {
+	/**
+	 * @return <code>true</code> is this Formula is a clause
+	 */
+	public final boolean isRule() {
 		return (!isClause);
 	}
 	
-	public Clause getClause() {
+	/**
+	 * @return the {@link Clause} object corresponding to this Formula <br/>
+	 * 			<code>null</code> if this is not a Clause object
+	 * @see Clause
+	 */
+	public final Clause getClause() {
 		if (!isClause)
 			return null;
 		return (Clause) this;
 	}
 	
-	public Rule getRule() {
+	/**
+	 * @return a {@link Rule} object coressponding to this formula <br />
+	 * 			<code>null</code> if this Formula is not a Rule
+	 * @see Rule
+	 */
+	public final Rule getRule() {
 		if (isClause)
 			return null;
 		
 		return (Rule) this;
 	}
 	
+	@Override
 	public abstract String toString();
 	
+	/**
+	 * @return a String in TPTP syntax of this Formula
+	 */
 	public abstract String toTPTP();
 }

@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Vector;
 
-
 public class MultiSegmentGen
 	implements Iterator<List<Literal>>, Iterable<List<Literal>>{
 	private ArrayList<SegmentGen>		seggenList;

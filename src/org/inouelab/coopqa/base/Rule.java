@@ -137,7 +137,7 @@ public class Rule extends Formula {
 	}
 	
 	/**
-	 * @return <i>true</i> if this is a SHRR rule
+	 * @return <i>true</i> if this is a SHRR rule<br />
 	 * 			<i>false</i> otherwise
 	 */
 	public boolean isSHRR() {
@@ -147,9 +147,6 @@ public class Rule extends Formula {
 		return (trackSHRR == 1);
 	}
 	
-	/**
-	 * @return a {@link String} representingn the rule in CoopQA format
-	 */
 	@Override
 	public String toString() {
 		Iterator<Literal> it = leftSide.iterator();
@@ -173,10 +170,7 @@ public class Rule extends Formula {
 		return str.toString();
 	}
 	
-	/**
-	 * @return a {@link String} in TPTP format for SOLAR
-	 * @see SolarConnector
-	 */
+	@Override
 	public String toTPTP() {
 		StringBuilder str = new StringBuilder();
 		Iterator<Literal> it = leftSide.iterator();

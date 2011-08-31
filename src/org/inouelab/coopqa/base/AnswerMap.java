@@ -21,6 +21,9 @@ public class AnswerMap extends HashMap<Integer, List<List<Integer>>>{
 	private Env env;		// current environment
 	private double time; 	// time to get this answer list
 	
+	/**
+	 * @param env the environment of the job 
+	 */
 	public AnswerMap(Env env) {
 		super();
 		

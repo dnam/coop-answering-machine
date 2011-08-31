@@ -6,7 +6,7 @@ import org.inouelab.coopqa.Env;
 import org.inouelab.coopqa.base.*;
 import org.inouelab.coopqa.operators.comgen.MultiCombinationGenerator;
 
-class OperatorGR extends Operator {
+final class OperatorGR extends Operator {
 	protected OperatorGR(Env job) {
 		super(false, job);
 	}
@@ -131,16 +131,4 @@ class OperatorGR extends Operator {
 	public int getType() {
 		return GR_t;
 	}
-	
-//	public static void main(String args[]) throws Exception {
-//		KnowledgeBase.init("../CQA/lib/gen_kb.txt");
-//		
-//		Query q = Query.parse("../CQA/lib/gen_query.txt");
-//		
-//		System.out.println("Query: " + q);
-//
-//		
-//		QuerySet ret = Operator.get().GR.perform(q);
-//		System.out.println(ret);
-//	}
 }

@@ -21,7 +21,7 @@ import org.inouelab.coopqa.base.*;
  * 
  * @author Nam Dang
  */
-public abstract class Operator {
+public class Operator {
 	/** Type of DC operator. 
 	 * @see Operator#DC */
 	public static final int DC_t = 0;
@@ -44,13 +44,21 @@ public abstract class Operator {
 	// A global storage for all generated queries
 	protected QuerySet globalSet;
 	protected Env 		env;
+	
+	/**
+	 * @param env the environment object
+	 */
+	public Operator(Env env) {
+		this(true, env);
+	}
 
 	/**
 	 * A constructor for the operator class. 
 	 * <code>init</code> differentiates if this is a generalized class,
-	 * or a sub-class of <code>Operator</code>.
+	 * or a sub-class of <code>Operator</code>.<br />
+	 * <br/>
 	 * If you plan to extends <code>Operator</code>, make sure
-	 * to set <code>init</code> as <i>false</i> in your constructor.
+	 * to set <code>init</code> as <b>false</b> in your constructor.
 	 * @param init if <i>true</i>, we initialize the sub-operators,
 	 * 			otherwise, we skip them.
 	 * @param env the {@link Env} environment object
@@ -73,17 +81,6 @@ public abstract class Operator {
 	}
 	
 	/**
-	 * A static class to create a new wrapper operator
-	 * for accessing sub-operators (which cannot be accessed directly).
-	 * @param env the environment object
-	 * @return the new operator
-	 */
-	public static Operator create(Env env) {
-		Operator op = new OperatorWrapper(env);
-		return op;
-	}
-	
-	/**
 	 * Returns a set of queries after performing
 	 * a generalization operation upon every queries
 	 * given in inSet
@@ -93,7 +90,7 @@ public abstract class Operator {
 	 * @see Operator#DC
 	 * @see Operator#GR
 	 */
-	public QuerySet run(QuerySet inputSet) {
+	public final QuerySet run(QuerySet inputSet) {
 		Iterator<Query> it = inputSet.iterator();
 		QuerySet retSet = new QuerySet();
 		
@@ -134,14 +131,17 @@ public abstract class Operator {
 	 * Reset the operator to run generalization
 	 * operations again
 	 */
-	 public void reset() {
+	 public final void reset() {
 		 globalSet.clear();
 	 }
 	 
 	/**
-	 * Performs the operation upon a single query
+	 * Performs generalization upon a single query
+	 * @param the query to process
 	 */
-	abstract QuerySet perform(Query query);
+	QuerySet perform(Query query) {
+		throw new UnsupportedOperationException();
+	}
 	
 	/**
 	 * @return the type of the operator
@@ -149,5 +149,7 @@ public abstract class Operator {
 	 * @see Operator#DC_t
 	 * @see Operator#GR_t
 	 */
-	public abstract int getType();
+	public int getType() {
+		throw new UnsupportedOperationException();
+	}
 }
