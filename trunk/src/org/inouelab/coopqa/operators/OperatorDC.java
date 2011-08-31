@@ -8,7 +8,7 @@ package org.inouelab.coopqa.operators;
 import org.inouelab.coopqa.Env;
 import org.inouelab.coopqa.base.*;
 
-class OperatorDC extends Operator {	
+final class OperatorDC extends Operator {	
 	protected OperatorDC(Env job) {
 		super(false, job);
 	}

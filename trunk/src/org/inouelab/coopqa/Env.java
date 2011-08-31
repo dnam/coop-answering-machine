@@ -30,7 +30,7 @@ public class Env {
 	 */
 	public Env() {
 		symTab = new SymTable();
-		op = Operator.create(this);
+		op = new Operator(this);
 		initialized = false;
 		maxTimePerCycle = 2;
 		cycleSize = 20;
