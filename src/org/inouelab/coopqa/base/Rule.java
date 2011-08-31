@@ -6,8 +6,6 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
 
-import org.inouelab.coopqa.solar.SolarConnector;
-
 /**
  * A class representing a rule in the knowledge base.
  * The left and right side are represented as a vector

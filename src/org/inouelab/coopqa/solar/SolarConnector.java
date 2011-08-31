@@ -34,7 +34,7 @@ public class SolarConnector {
 	private long lastRunTime;
 	private File tmpDir;
 	private static double BILLION = ((double) (1000)) * ((double) (1000))
-			* (double) (1000);
+			* (1000);
 	private static int SOLAR_DEFAULT_CODE = 902; // check with SOLAR's ExitCode
 	private static int LINUX_SOLAR_CODE = 134; // check with SOLAR's ExitCode
 	
@@ -45,6 +45,7 @@ public class SolarConnector {
 			this.is = is;
 		}
 		
+		@Override
 		public void run() {
 			try {
 				InputStreamReader isr = new InputStreamReader(is);
@@ -276,7 +277,7 @@ public class SolarConnector {
 				queryAnsList.add(ansList);
 			}
 
-			retMap.setTime(((double) lastRunTime) / BILLION);
+			retMap.setTime((lastRunTime) / BILLION);
 			return retMap;
 		} catch (Exception e) {
 			throw new Exception("Error in SolarConnector.run(): "

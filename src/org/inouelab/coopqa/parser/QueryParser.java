@@ -34,7 +34,8 @@ public class QueryParser extends java_cup.runtime.lr_parser {
     "\002\002\005\000\002\002\005" });
 
   /** Access to production table. */
-  public short[][] production_table() {return _production_table;}
+  @Override
+public short[][] production_table() {return _production_table;}
 
   /** Parse-action table. */
   protected static final short[][] _action_table = 
@@ -53,7 +54,8 @@ public class QueryParser extends java_cup.runtime.lr_parser {
     "\ufffd\005\ufffd\001\002" });
 
   /** Access to parse-action table. */
-  public short[][] action_table() {return _action_table;}
+  @Override
+public short[][] action_table() {return _action_table;}
 
   /** <code>reduce_goto</code> table. */
   protected static final short[][] _reduce_table = 
@@ -68,19 +70,22 @@ public class QueryParser extends java_cup.runtime.lr_parser {
     "\002\001\001" });
 
   /** Access to <code>reduce_goto</code> table. */
-  public short[][] reduce_table() {return _reduce_table;}
+  @Override
+public short[][] reduce_table() {return _reduce_table;}
 
   /** Instance of action encapsulation class. */
   protected CUP$QueryParser$actions action_obj;
 
   /** Action encapsulation object initializer. */
-  protected void init_actions()
+  @Override
+protected void init_actions()
     {
       action_obj = new CUP$QueryParser$actions(this);
     }
 
   /** Invoke a user supplied parse action. */
-  public java_cup.runtime.Symbol do_action(
+  @Override
+public java_cup.runtime.Symbol do_action(
     int                        act_num,
     java_cup.runtime.lr_parser parser,
     java.util.Stack            stack,
@@ -92,15 +97,19 @@ public class QueryParser extends java_cup.runtime.lr_parser {
   }
 
   /** Indicates start state. */
-  public int start_state() {return 0;}
+  @Override
+public int start_state() {return 0;}
   /** Indicates start production. */
-  public int start_production() {return 1;}
+  @Override
+public int start_production() {return 1;}
 
   /** <code>EOF</code> Symbol index. */
-  public int EOF_sym() {return 0;}
+  @Override
+public int EOF_sym() {return 0;}
 
   /** <code>error</code> Symbol index. */
-  public int error_sym() {return 1;}
+  @Override
+public int error_sym() {return 1;}
 
 
     public Env env;

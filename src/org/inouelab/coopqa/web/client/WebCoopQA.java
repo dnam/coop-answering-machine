@@ -29,6 +29,7 @@ class WebCoopQA implements EntryPoint, ValueChangeHandler<String>  {
 
 	private final SubmitPage uploadForm = new SubmitPage();
 	
+	@Override
 	public void onModuleLoad() {
 		History.addValueChangeHandler(this);
 		changePage(History.getToken());
