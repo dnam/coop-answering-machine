@@ -6,6 +6,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+/**
+ * Generate combinations from a list
+ * @author Nam Dang
+ * @param <E> type of element
+ */
 public class CombiGenerator<E> 
         implements Iterator<List<E>>, Iterable<List<E>> {
 

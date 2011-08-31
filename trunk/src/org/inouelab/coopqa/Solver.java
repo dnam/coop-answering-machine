@@ -15,9 +15,9 @@ import org.inouelab.coopqa.operators.Operator;
 import org.inouelab.coopqa.solar.SolarWorker;
 
 /**
- * @author Nam Dang
  * This is a class that provides a result based on given
  * <code>Env</code> (environment) object.
+ * @author Nam Dang
  * @see Env
  */
 public class Solver {

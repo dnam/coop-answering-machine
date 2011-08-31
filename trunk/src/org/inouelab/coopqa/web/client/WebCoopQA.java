@@ -23,7 +23,7 @@ import com.google.gwt.user.client.ui.RootPanel;
 
 
 /**
- * Google Visualization API in GWT demo.
+ * Main class for Coop QA
  */
 class WebCoopQA implements EntryPoint, ValueChangeHandler<String>  {
 

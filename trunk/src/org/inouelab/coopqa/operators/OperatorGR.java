@@ -6,6 +6,11 @@ import org.inouelab.coopqa.Env;
 import org.inouelab.coopqa.base.*;
 import org.inouelab.coopqa.operators.comgen.MultiCombinationGenerator;
 
+/**
+ * Goal-Replacement Operator
+ * @author Nam Dang
+ *
+ */
 final class OperatorGR extends Operator {
 	protected OperatorGR(Env job) {
 		super(false, job);

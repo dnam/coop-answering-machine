@@ -102,7 +102,7 @@ public class ServiceImpl extends RemoteServiceServlet
 	
 	/**
 	 * Method to perform job submission.
-	 * Used by {@link #submitFileJob(String, String)} and {@link #submitTextJob(String, String)}
+	 * Used by {@link #submitFileJob(String, String, int)} and {@link #submitTextJob(String, String, int)}
 	 * @param queryFile the query file
 	 * @param kbFile the knowledge base file
 	 * @return the job id

@@ -4,6 +4,12 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Vector;
 
+/**
+ * Query class for the web
+ * @author Nam Dang
+ * @see org.inouelab.coopqa.base.Query#webConvert()
+ *
+ */
 public class WebQuery implements Serializable {
 	private static final long serialVersionUID = 22L;
 	private int id; // ID of a query, based on a global counter

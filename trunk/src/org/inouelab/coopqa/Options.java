@@ -11,6 +11,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
 
+/**
+ * Parsing the argument from the shell and set appropriate values for the
+ * environment
+ * @author Nam Dang
+ * @see Env
+ *
+ */
 public class Options {
 	private static final String SOLAR_DEFAULT = "solar2-build310.jar";
 	private static final String SETTING_FILE = "coopqa.ini";

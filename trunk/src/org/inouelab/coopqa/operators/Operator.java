@@ -16,8 +16,6 @@ import org.inouelab.coopqa.base.*;
  * </ul>
  * The operators could be differentiated with {@link #getType()}
  * <br />
- * In order to use this class, user should call the static
- * method {@link #create(Env)}
  * 
  * @author Nam Dang
  */
@@ -84,7 +82,7 @@ public class Operator {
 	 * Returns a set of queries after performing
 	 * a generalization operation upon every queries
 	 * given in inSet
-	 * @param inSet the input set of queries
+	 * @param inputSet the input set of queries
 	 * @return the result set
 	 * @see Operator#AI
 	 * @see Operator#DC
@@ -137,7 +135,7 @@ public class Operator {
 	 
 	/**
 	 * Performs generalization upon a single query
-	 * @param the query to process
+	 * @param query the query to process
 	 */
 	QuerySet perform(Query query) {
 		throw new UnsupportedOperationException();

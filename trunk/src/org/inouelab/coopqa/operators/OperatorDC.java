@@ -8,6 +8,11 @@ package org.inouelab.coopqa.operators;
 import org.inouelab.coopqa.Env;
 import org.inouelab.coopqa.base.*;
 
+/**
+ * Dropping Condition Operator
+ * @author Nam Dang
+ *
+ */
 final class OperatorDC extends Operator {	
 	protected OperatorDC(Env job) {
 		super(false, job);
@@ -16,7 +21,7 @@ final class OperatorDC extends Operator {
 	/**
 	 * Returns the set of queries after applying
 	 * DC on each literal of q
-	 * @param q the query to drop
+	 * @param query the query to drop
 	 * @return set of queries
 	 */
 	@Override

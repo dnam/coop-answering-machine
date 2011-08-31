@@ -8,7 +8,7 @@ import java.util.Map;
  * variable) to a unique integer  * as identifier. This symbol table
  * should is shared with respect to a given knowledge base (KB)
  * and a query Q(X).
- * @author: Nam Dang
+ * @author Nam Dang
  */
 public class SymTable { 
 	// each type's id is seperated by GAP

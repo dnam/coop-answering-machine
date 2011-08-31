@@ -2,6 +2,12 @@ package org.inouelab.coopqa.web.shared;
 
 import java.io.Serializable;
 
+/**
+ * Literal class for the Web
+ * @author Nam Dang
+ * @see org.inouelab.coopqa.base.Literal#webConvert()
+ *
+ */
 public class WebLiteral implements Serializable {
 	private static final long serialVersionUID = 87L;
 	private String pred;
@@ -21,7 +27,7 @@ public class WebLiteral implements Serializable {
 
 	/**
 	 * Sets the id of the literal's predicate
-	 * @param id the id of predicate
+	 * @param pred the id of predicate
 	 */
 	public void setPred(String pred) {
 		this.pred = pred;

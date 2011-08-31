@@ -10,6 +10,11 @@ import java.util.Iterator;
 import org.inouelab.coopqa.Env;
 import org.inouelab.coopqa.base.*;
 
+/**
+ * Anti-instantiation Operator
+ * @author Nam Dang
+ *
+ */
 final class OperatorAI extends Operator {
 	protected OperatorAI(Env job) {
 		super(false, job);

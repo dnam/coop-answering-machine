@@ -6,6 +6,11 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Vector;
 
+/**
+ * Generates combinations from a list of lists
+ * @author Nam Dang
+ * @param <E> element type
+ */
 public class MultiCombinationGenerator<E>
 	implements Iterator<List<E>>, Iterable<List<E>>{
 	private int[] kList;
