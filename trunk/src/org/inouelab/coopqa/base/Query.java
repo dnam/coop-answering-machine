@@ -503,6 +503,7 @@ public class Query {
 	/**
 	 * Creates a clone of this query
 	 */
+	@Override
 	public Query clone() {
 		Query q = new Query(env);
 		for (int i = 0; i < this.litVector.size(); i++) {

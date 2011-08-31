@@ -6,8 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Set;
-
 import org.inouelab.coopqa.Env;
 import org.inouelab.coopqa.Options;
 import org.inouelab.coopqa.base.Literal;
@@ -135,15 +133,18 @@ public class SegmentGen
     	setInitialIndexes();
     }
 
-    public boolean hasNext() {
+    @Override
+	public boolean hasNext() {
         return currentIdxs != null;
     }
 
-    public Iterator<List<Literal>> iterator() {
+    @Override
+	public Iterator<List<Literal>> iterator() {
         return this;
     }
     
-    public List<Literal> next() {
+    @Override
+	public List<Literal> next() {
         if(!hasNext()) {
             throw new NoSuchElementException();
         }
@@ -169,7 +170,8 @@ public class SegmentGen
     	println("");
     }
 
-    public void remove() {
+    @Override
+	public void remove() {
         throw new UnsupportedOperationException();
     }
     

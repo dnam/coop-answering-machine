@@ -12,7 +12,6 @@ import java.util.Vector;
 
 import org.inouelab.coopqa.Env;
 import org.inouelab.coopqa.parser.KBParser;
-import org.inouelab.coopqa.parser.QueryParser;
 import org.inouelab.coopqa.solar.SolarConnector;
 
 /**

@@ -35,15 +35,18 @@ public class CombiGenerator<E>
         }
     }
 
-    public boolean hasNext() {
+    @Override
+	public boolean hasNext() {
         return currentIdxs != null;
     }
 
-    public Iterator<List<E>> iterator() {
+    @Override
+	public Iterator<List<E>> iterator() {
         return this;
     }
     
-    public List<E> next() {
+    @Override
+	public List<E> next() {
         if(!hasNext()) {
             throw new NoSuchElementException();
         }
@@ -55,7 +58,8 @@ public class CombiGenerator<E>
         return currentCombination;
     }
 
-    public void remove() {
+    @Override
+	public void remove() {
         throw new UnsupportedOperationException();
     }
     
