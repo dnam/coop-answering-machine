@@ -6,8 +6,12 @@ import gwtupload.client.IUploader.UploadedInfo;
 import gwtupload.client.SingleUploader;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.FocusEvent;
+import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.History;
@@ -23,6 +27,7 @@ import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SubmitButton;
 import com.google.gwt.user.client.ui.TextArea;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -71,6 +76,9 @@ public class SubmitPage extends Composite   {
 	@UiField
 	Hyperlink switchLink;
 	
+	@UiField
+	TextBox depthInput;
+	
 	private final Button 		queryResetButton;
 	private final Button 		kbResetButton;
 	private SingleUploader 		queryUploader;
@@ -107,6 +115,23 @@ public class SubmitPage extends Composite   {
 			}
 
 		};
+		
+		// Depth Input box
+		depthInput.addFocusHandler(new FocusHandler() {			
+			@Override
+			public void onFocus(FocusEvent event) {
+				depthInput.setText("");
+			}
+		});		
+		depthInput.addChangeHandler(new ChangeHandler() {
+			@Override
+			public void onChange(ChangeEvent event) {
+				String text = depthInput.getText().replaceAll("[^0-9]", "");
+				if (text.length() == 0)
+					text = "0";
+				depthInput.setText(text);
+			}
+		});
 				
 		// Query and KB file text input
 		kbBox.setText(sampleKB);
@@ -241,7 +266,7 @@ public class SubmitPage extends Composite   {
 			return;
 		}
 		
-		cqaSrv.submitTextJob(queryString, kbString, new AsyncCallback<String>() {
+		cqaSrv.submitTextJob(queryString, kbString, getDepth(), new AsyncCallback<String>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				showError(caught.getMessage());
@@ -259,6 +284,13 @@ public class SubmitPage extends Composite   {
 		});		
 	}
 	
+	private int getDepth() {
+		String text = depthInput.getText();
+		if (text.equals("UNLIMITED"))
+			text = "0";
+		return Integer.parseInt(text);		
+	}
+	
 	/**
 	 * Submits with files
 	 */
@@ -266,7 +298,7 @@ public class SubmitPage extends Composite   {
 		if (!checkFormData())
 			return;
 		
-		cqaSrv.submitFileJob(queryPath, kbPath, new AsyncCallback<String>() {
+		cqaSrv.submitFileJob(queryPath, kbPath, getDepth(), new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
 				kbPath = null;
@@ -310,6 +342,8 @@ public class SubmitPage extends Composite   {
 			textSubmit.setVisible(true);
 			switchLink.setText("Switch to File Mode");
 			switchLink.setTargetHistoryToken("file");
+			kbBox.setEnabled(true);
+			queryBox.setEnabled(true);	
 			submitButton.setEnabled(true);
 		}
 	}

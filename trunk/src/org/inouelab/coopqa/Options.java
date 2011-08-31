@@ -37,7 +37,8 @@ public class Options {
 		this.cycleSize = 20;
 		this.maxTimePerCycle = 2;
 		this.savedSettings = false;
-		this.limit = Integer.MAX_VALUE;
+		this.queryLimit = Integer.MAX_VALUE;
+		this.depthLimit = Integer.MAX_VALUE;
 
 		// Load the coopqa.ini file if saved before
 		try {
@@ -73,6 +74,7 @@ public class Options {
 	    out.println("  -solar [PATH] Path of SOLAR's executable JAR file");
 	    out.println("  -c  N         Number of queries per cycle to process");
 	    out.println("  -l  N         Limit the number of output queries*");
+	    out.println("  -d  N		 Limit the depth of the search tree");
 	    out.println("  -o  [FILE]    Output the result to a file");
 	    out.println("  -t  [PATH]    Specify the temporary folder");
 	    out.println("  -s            Save the above settings** to coopqa.ini");
@@ -80,7 +82,7 @@ public class Options {
 	    out.println();
 	    out.println("NOTE:");
 	    out.println("* The number of generated queries will not be exactly N");
-	    out.println("  because queries are generated in batch. The limit will");
+	    out.println("  because queries are generated in batch. The queryLimit will");
 	    out.println("  be used as a bounder so that when the number of generated");
 	    out.println("  queries is above N, the execution stops.");
 	    out.println();
@@ -132,7 +134,8 @@ public class Options {
 		env.setCycleSize(cycleSize);
 		env.setSolarPath(solar);
 		env.setTmpDir(tmpDir);
-		env.setLimitVal(limit);
+		env.setQueryLimit(queryLimit);
+		env.setDepth(depthLimit);
 		env.setMaxTimePerCycle(maxTimePerCycle);
 		
 		env.init();
@@ -185,18 +188,25 @@ public class Options {
 			} else if (op.equals("-t")) {
 				if (!isValidFileName(opVal))
 					throw new IllegalArgumentException("Invalid temp path");
+				i++;
 			} else if (op.equals("-s")) {
 				savedSettings = true;
 			} else if (op.equals("-l")) {
-				if (opVal == null || (limit = Integer.parseInt(opVal)) <= 0)
+				if (opVal == null || (queryLimit = Integer.parseInt(opVal)) <= 0)
 					throw new IllegalArgumentException("Limit must be a positive value");
+				i++;
 			} else if (op.equals("-ct")) {
 				if (opVal == null || (maxTimePerCycle = Integer.parseInt(opVal)) <= 0)
-					throw new IllegalArgumentException("Time limit must be a postive value");
+					throw new IllegalArgumentException("Time queryLimit must be a postive value");
+				i++;
+			} else if (op.equals("-d")) {
+				System.out.println("hello: " + opVal);
+				if (opVal == null || (depthLimit = Integer.parseInt(opVal)) <= 0)
+					throw new IllegalArgumentException("Depth queryLimit must be a positive value");
+				i++;
 			}
-			else {
+			else
 				throw new IllegalArgumentException("Invalid syntax");
-			}
 		}
 		
 		// At least we need the input file
@@ -257,5 +267,6 @@ public class Options {
 	private boolean 	savedSettings;
 	private int			cycleSize;
 	private int 		maxTimePerCycle;
-	private int 		limit;
+	private int 		queryLimit;
+	private int			depthLimit;
 }

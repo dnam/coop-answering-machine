@@ -100,6 +100,7 @@ public class Result {
 		
 		Iterator<Query> it = querySet.iterator();
 		str.append("Query Set: " + querySet.getOpStr() + ": \n");
+		str.append("Depth: " + querySet.getDepth() + "\n\n");
 		while(it.hasNext()) {
 			Query query = it.next();
 			

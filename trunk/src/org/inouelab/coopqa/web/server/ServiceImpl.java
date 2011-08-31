@@ -108,7 +108,10 @@ public class ServiceImpl extends RemoteServiceServlet
 	 * @return the job id
 	 * @throws ServerErrorException if error occurs
 	 */
-	private String submitJob(String queryFile, String kbFile) throws ServerErrorException {
+	private String submitJob(String queryFile, String kbFile, int depthLimit) throws ServerErrorException {
+		if (depthLimit <= 0)
+			depthLimit = Integer.MAX_VALUE;
+		
 		// Generate a result file
 		String resultID; 
 		File mainFile, tmpFile;
@@ -127,14 +130,14 @@ public class ServiceImpl extends RemoteServiceServlet
 		mainFile.delete(); // delete the main file
 
 		// Submit the job
-		executor.submit(new RunnableSolver(queryFile, kbFile, resultID, tmpDir, retDir, solarPath));
+		executor.submit(new RunnableSolver(queryFile, kbFile, resultID, tmpDir, retDir, solarPath, depthLimit));
 		
 		// Return the result ID
 		return resultID;
 	}
 
 	@Override
-	public String submitTextJob(String queryString, String kbString)
+	public String submitTextJob(String queryString, String kbString, int depthLimit)
 			throws ServerErrorException {
 		if (queryString == null || kbString == null)
 			throw new ServerErrorException("invalid input");
@@ -157,7 +160,7 @@ public class ServiceImpl extends RemoteServiceServlet
 			out.write(kbString);
 			out.close();
 			
-			return submitJob(queryFile.getName(), kbFile.getName());			
+			return submitJob(queryFile.getName(), kbFile.getName(), depthLimit);			
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new ServerErrorException("IOException on server's side: " + e.getMessage());
@@ -165,7 +168,7 @@ public class ServiceImpl extends RemoteServiceServlet
 	}
 	
 	@Override
-	public String submitFileJob(String queryFileName, String kbFileName)
+	public String submitFileJob(String queryFileName, String kbFileName, int depthLimit)
 			throws ServerErrorException {	
 		if (queryFileName == null || kbFileName == null)
 			throw new ServerErrorException("Please upload the files first");
@@ -179,7 +182,7 @@ public class ServiceImpl extends RemoteServiceServlet
 		// Reset the ression
 		session.removeAttribute("files");
 		
-		return submitJob(queryFileName, kbFileName);			
+		return submitJob(queryFileName, kbFileName, depthLimit);			
 	}
 	
 	@Override
