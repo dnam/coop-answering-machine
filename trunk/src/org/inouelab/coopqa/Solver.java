@@ -53,8 +53,8 @@ public class Solver {
 		Operator OP = env.op();
 		while (!workingQueue.isEmpty() && queryLimit > 0) {
 			QuerySet nextSet = workingQueue.poll();
-			if (nextSet.getDepth() == depthLimit)
-				break;
+			if (nextSet.getDepth() + 1 == depthLimit)
+				continue;
 
 			Integer op = nextSet.getLastOp();
 			QuerySet ret = null;
