@@ -34,7 +34,8 @@ public class Env {
 		initialized = false;
 		maxTimePerCycle = 2;
 		cycleSize = 20;
-		limitVal = Integer.MAX_VALUE;
+		depthLimit = Integer.MAX_VALUE;
+		queryLimit = Integer.MAX_VALUE;
 	}
 
 	/**
@@ -61,7 +62,7 @@ public class Env {
 	 * @see Solver#run(Env)
 	 */
 	public int getLimitval() {
-		return limitVal;
+		return queryLimit;
 	}
 
 	/**
@@ -84,6 +85,16 @@ public class Env {
 	 */
 	public String getTmpDir() {
 		return tmpDir;
+	}
+	
+	public void setDepth(int depth) {
+		if (depth <= 0)
+			throw new IllegalArgumentException("depthLimit must be a positive value");
+		this.depthLimit = depth;
+	}
+	
+	public int getDepth() {
+		return depthLimit;
 	}
 	
 	/**
@@ -153,8 +164,8 @@ public class Env {
 		this.kbFile = kbFile;
 	}	
 	
-	public void setLimitVal(int limitVal) {
-		this.limitVal = limitVal;
+	public void setQueryLimit(int queryLimit) {
+		this.queryLimit = queryLimit;
 	}
 
 	public void setOutputFile(String outputFile) {
@@ -200,21 +211,26 @@ public class Env {
 		return maxTimePerCycle;
 	}
 
+	// Primary attribute
+	private boolean initialized; // is this object initialized or not?
+	private KnowledgeBase kb; // knowledge base
+	private int queryLimit; // limiting number of queries
+	private SymTable symTab; // symbol table
+	private int depthLimit;
+	
+	// Operator
+	private Operator op; // operator object	
+	
+	// SOLAR
+	private SolarWorker worker; // worker
+
 	private SolarConnector connector; // the solar connector
 	private int cycleSize; // cycle size: number of queries to solve in a cycle
 	private int maxTimePerCycle; // max time spent upon a cycle
-	private boolean initialized; // is this object initialized or not?
-	private KnowledgeBase kb; // knowledge base
-	
-	private int limitVal; // limiting number of queries
-	
-	private Operator op; // operator object
 	private String solarPath; // path to SOLAR
-	private SymTable symTab; // symbol table
+	private String tmpDir; // temporarily directory	
 	
-	private String tmpDir; // temporarily directory
-	private SolarWorker worker; // worker
-	
+	// Files
 	private String kbFile; // path to knowledge base file
 	private String outputFile; // output the result to a text file
 	private String queryFile; // the query file

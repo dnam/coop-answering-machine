@@ -46,11 +46,15 @@ public class Solver {
 		Queue<QuerySet> workingQueue = new LinkedList<QuerySet>();
 		workingQueue.offer(root); // add the root
 
-		// Runs until the queue is empty
-		int limit = env.getLimitval();
+		// Get the limits
+		int queryLimit = env.getLimitval();
+		int depthLimit = env.getDepth();
+	
 		Operator OP = env.op();
-		while (!workingQueue.isEmpty() && limit > 0) {
+		while (!workingQueue.isEmpty() && queryLimit > 0) {
 			QuerySet nextSet = workingQueue.poll();
+			if (nextSet.getDepth() == depthLimit)
+				break;
 
 			Integer op = nextSet.getLastOp();
 			QuerySet ret = null;
@@ -74,10 +78,10 @@ public class Solver {
 				if (ret != null) {
 					workingQueue.add(ret);
 					worker.queue(ret);
-					limit -= ret.size();
+					queryLimit -= ret.size();
 				}
 			}
-			if (limit <= 0)
+			if (queryLimit <= 0)
 				break;
 
 			if (doDC) {
@@ -85,10 +89,10 @@ public class Solver {
 				if (ret != null) {
 					workingQueue.add(ret);
 					worker.queue(ret);
-					limit -= ret.size();
+					queryLimit -= ret.size();
 				}
 			}
-			if (limit <= 0)
+			if (queryLimit <= 0)
 				break;
 
 			if (doGR) {
@@ -96,10 +100,10 @@ public class Solver {
 				if (ret != null) {
 					workingQueue.add(ret);
 					worker.queue(ret);
-					limit -= ret.size();
+					queryLimit -= ret.size();
 				}
 			}
-			if (limit <= 0)
+			if (queryLimit <= 0)
 				break;
 		}
 

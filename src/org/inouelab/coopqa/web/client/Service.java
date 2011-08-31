@@ -19,7 +19,7 @@ public interface Service extends RemoteService {
 	 * @return the String of the Job ID
 	 * @throws ServerErrorException if any error occurs
 	 */
-	String submitFileJob(String queryFileName, String kbFileName) throws ServerErrorException;
+	String submitFileJob(String queryFileName, String kbFileName, int depthLimit) throws ServerErrorException;
 	
 	/**
 	 * Submits a CoopQA job with the input as Strings
@@ -28,7 +28,7 @@ public interface Service extends RemoteService {
 	 * @return the String of the job ID
 	 * @throws ServerErrorException if any error occurs during communication
 	 */
-	String submitTextJob(String queryString, String kbString) throws ServerErrorException;
+	String submitTextJob(String queryString, String kbString, int depthLimit) throws ServerErrorException;
 	
 	/**
 	 * Obtains a result of the given job id

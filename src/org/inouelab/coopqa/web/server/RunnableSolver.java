@@ -37,7 +37,7 @@ class RunnableSolver implements Runnable {
 	 * @param solarPath Path to SOLAR
 	 */
 	public RunnableSolver(String queryFile, String kbFile, String resultFile, 
-			File tmpDir, File retDir, String solarPath) {
+			File tmpDir, File retDir, String solarPath, int depthLimit) {
 		try {
 			this.queryFile = (new File(tmpDir, queryFile)).getCanonicalPath();
 		} catch (IOException e) {
@@ -62,18 +62,16 @@ class RunnableSolver implements Runnable {
 		
 		try {
 			env.setTmpDir(tmpDir.getCanonicalPath());
+			env.setSolarPath(solarPath);
+			env.setQueryFile(this.queryFile);
+			env.setKbFile(this.kbFile);
+			env.setDepth(depthLimit);
+			env.init();
 		} catch (IOException e) {
 			makeErrorFile(resultFile, "Unable to locate temporary directory");
 			return;
 		}
-		env.setSolarPath(solarPath);
-		System.out.println("Query file: " + this.queryFile);
-		System.out.println("KB file: " + this.kbFile);
-		env.setQueryFile(this.queryFile);
-		env.setKbFile(this.kbFile);
-		try {
-			env.init();
-		} catch (Exception e) {
+		catch (Exception e) {
 			System.out.println("Unable to initialize");
 			makeErrorFile(resultFile, e.getMessage());
 			return;

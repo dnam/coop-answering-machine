@@ -25,6 +25,7 @@ public class QuerySet extends HashSet<Query> {
 	private Vector<Integer> ops; // Operator performed upon this set
 	private QuerySet parent;
 	private Vector<QuerySet> children;
+	private int depth;
 
 	/**
 	 * Constructs an empty query set with empty children
@@ -35,6 +36,14 @@ public class QuerySet extends HashSet<Query> {
 		ops = new Vector<Integer>();
 		children = new Vector<QuerySet>();
 		parent = null;
+		depth = 0;
+	}
+	
+	/**
+	 * @return the depth of this query in the execution tree
+	 */
+	public int getDepth() {
+		return depth;
 	}
 	
 	/**
@@ -58,6 +67,7 @@ public class QuerySet extends HashSet<Query> {
 	public QuerySet(QuerySet parent) {
 		this();
 		this.parent = parent;
+		this.depth = parent.depth + 1;
 	}
 	
 	/**
@@ -96,6 +106,7 @@ public class QuerySet extends HashSet<Query> {
 	 */
 	public void setParent(QuerySet parent) {
 		this.parent = parent;
+		this.depth = parent.depth + 1;
 	}	
 	
 	/**
@@ -104,6 +115,7 @@ public class QuerySet extends HashSet<Query> {
 	 */
 	public void addChild(QuerySet child) {
 		children.add(child);
+		child.setParent(this);
 	}
 	
 	/**
@@ -185,6 +197,7 @@ public class QuerySet extends HashSet<Query> {
 	@Override
 	public String toString() {
 		StringBuilder bld = new StringBuilder();
+		bld.append("Depth: " + depth + "\n\n");
 		if (ops.size() == 0) {
 			bld.append("(): ");
 		}

@@ -12,16 +12,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  * @see Service
  */
 public interface ServiceAsync {
-	/**
-	 * Submits a CoopQA job with two files
-	 * @param queryFileName the query file name (provided by the server after submission)
-	 * @param kbFileName the knowledge base file name (also provided by the sever)
-	 * @return the String of the Job ID
-	 * @throws ServerErrorException if any error occurs
-	 * @param callback the asynchronous callback class
-	 * @see Service#submitFileJob(String, String)
-	 */
-	void submitFileJob(String queryFileName, String kbFileName,	AsyncCallback<String> callback);
+	void submitFileJob(String queryFileName, String kbFileName, int depthLimit,
+			AsyncCallback<String> callback);
 	
 	/**
 	 * Submits a CoopQA job with the input as Strings
@@ -32,7 +24,7 @@ public interface ServiceAsync {
 	 * @param callback the asynchronous callback class
 	 * @see Service#submitTextJob(String, String)
 	 */
-	void submitTextJob(String queryString, String kbString,	AsyncCallback<String> callback);
+	void submitTextJob(String queryString, String kbString,	int depthLimit, AsyncCallback<String> callback);
 	
 	/**
 	 * Obtains a result of the given job id
