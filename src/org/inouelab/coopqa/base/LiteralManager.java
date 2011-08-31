@@ -6,6 +6,12 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Unused. For caching the literal.
+ * Maybe for future improvement
+ * @author Nam Dang
+ *
+ */
 public class LiteralManager {
 	private class Pair {
 		private int x, y;

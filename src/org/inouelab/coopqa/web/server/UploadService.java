@@ -15,11 +15,13 @@ import gwtupload.server.exceptions.UploadActionException;
 
 import org.apache.commons.fileupload.FileItem;
 
+/**
+ * Service for users to upload a file to the system
+ * @author Nam Dang
+ *
+ */
 public class UploadService extends UploadAction {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 7946877476507810602L;
 	private File tmpDir;
 

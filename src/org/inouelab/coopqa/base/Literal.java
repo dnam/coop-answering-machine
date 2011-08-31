@@ -9,14 +9,15 @@ import org.inouelab.coopqa.Env;
 import org.inouelab.coopqa.web.shared.WebLiteral;
 
 /**
- * @author Maheen Bakhtyar
- * @author Nam Dang <br />
  * A class representing a <code>literal</code> in first-order logic.
  * Stores the unique ID, literal being negative or not 
  * and the parameters of the literal.<br />  
  * Contains methods to access literal details and fetching
  * the name of the literal from the symbol table based on the ID.
  * 
+ * @author Maheen Bakhtyar
+ * @author Nam Dang
+ *  
  * @see Query
  * @see Clause
  * @see Rule
@@ -41,7 +42,7 @@ public class Literal implements Comparable<Literal>, Serializable {
 
 	/**
 	 * Sets the pred of the literal's predicate
-	 * @param pred the pred of predicate
+	 * @param id the pred of predicate
 	 */
 	public void setID(int id) {
 		this.pred = id;
@@ -177,7 +178,6 @@ public class Literal implements Comparable<Literal>, Serializable {
 	 * @param other the other literal to compare against with
 	 * @return positive if this literal is ranked higher
 	 * 		   negative if other is ranked higher
-	 * @see toCompare()
 	 */
 	@Override
 	public int compareTo(Literal other) {
@@ -253,7 +253,6 @@ public class Literal implements Comparable<Literal>, Serializable {
 	
 	
 	/**
-	 * @author Nam Dang
 	 * @param other the other literal to compare with
 	 * @param theta store the substitution rule for the query
 	 * 			q1 (which this object belongs to) and q2 (which
@@ -274,7 +273,7 @@ public class Literal implements Comparable<Literal>, Serializable {
 	 * 
 	 * @return 0 or a positive value if the two are equivalent
 	 * 			-1 if not
-	 * @see Query#
+	 * @see Query#equals(Object)
 	 */
 	public boolean isEquivalent(Literal other, Map<Integer, Integer> theta) {
 		if (this.neg != other.neg || this.pred != other.pred)
@@ -366,7 +365,7 @@ public class Literal implements Comparable<Literal>, Serializable {
 	 * @param theta the substitution
 	 * @return true if the current literal subsume the others,
 	 * 			false otherwise
-	 * @see Query#subsumed(Vector)
+	 * @see Query#subsumed(java.util.List)
 	 */
 	public boolean subsume(Literal other, Map<Integer, Integer> theta) {
 		if (this.neg != other.neg || this.pred != other.pred)

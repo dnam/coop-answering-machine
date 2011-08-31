@@ -11,7 +11,12 @@ import org.inouelab.coopqa.Options;
 import org.inouelab.coopqa.base.Literal;
 import org.inouelab.coopqa.base.Query;
 
-public class SegmentGen 
+/**
+ * Beta: Segment generator for GR
+ * @author Nam Dang
+ * @see MultiSegmentGen
+ */
+class SegmentGen 
         implements Iterator<List<Literal>>, Iterable<List<Literal>> {
     private final List<Literal> 					querySeg;
     private int[] 									currentIdxs;
@@ -39,8 +44,8 @@ public class SegmentGen
 
 	/**
 	 * Constructor for the Segment Generator
-	 * @param querySeg the segment of the query as {@link List} of {@Link Literal}
-	 * @param ruleSeg the the rule as {@link List} of {@Link Literal}
+	 * @param querySeg the segment of the query as a list of {@link Literal}
+	 * @param ruleSeg the the rule as a list of {@link Literal}
 	 * @param theta the shared theta of the job
 	 */
 	public SegmentGen(List<Literal> querySeg, List<Literal> ruleSeg, 

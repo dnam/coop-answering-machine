@@ -4,6 +4,12 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Vector;
 
+/**
+ * QuerySet equivalence for the web-module
+ * @author Nam Dang
+ * @see org.inouelab.coopqa.base.QuerySet#webConvert()
+ *
+ */
 public class WebQuerySet extends Vector<WebQuery> implements Serializable {
 	private static final long serialVersionUID = 10L;
 	private Vector<Integer> ops; // Operator performed upon this set

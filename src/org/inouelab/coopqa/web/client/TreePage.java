@@ -30,6 +30,12 @@ import com.google.gwt.visualization.client.visualizations.OrgChart;
 import com.google.gwt.visualization.client.visualizations.OrgChart.Options;
 import com.google.gwt.visualization.client.visualizations.OrgChart.Size;
 
+/**
+ * Displays a {@link org.inouelab.coopqa.base.Result} in the
+ * format of a tree chart
+ * @author Nam Dang
+ *
+ */
 public class TreePage extends Composite {
 
 	private static TreePageUiBinder uiBinder = GWT

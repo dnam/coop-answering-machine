@@ -10,7 +10,6 @@ import org.inouelab.coopqa.solar.SolarConnector;
 import org.inouelab.coopqa.solar.SolarWorker;
 
 /**
- * @author Nam Dang
  * Provides a container for environment information.
  * This class is used by many other classes throughout the
  * system because it provides facility to access to:
@@ -19,7 +18,7 @@ import org.inouelab.coopqa.solar.SolarWorker;
  * - Doesn't support multi-tasking: meaning you could not
  * share the same environment for two different threads (except
  * worker thread)
- * 
+ * @author Nam Dang 
  */
 public class Env {
 	

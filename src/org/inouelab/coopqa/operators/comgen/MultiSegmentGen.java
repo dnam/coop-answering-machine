@@ -14,6 +14,12 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Vector;
 
+
+/**
+ * Beta: Multi-segment generator for GR
+ * @author Nam
+ *
+ */
 public class MultiSegmentGen
 	implements Iterator<List<Literal>>, Iterable<List<Literal>>{
 	private ArrayList<SegmentGen>		seggenList;

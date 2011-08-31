@@ -23,8 +23,8 @@ import org.inouelab.coopqa.web.shared.WebQuery;
 /**
  * A class represents a query in disjucntive normal form (DNF)
  * It provides methods for:
- * - Checking equivalence (see {@link Query#equals(Object))
- * - Checking subsumption (see {@link Query#subsumed(Vector))
+ * - Checking equivalence (see {@link Query#equals(Object)})
+ * - Checking subsumption (see {@link Query#subsumed(List)})
  * 
  * @author Maheen Bakhtyar
  * @author Nam Dang 
@@ -683,9 +683,9 @@ public class Query {
 	}
 	
 	/**
-	 * Converts a {@link QuerySet} to a {@link WebQuerySet} object.
-	 * @return a {@link WebQuerySet} object
-	 * @see WebQuerySet
+	 * Converts a {@link QuerySet} to a {@link WebQuery} object.
+	 * @return a {@link WebQuery} object
+	 * @see WebQuery
 	 */
 	public WebQuery webConvert() {
 		WebQuery webQuery = new WebQuery(id);

@@ -5,6 +5,12 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
 
+/**
+ * Equivalent to Result class 
+ * @author Nam Dang
+ * @see org.inouelab.coopqa.base.Result#webConvert()
+ *
+ */
 public class WebResult implements Serializable {
 	private static final long serialVersionUID = -4228568422318343615L;
 	
