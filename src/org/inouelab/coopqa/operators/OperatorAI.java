@@ -36,13 +36,13 @@ final class OperatorAI extends Operator {
 			int id = idIt.next();
 			Iterator<Query> itQu = query.replace(id, newVarID).iterator();
 			while (itQu.hasNext()) {
-				Query q = itQu.next();
-				if (globalSet.add(q)) { // new query
-					retSet.add(q);
+				Query newQuery = itQu.next();
+				if (globalSet.add(newQuery)) { // new query
+					retSet.add(newQuery);
 				}
 				else { // do not add twice
-					q.setSkipped(true);
-					retSet.add(q);
+					newQuery.setSkipped(true);
+					retSet.add(newQuery);
 				}
 			}
 		}
