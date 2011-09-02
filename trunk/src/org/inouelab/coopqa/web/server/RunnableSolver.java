@@ -8,7 +8,7 @@ import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 
 import org.inouelab.coopqa.Env;
-import org.inouelab.coopqa.Solver;
+import org.inouelab.coopqa.GenOp;
 import org.inouelab.coopqa.base.Result;
 import org.inouelab.coopqa.web.shared.WebResult;
 
@@ -82,7 +82,7 @@ class RunnableSolver implements Runnable {
 	public void run() {	
 		Result result;
 		try {
-			result = Solver.run(env);
+			result = GenOp.run(env);
 			
 			FileOutputStream fos = new FileOutputStream(new File(retDir, resultFile + ".tmp"));
 			ObjectOutputStream oos = new ObjectOutputStream(fos);			

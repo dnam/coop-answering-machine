@@ -15,7 +15,7 @@ import org.inouelab.coopqa.base.QuerySet;
  * generates queries.
  * 
  * @author Nam Dang
- * @see org.inouelab.coopqa.Solver
+ * @see org.inouelab.coopqa.GenOp
  */
 public class SolarWorker implements Callable<AnswerMap> {
 	private static final int DEFAULT_CYCLE = 20;
