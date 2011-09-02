@@ -24,7 +24,7 @@ import org.inouelab.coopqa.web.shared.WebQuery;
  * A class represents a query in disjucntive normal form (DNF)
  * It provides methods for:
  * - Checking equivalence (see {@link Query#equals(Object)})
- * - Checking subsumption (see {@link Query#subsumed(List)})
+ * - Checking subsumption (see {@link Query#isSubsumedBy(List)})
  * 
  * @author Maheen Bakhtyar
  * @author Nam Dang 
@@ -668,7 +668,7 @@ public class Query {
 	 * @return  <code>true</code> if the other query subsumes this query
 	 * 			<code>false</code> otherwise
 	 */
-	public boolean subsumed(List<Literal> other) {
+	public boolean isSubsumedBy(List<Literal> other) {
 		if (this.size() != other.size())
 			return false;
 		

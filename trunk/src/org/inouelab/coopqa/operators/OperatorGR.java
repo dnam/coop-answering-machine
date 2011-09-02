@@ -118,7 +118,7 @@ final class OperatorGR extends Operator {
 			Query subQ = new Query(lVector, env);
 			
 			// check if the query is subsumed by the left-hand side
-			if (subQ.subsumed(rVector)) {
+			if (subQ.isSubsumedBy(rVector)) {
 				Query newQuery = q.replaceLiterals(lVector, r.getFirstRight());
 				if (globalSet.add(newQuery)) { // add a new query: returns true if the query is new
 					setQ.add(newQuery);

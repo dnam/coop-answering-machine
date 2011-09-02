@@ -365,7 +365,7 @@ public class Literal implements Comparable<Literal>, Serializable {
 	 * @param theta the substitution
 	 * @return true if the current literal subsume the others,
 	 * 			false otherwise
-	 * @see Query#subsumed(java.util.List)
+	 * @see Query#isSubsumedBy(java.util.List)
 	 */
 	public boolean subsume(Literal other, Map<Integer, Integer> theta) {
 		if (this.neg != other.neg || this.pred != other.pred)
