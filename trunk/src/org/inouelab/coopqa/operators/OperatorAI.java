@@ -37,11 +37,10 @@ final class OperatorAI extends Operator {
 			Iterator<Query> itQu = query.replace(id, newVarID).iterator();
 			while (itQu.hasNext()) {
 				Query q = itQu.next();
-				if (!globalSet.contains(q)) { // if previously generated
+				if (globalSet.add(q)) { // new query
 					retSet.add(q);
-					globalSet.add(q);
 				}
-				else if (!retSet.contains(q)) { // do not add twice
+				else { // do not add twice
 					q.setSkipped(true);
 					retSet.add(q);
 				}

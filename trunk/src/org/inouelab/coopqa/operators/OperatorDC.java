@@ -37,14 +37,13 @@ final class OperatorDC extends Operator {
 			return null;
 		
 		for (int i = 0; i < n; i++) {
-			Query q = query.dropAt(i);
-			if (!globalSet.contains(q)) {
-				retSet.add(q);
-				globalSet.add(q);
+			Query newQuery = query.dropAt(i);
+			if (globalSet.add(newQuery)) { // new query
+				retSet.add(newQuery);
 			}
-			else if (!retSet.contains(q)) { // do not add twice
-				q.setSkipped(true);
-				retSet.add(q);
+			else {
+				newQuery.setSkipped(true);
+				retSet.add(newQuery);
 			}
 		}
 		
