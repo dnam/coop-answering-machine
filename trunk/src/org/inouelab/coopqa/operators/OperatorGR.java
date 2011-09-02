@@ -116,13 +116,14 @@ final class OperatorGR extends Operator {
 		while (comGen.hasNext()) {
 			List<Literal> lVector = comGen.next();
 			Query subQ = new Query(lVector, env);
+			
+			// check if the query is subsumed by the left-hand side
 			if (subQ.subsumed(rVector)) {
 				Query newQuery = q.replaceLiterals(lVector, r.getFirstRight());
-				if (!globalSet.contains(newQuery)) {
+				if (globalSet.add(newQuery)) { // add a new query: returns true if the query is new
 					setQ.add(newQuery);
-					globalSet.add(newQuery);
 				}
-				else if (!setQ.contains(q)) { // do not add twice
+				else { // set the query as "skipped"
 					q.setSkipped(true);
 					setQ.add(q);
 				}
