@@ -1,6 +1,8 @@
 package org.inouelab.coopqa.base;
 
 import java.io.Serializable;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
@@ -23,6 +25,60 @@ import org.inouelab.coopqa.web.shared.WebLiteral;
  * @see Rule
  */
 public class Literal implements Comparable<Literal>, Serializable {
+	
+	/**
+	 * An alternative comparator for {@link Collections#sort(List, Comparator)}
+	 * which only differentiates two parameters if they are both constants
+	 * @author Nam Dang
+	 */
+	public static class AltComp implements Comparator<Literal> {
+		private Env env;
+		
+		/**
+		 * Constructor
+		 * @param env the environment object
+		 */
+		public AltComp(Env env) {
+			this.env = env;
+		}
+		
+		@Override
+		public int compare(Literal l1, Literal l2) {
+			int pred1 = l1.getPred()* (l1.isNegative()? -1: 1);
+			int pred2 = l2.getPred()* (l2.isNegative()? -1: 1);
+			
+			if (pred1 != pred2)
+				return (pred1 - pred2);
+			
+			int n = l1.size();
+			for (int i = 0; i < n; i++) {
+				int param1 = l1.getParamAt(i);
+				int param2 = l2.getParamAt(i);
+				
+				// Get the type
+				SymType pType = env.symTab().getTypeID(param1);
+				SymType qType = env.symTab().getTypeID(param2);
+				
+				// if they are of the same type
+				if (pType == qType) {
+					// skip if we have a pair of variables
+					if (pType == SymType.VARIABLE)
+						continue;
+
+					// Constant
+					if (param1 == param2)
+						continue;
+					
+					return (param1 - param2);
+				}
+				
+				// ignore they are of different types			
+			}
+			
+			return 0;
+		}		
+	}
+	
 	public Literal(Env env, Vector<Integer> paramList) {
 		this.params = new int[paramList.size()];
 		for (int i = 0; i < paramList.size(); i++)
@@ -42,10 +98,10 @@ public class Literal implements Comparable<Literal>, Serializable {
 
 	/**
 	 * Sets the pred of the literal's predicate
-	 * @param id the pred of predicate
+	 * @param pred the pred of predicate
 	 */
-	public void setID(int id) {
-		this.pred = id;
+	public void setPred(int pred) {
+		this.pred = pred;
 		hashval = null;
 	}
 
@@ -72,13 +128,26 @@ public class Literal implements Comparable<Literal>, Serializable {
 		hashval = null;
 	}
 	
-	public int getID() {
+	/**
+	 * @return the literal's predicate
+	 */
+	public int getPred() {
 		return pred;
 	}
 
-	
+	/**
+	 * @param i the position to read the parameter
+	 * @return the parameter at i-th position
+	 */
 	public int getParamAt(int i) {
 		return params[i];
+	}
+	
+	/**
+	 * @return the size of the parameters
+	 */
+	public int size() {
+		return params.length;
 	}
 
 	/**
@@ -328,7 +397,7 @@ public class Literal implements Comparable<Literal>, Serializable {
 	
 	/**
 	 * If this literal subsumes the other, 
-	 * @param other
+	 * @param other the other literal to check against
 	 * @return returns the subsumption rule
 	 */
 	public Map<Integer, Integer> getSubRule(Literal other) {
@@ -342,10 +411,6 @@ public class Literal implements Comparable<Literal>, Serializable {
 			int elem2 = other.params[i];
 			
 			SymType type1 = env.symTab().getTypeID(elem1);
-			SymType type2 = env.symTab().getTypeID(elem2);
-			
-			if (type1 != type2) // different types 
-				return null;
 			
 			if (type1 == SymType.CONSTANT) {
 				if (elem1 != elem2) // constant mismatched
@@ -361,6 +426,7 @@ public class Literal implements Comparable<Literal>, Serializable {
 	}
 	
 	/**
+	 * Check if there is a theta so that (this) (theta) = other
 	 * @param other the other literal the check against
 	 * @param theta the substitution
 	 * @return true if the current literal subsume the others,

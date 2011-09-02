@@ -1,6 +1,7 @@
 package org.inouelab.coopqa.operators.comgen;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -10,6 +11,7 @@ import org.inouelab.coopqa.Env;
 import org.inouelab.coopqa.Options;
 import org.inouelab.coopqa.base.Literal;
 import org.inouelab.coopqa.base.Query;
+import org.inouelab.coopqa.base.SymType;
 
 /**
  * Beta: Segment generator for GR
@@ -123,7 +125,7 @@ class SegmentGen
     		Integer otherVal = newTheta.get(key);
     		Integer thisVal = theta.get(key);
     		
-    		if (thisVal != otherVal)
+    		if (!thisVal.equals(otherVal))
     			return true;
     	}
 
@@ -165,6 +167,8 @@ class SegmentGen
     }
     
     public void printMap(Map<Integer, Integer> map) {
+    	if (map == null)
+    		return;
     	Iterator<Integer> it = map.keySet().iterator();
     	int key, val;
     	while(it.hasNext()) {
@@ -274,9 +278,9 @@ class SegmentGen
 		Options options = new Options(env);
 		
 		String[] testArgs = { "-kb",
-				"C:\\Users\\Nam\\workspace\\CQA\\lib\\gen_kb.txt", 
+				"C:\\Users\\Nam\\workspace\\CQA\\test\\gen_kb.txt", 
 				"-q",
-				"C:\\Users\\Nam\\workspace\\CQA\\lib\\gen_query.txt"};
+				"C:\\Users\\Nam\\workspace\\CQA\\test\\gen_query.txt"};
 		options.init(testArgs);
 		
     	
@@ -288,12 +292,16 @@ class SegmentGen
     	List<Literal> querySeg = query.getLitVector();
     	List<Literal> ruleSeg = rule.getLitVector();
     	
-    	println("Query: " + query);
-    	println("Rule: " + rule);
+    	System.out.println("Query: " + query);
+    	System.out.println("Rule: " + rule);
     	
+    	
+    	
+    	SegmentGen.setDebug(true);
     	SegmentGen gen = new SegmentGen(querySeg, ruleSeg, theta, env);
+        
     	while(gen.hasNext()) {
-    		println(gen.next());
+    		System.out.println(gen.next());
     	}
     }
 }
