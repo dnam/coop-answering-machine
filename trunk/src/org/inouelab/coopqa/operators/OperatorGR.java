@@ -5,6 +5,7 @@ import java.util.*;
 import org.inouelab.coopqa.Env;
 import org.inouelab.coopqa.base.*;
 import org.inouelab.coopqa.operators.comgen.MultiCombinationGenerator;
+import org.inouelab.coopqa.operators.comgen.MultiSegmentGen;
 
 /**
  * Goal-Replacement Operator
@@ -35,22 +36,24 @@ final class OperatorGR extends Operator {
 	}
 	
 	QuerySet doGR(Query q, Rule r) {
+		// Literal's alternate comparator
+		Literal.AltComp altComp = new Literal.AltComp(env);
 		// Extract two vectors of Query and Rule
 		List<Literal> qVector = new Vector<Literal>();
 		Iterator<Literal> it = q.iterator();
 		while (it.hasNext())
 			qVector.add(it.next());
-		Collections.sort(qVector);
+		Collections.sort(qVector, altComp);
 		
 		List<Literal> rVector = r.extractLeft();
-		Collections.sort(rVector);
+		Collections.sort(rVector, altComp);
 		
 		// Create segments of Rule
 		Vector<Vector<Literal>> rSegments = new Vector<Vector<Literal>>();
 		int begin = 0, end = 0;
 		Vector<Literal> segment = new Vector<Literal>();
 		while(end < rVector.size()) {
-			if (rVector.get(begin).compareTo(rVector.get(end)) != 0) {
+			if (altComp.compare(rVector.get(begin), rVector.get(end)) != 0) {
 				rSegments.add(segment);
 				segment = new Vector<Literal>();
 				begin = end;
@@ -70,7 +73,7 @@ final class OperatorGR extends Operator {
 			int mid = (low + high) / 2;
 			while (low <= high) {
 				mid = (low + high)/2;
-				int comp = qVector.get(mid).compareTo(lit);
+				int comp = altComp.compare(qVector.get(mid),lit);
 				if (comp == 0)
 					break;
 				else if (comp > 1)
@@ -80,15 +83,15 @@ final class OperatorGR extends Operator {
 			}
 			
 			// Mismatch
-			if (qVector.get(mid).compareTo(lit) != 0)
+			if (altComp.compare(qVector.get(mid), lit) != 0)
 				return null;
 			
 			int idx = mid;
-			while(idx >= 0 && qVector.get(idx).compareTo(lit) == 0)
+			while(idx >= 0 && altComp.compare(qVector.get(idx), lit) == 0)
 				idx--;
 			idx++;
 			
-			while(idx < qVector.size() && qVector.get(idx).compareTo(lit) == 0) {
+			while(idx < qVector.size() && altComp.compare(qVector.get(idx), lit) == 0) {
 				segment.add(qVector.get(idx));
 				idx++;
 			}
@@ -108,26 +111,42 @@ final class OperatorGR extends Operator {
 		//Set of retrurned query
 		QuerySet setQ = new QuerySet();
 		
+		// TODO old code, to be removed
 		// Generate a combination
-		MultiCombinationGenerator<Literal> comGen = 
-			new MultiCombinationGenerator<Literal>(qSegments, rSegs);
+//		MultiCombinationGenerator<Literal> comGen = 
+//			new MultiCombinationGenerator<Literal>(qSegments, rSegs);
+//		
+//		// Produce segments of query
+//		while (comGen.hasNext()) {
+//			List<Literal> lVector = comGen.next();
+//			
+//			// check if the query is subsumed by the left-hand side
+//			if (Query.subsume(rVector, lVector)) {
+//				Query newQuery = q.replaceLiterals(lVector, r.getFirstRight());
+//				if (globalSet.add(newQuery)) { // add a new query: returns true if the query is new
+//					setQ.add(newQuery);
+//				}
+//				else { // set the query as "skipped"
+//					q.setSkipped(true);
+//					setQ.add(q);
+//				}
+//			}
+//		}
 		
-		// Produce segments of query
-		while (comGen.hasNext()) {
-			List<Literal> lVector = comGen.next();
-			Query subQ = new Query(lVector, env);
-			
+		MultiSegmentGen segGen = new MultiSegmentGen(qSegments, qSegments, env);
+		while (segGen.hasNext()) {
+			List<Literal> lVector = segGen.next();
+
 			// check if the query is subsumed by the left-hand side
-			if (subQ.isSubsumedBy(rVector)) {
-				Query newQuery = q.replaceLiterals(lVector, r.getFirstRight());
-				if (globalSet.add(newQuery)) { // add a new query: returns true if the query is new
-					setQ.add(newQuery);
-				}
-				else { // set the query as "skipped"
-					q.setSkipped(true);
-					setQ.add(q);
-				}
+			Query newQuery = q.replaceLiterals(lVector, r.getFirstRight());
+			if (globalSet.add(newQuery)) { // add a new query: returns true if
+											// the query is new
+				setQ.add(newQuery);
+			} else { // set the query as "skipped"
+				q.setSkipped(true);
+				setQ.add(q);
 			}
+
 		}
 		
 		return setQ;		

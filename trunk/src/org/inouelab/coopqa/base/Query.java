@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -51,23 +52,6 @@ public class Query {
 		
 		// For AI operators
 		idCountMap = new HashMap<Integer, Integer>();
-	}
-
-	/**
-	 * Constructs the query from a vector of literals
-	 * @param lVector literal vector
-	 * @param env The environment of this job
-	 */
-	public Query(List<Literal> lVector, Env env) {
-		this.id = env.symTab().getQueryID();
-		this.litVector = new Vector<Literal>(lVector);
-		this.hashVal = null;
-		this.env = env;
-		this.id = env.symTab().getQueryID();
-		this.skipped = false;
-		
-		// For AI operators
-		this.idCountMap = new HashMap<Integer, Integer>();
 	}
 	
 	/**
@@ -263,7 +247,7 @@ public class Query {
 			Literal otherLit = other.litVector.get(i);
 			if (thisLit.isNegative() != otherLit.isNegative())
 				return false;
-			if (thisLit.getID() != otherLit.getID())
+			if (thisLit.getPred() != otherLit.getPred())
 				return false;
 		}
 		
@@ -661,23 +645,23 @@ public class Query {
 	}
 	
 	/**
-	 * Check if the current query is subsumed by the other Query
+	 * Check if the query is subsumed by the other Query
 	 * That is to say: there exists a substitution theta such
 	 * that: <code>(other Query) (theta) := thisQuery</code>
-	 * @param 	other the other query in form of vector of literals
+	 * @param 	query the query in form of a List
+	 * @param	rule the left hand side of a rule
 	 * @return  <code>true</code> if the other query subsumes this query
 	 * 			<code>false</code> otherwise
 	 */
-	public boolean isSubsumedBy(List<Literal> other) {
-		if (this.size() != other.size())
+	public static boolean subsume(List<Literal> rule, List<Literal> query) {
+		if (rule.size() != query.size())
 			return false;
 		
 		Map<Integer, Integer> theta = new HashMap<Integer, Integer>();
-		for (int i = 0; i < this.size(); i++) {
-			if (!other.get(i).subsume(this.litVector.get(i), theta))
+		for (int i = 0; i < rule.size(); i++) {
+			if (!rule.get(i).subsume(query.get(i), theta))
 				return false;
 		}
-		
 		
 		return true;
 	}

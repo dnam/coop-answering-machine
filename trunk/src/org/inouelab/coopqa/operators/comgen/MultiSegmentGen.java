@@ -49,7 +49,10 @@ public class MultiSegmentGen
 		setFirst();
 	}
 	
-	public void setFirst() {
+	/**
+	 * Set the first result for the iterator
+	 */
+	private void setFirst() {
 		int i = 0;
 		while (i < seggenList.size()) {
 			if (i < 0) {
@@ -72,8 +75,6 @@ public class MultiSegmentGen
 		for (int j = 0; j < lastResults.size(); j++) {
 			nextResult.addAll(lastResults.get(j));
 		}
-		
-		setNext();
 	}
 
 	@Override
@@ -99,22 +100,23 @@ public class MultiSegmentGen
 		return toReturn;
 	}
 	
+	/**
+	 * Sets the next result of the operator
+	 */
 	private void setNext() {
 		int i = seggenList.size() - 1;
 		while(i >= 0 && i < seggenList.size()) {
 			final SegmentGen thisGen = seggenList.get(i);
+			
 			if (!thisGen.hasNext()) { // out of elements
 				thisGen.reset();
-				i--;
+				i--; // try to fall back
 				continue;
 			}
 			
 			// There is a next element
 			final List<Literal> ret = thisGen.next();
 			lastResults.set(i, ret);
-			if (ret == null) {
-				System.out.println("ERROR");
-			}
 			
 			// Move forward
 			i++;
@@ -144,31 +146,36 @@ public class MultiSegmentGen
 		Options options = new Options(env);
 		
 		String[] testArgs = { "-kb",
-				"C:\\Users\\Nam\\workspace\\CQA\\lib\\gen_kb.txt", 
+				"C:\\Users\\Nam\\workspace\\CQA\\test\\gen_kb.txt", 
 				"-q",
-				"C:\\Users\\Nam\\workspace\\CQA\\lib\\gen_query.txt"};
+				"C:\\Users\\Nam\\workspace\\CQA\\test\\gen_query.txt"};
 		options.init(testArgs);
 		   	
     	Query query = Query.parse("test/query.txt", env);
     	Query rule = Query.parse("test/rule.txt", env);
     	
-    	Vector<Literal> rVector = rule.getLitVector();
+    	Vector<Literal> ruleVector = rule.getLitVector();
     	Vector<Literal> qVector = query.getLitVector();
     	
-    	Collections.sort(rVector);
-    	Collections.sort(qVector);
+    	
+    	Literal.AltComp altComp = new Literal.AltComp(env);
+    	Collections.sort(ruleVector, altComp);
+    	Collections.sort(qVector, altComp);
+    	
+    	System.out.println("Rule: " + ruleVector);
+    	System.out.println("Query: " + qVector);
     	
 		// Create segments of Rule
 		List<List<Literal>> rSegments = new Vector<List<Literal>>();
 		int begin = 0, end = 0;
 		Vector<Literal> segment = new Vector<Literal>();
-		while(end < rVector.size()) {
-			if (rVector.get(begin).compareTo(rVector.get(end)) != 0) {
+		while(end < ruleVector.size()) {
+			if (altComp.compare(ruleVector.get(begin), ruleVector.get(end)) != 0) {
 				rSegments.add(segment);
 				segment = new Vector<Literal>();
 				begin = end;
 			}
-			segment.add(rVector.get(end));
+			segment.add(ruleVector.get(end));
 			end++;
 		}
 		rSegments.add(segment);
@@ -184,7 +191,7 @@ public class MultiSegmentGen
 			int mid = (low + high) / 2;
 			while (low <= high) {
 				mid = (low + high)/2;
-				int comp = qVector.get(mid).compareTo(lit);
+				int comp = altComp.compare(qVector.get(mid), lit);
 				if (comp == 0)
 					break;
 				else if (comp > 1)
@@ -194,17 +201,17 @@ public class MultiSegmentGen
 			}
 			
 			// Mismatch
-			if (qVector.get(mid).compareTo(lit) != 0) {
+			if (altComp.compare(qVector.get(mid), lit) != 0) {
 				System.err.println("error");
 				System.exit(-1);
 			}
 			
 			int idx = mid;
-			while(idx >= 0 && qVector.get(idx).compareTo(lit) == 0)
+			while(idx >= 0 && altComp.compare(qVector.get(idx), lit) == 0)
 				idx--;
 			idx++;
 			
-			while(idx < qVector.size() && qVector.get(idx).compareTo(lit) == 0) {
+			while(idx < qVector.size() && altComp.compare(qVector.get(idx), lit) == 0) {
 				segment.add(qVector.get(idx));
 				idx++;
 			}
