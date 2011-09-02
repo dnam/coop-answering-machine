@@ -261,7 +261,7 @@ class CUP$KBParser$actions {
 		int tleft = ((java_cup.runtime.Symbol)CUP$KBParser$stack.peek()).left;
 		int tright = ((java_cup.runtime.Symbol)CUP$KBParser$stack.peek()).right;
 		Vector<Integer> t = (Vector<Integer>)((java_cup.runtime.Symbol) CUP$KBParser$stack.peek()).value;
-		 Literal l = new Literal(parser.env(), t); l.setID(parser.env().symTab().addSymbol(pred, SymType.PREDICATE)); l.setNegative(false); RESULT=l; 
+		 Literal l = new Literal(parser.env(), t); l.setPred(parser.env().symTab().addSymbol(pred, SymType.PREDICATE)); l.setNegative(false); RESULT=l; 
               CUP$KBParser$result = parser.getSymbolFactory().newSymbol("basic_literal",2, ((java_cup.runtime.Symbol)CUP$KBParser$stack.elementAt(CUP$KBParser$top-1)), ((java_cup.runtime.Symbol)CUP$KBParser$stack.peek()), RESULT);
             }
           return CUP$KBParser$result;
