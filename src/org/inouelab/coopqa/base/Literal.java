@@ -384,34 +384,31 @@ public class Literal implements Comparable<Literal>, Serializable {
 		
 		int n = this.params.length;
 		for (int i = 0; i < n; i++) {
-			int elem1 = this.params[i];
-			int elem2 = other.params[i];
+			int thisElem = this.params[i];
+			int otherElem = other.params[i];
 			
-			SymType type1 = env.symTab().getTypeID(elem1);
-			SymType type2 = env.symTab().getTypeID(elem2);
+			SymType thisType = env.symTab().getTypeID(thisElem);
 			
-			if (type1 != type2) // different types 
-				return false;
-			
-			if (type1 == SymType.CONSTANT) {
-				if (elem1 != elem2) // constant mismatching
+			if (thisType == SymType.CONSTANT) {
+				if (thisElem != otherElem) // constant mismatching
 					return false;
+				
 				continue; // matched constant
 			}
-			
-			// Var vs. var. Check substitution rule that var1 -> someVar
-			// if someVar != var2 (elem2) -> return false
-			// if someVar == var2 -> continue to the next element
-			// if no rule yet -> add rule var1->var2, continue
-			Integer someVar = localTheta.get(elem1);
+
+			// thisElem: a variable
+			// otherElem: a constant or a variable
+			// Check substitution rule that thisElem -> otherElem
+			Integer someVar = localTheta.get(thisElem);
 			if (someVar == null) { // no rules yet				
-				localTheta.put(elem1, elem2); // add a new rule
+				localTheta.put(thisElem, otherElem); // add a new rule
 			}
-			else if (!someVar.equals(elem2))
+			else if (!someVar.equals(otherElem))
 				return false;
 		}
 		
-		theta.putAll(localTheta);		
+		theta.putAll(localTheta);
+		
 		return true;
 	}
 	
