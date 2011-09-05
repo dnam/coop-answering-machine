@@ -39,9 +39,8 @@ public class MultiSegmentGen
 		this.lastResults = new ArrayList<List<Literal>>();
 		
 		Map<Integer, Integer> theta = new HashMap<Integer, Integer>();
-		SegmentGen.setDebug(false);
 		for (int i = 0; i < querySegs.size(); i++) {
-			SegmentGen comb = new SegmentGen(querySegs.get(i), ruleSegs.get(i), theta, env);
+			SegmentGen comb = new SegmentGen(querySegs.get(i), ruleSegs.get(i), theta);
 			seggenList.add(comb);
 			lastResults.add(null);
 		}

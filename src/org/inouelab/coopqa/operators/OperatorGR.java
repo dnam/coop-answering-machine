@@ -4,7 +4,7 @@ import java.util.*;
 
 import org.inouelab.coopqa.Env;
 import org.inouelab.coopqa.base.*;
-import org.inouelab.coopqa.operators.comgen.MultiSegmentGen;
+import org.inouelab.coopqa.operators.comgen.*;
 
 /**
  * Goal-Replacement Operator
@@ -103,15 +103,16 @@ final class OperatorGR extends Operator {
 		if (rSegments.size() != qSegments.size())
 			return null;
 		
-		int[] rSegs = new int[rSegments.size()];
-		for (int i = 0; i < rSegs.length; i++)
-			rSegs[i] = rSegments.get(i).size();
+		
 		
 		//Set of retrurned query
 		QuerySet setQ = new QuerySet();
 		
 		// TODO old code, to be removed
 		// Generate a combination
+//		int[] rSegs = new int[rSegments.size()];
+//		for (int i = 0; i < rSegs.length; i++)
+//			rSegs[i] = rSegments.get(i).size();
 //		MultiCombinationGenerator<Literal> comGen = 
 //			new MultiCombinationGenerator<Literal>(qSegments, rSegs);
 //		
