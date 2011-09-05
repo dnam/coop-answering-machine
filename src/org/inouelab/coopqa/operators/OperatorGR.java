@@ -133,7 +133,7 @@ final class OperatorGR extends Operator {
 //			}
 //		}
 		
-		MultiSegmentGen segGen = new MultiSegmentGen(qSegments, qSegments, env);
+		MultiSegmentGen segGen = new MultiSegmentGen(qSegments, qSegments);
 		while (segGen.hasNext()) {
 			List<Literal> lVector = segGen.next();
 
