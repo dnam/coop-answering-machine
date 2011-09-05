@@ -10,6 +10,8 @@ import java.util.Vector;
  * Generates combinations from a list of lists
  * @author Nam Dang
  * @param <E> element type
+ * @deprecated use {@link MultiSegmentGen instead}
+ * @see MultiSegmentGen
  */
 public class MultiCombinationGenerator<E>
 	implements Iterator<List<E>>, Iterable<List<E>>{

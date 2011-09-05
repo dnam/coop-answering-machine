@@ -11,7 +11,7 @@ import java.util.NoSuchElementException;
  * @author Nam Dang
  * @param <E> type of element
  */
-public class CombiGenerator<E> 
+class CombiGenerator<E> 
         implements Iterator<List<E>>, Iterable<List<E>> {
 
     private final List<E> set;
