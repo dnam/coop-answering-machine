@@ -25,9 +25,8 @@ public class MultiSegmentGen
 	private ArrayList<SegmentGen>		seggenList;
 	private List<Literal> 				nextResult;
 	private ArrayList<List<Literal>> 	lastResults;
-	private Env env;
 	
-	public MultiSegmentGen (List<List<Literal>> querySegs, List<List<Literal>> ruleSegs, Env env) {
+	public MultiSegmentGen (List<List<Literal>> querySegs, List<List<Literal>> ruleSegs) {
 		if (querySegs.size() != ruleSegs.size())
 			throw new IllegalArgumentException("Query and Rule must be of the same segments");
 	
@@ -219,7 +218,7 @@ public class MultiSegmentGen
 		}
 		System.out.println("# query segments: " + qSegments.size());
     	
-		MultiSegmentGen multiGen = new MultiSegmentGen(qSegments, rSegments, env);
+		MultiSegmentGen multiGen = new MultiSegmentGen(qSegments, rSegments);
 		
 		System.out.println("All combinations: ");
 		while(multiGen.hasNext()) {
