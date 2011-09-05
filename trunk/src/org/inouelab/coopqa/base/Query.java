@@ -39,6 +39,12 @@ public class Query {
 	private Env env;
 	private boolean skipped; // skipped the query: not solve it
 	
+	// Caching comparison result
+	private Map<Integer, Boolean> equalCache;
+	
+	// Store the set of Queries
+	private static Map<Integer, Query> querySet = new HashMap<Integer, Query>();
+	
 
 	/**
 	 * @param env The environment of this job
@@ -49,6 +55,9 @@ public class Query {
 		this.hashVal = null;
 		this.env = env;
 		this.skipped = false;
+		this.equalCache = new HashMap<Integer, Boolean>();
+		
+		querySet.put(this.id, this);
 		
 		// For AI operators
 		idCountMap = new HashMap<Integer, Integer>();
@@ -219,6 +228,27 @@ public class Query {
 	}
 	
 	/**
+	 * @param value the value to cache
+	 * @param other the other query to cache
+	 * @return the original value
+	 */
+	private boolean cacheEqualsResult(boolean value, Query other) {
+		this.equalCache.put(other.id, value);
+		other.equalCache.put(this.id, value);
+		return value;
+	}
+	
+	/**
+	 * Removes an entry from the cache
+	 * @param otherID the id of the other query
+	 */
+	private void removeCache(int otherID) {
+		Query other = querySet.get(otherID);
+		this.equalCache.remove(otherID);
+		other.equalCache.remove(this.id);
+	}
+	
+	/**
 	 * Check the equivalence between two queries.
 	 * Two queries are defined to be equivalent if:
 	 * There is an inversible substitution <code>theta</code> that:
@@ -237,6 +267,11 @@ public class Query {
 		
 		Query other = (Query) obj;
 		
+		// Check if the comparison result is cached
+		Boolean ret = this.equalCache.get(other.id);
+		if (ret != null)
+			return ret;
+		
 		// First they are of the same size?
 		if (this.litVector.size() != other.litVector.size())
 			return false;
@@ -246,28 +281,22 @@ public class Query {
 			Literal thisLit = this.litVector.get(i);
 			Literal otherLit = other.litVector.get(i);
 			if (thisLit.isNegative() != otherLit.isNegative())
-				return false;
+				return cacheEqualsResult(false, other);
 			if (thisLit.getPred() != otherLit.getPred())
-				return false;
+				return cacheEqualsResult(false, other);
 		}
 		
 		// Build segmentation vector
-		if (this.segVector == null)
-			this.buildSegment();
-		if (other.segVector == null)
-			other.buildSegment();
-		
-		if (this.segVector == null || other.segVector == null) {
-			return false;
-		}
+		this.buildSegment();
+		other.buildSegment();
 		
 		// Do they have the same segment vector
 		if (this.segVector.size() != other.segVector.size())
-			return false;
+			return cacheEqualsResult(false, other);
 		
 		for (int i = 0; i < this.segVector.size(); i++) {
 			if (this.segVector.get(i) != other.segVector.get(i))
-				return false;
+				return cacheEqualsResult(false, other);
 		}
 					
 		// Storing substitution rule THETA
@@ -283,7 +312,9 @@ public class Query {
 			swapCache.add(null);
 		}
 		
-		// Now we check segment by segment		
+		// Now we check segment by segment
+		// Matching basically means we try to find a certain ordering such that
+		// we can find a replacement between a vector against the other by direct mapping
 		int i = 0, segIdx = 0;
 		boolean fallBack = false;
 		while (segIdx < segVector.size()) {
@@ -309,8 +340,7 @@ public class Query {
 					
 					// copy the current theta into a cache
 					// as the isEquivalent will change theta
-					Map<Integer, Integer> tmpTheta = new HashMap<Integer, Integer>();
-					tmpTheta.putAll(theta);
+					Map<Integer, Integer> tmpTheta = new HashMap<Integer, Integer>(theta);
 					
 					if (thisLit.isEquivalent(otherLit, theta)) {
 						// swapping i <--> j
@@ -319,10 +349,10 @@ public class Query {
 						// Store the swap
 						swapCache.set(i, j); // we swapped i by j
 						
-						// Store the old theta into the cache
+						// Store the new theta into the cache
 						thetaCache.set(i, tmpTheta);
 						
-						// set the succeed bit
+						// set the succeed bit and breaks
 						succeed = true;
 						break;
 					}
@@ -346,7 +376,7 @@ public class Query {
 			}
 			
 			if (i < 0)
-				return false; // TOTAL FAILURE
+				return cacheEqualsResult(false, other);; // TOTAL FAILURE
 			
 			if (i < begin) // fall back to the previous segment
 				segIdx--;
@@ -355,7 +385,7 @@ public class Query {
 				segIdx++;
 		}
 
-		return true;
+		return cacheEqualsResult(true, other);
 	}
 
 	
@@ -506,8 +536,14 @@ public class Query {
 	 * beginning by looking at the end of the previous segment)
 	 */
 	public void buildSegment() {
-		if (litVector.size() == 0) // nothing to build
+		if (segVector != null || litVector.size() == 0) // nothing to build
 			return;
+		
+		// Clear the cache map
+		Iterator<Integer> keyIt = equalCache.keySet().iterator();
+		while (keyIt.hasNext()) {
+			removeCache(keyIt.next());
+		}
 		
 		segVector = new Vector<Integer>();
 
@@ -522,6 +558,15 @@ public class Query {
 		}
 		
 		segVector.add(end);
+	}
+	
+	/**
+	 * Returns a copy of the segment vector
+	 */
+	public Vector<Integer> getSegmentVect() {
+		if (segVector == null)
+			buildSegment();
+		return new Vector<Integer>(segVector);
 	}
 	
 	

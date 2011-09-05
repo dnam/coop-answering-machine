@@ -58,7 +58,7 @@ public class Env {
 	
 	/**
 	 * @return the limit of the number of the queries to generate
-	 * @see Solver#run(Env)
+	 * @see GenOp#run(Env)
 	 */
 	public int getLimitval() {
 		return queryLimit;

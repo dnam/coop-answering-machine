@@ -31,18 +31,20 @@ public class CoopQA {
 //			options.init(args);
 			
 			// The root of the tree
-			Result ret = Solver.run(env);
+			Result ret = GenOp.run(env);
 			
 			System.out.println(ret.printAll());
 			System.out.println("Total SOLAR time: " + ret.getSolarTime() + "s");
 		}
 		catch (IllegalArgumentException e) {
+			e.printStackTrace();
 			System.out.println("ERROR: " + e.getMessage());
 			options.printHelp();
 		}
 		catch (Exception e) {
+			e.printStackTrace();
 			System.out.println("ERROR: " + e.getMessage());
-			options.printHelp();
+//			options.printHelp();
 		}
 
 	}

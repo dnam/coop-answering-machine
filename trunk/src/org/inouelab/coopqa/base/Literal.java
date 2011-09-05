@@ -351,12 +351,10 @@ public class Literal implements Comparable<Literal>, Serializable {
 		if (theta == null)
 			throw new NullPointerException("theta cannot be null");
 
-		
 		// assertion. for debugging
 		assert this.params.length == other.params.length;
 		
-		int n = this.params.length;
-		for (int i = 0; i < n; i++) {
+		for (int i = 0; i < this.params.length; i++) {
 			int elem1 = this.params[i];
 			int elem2 = other.params[i];
 			

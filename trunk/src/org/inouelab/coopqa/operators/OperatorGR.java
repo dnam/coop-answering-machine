@@ -4,7 +4,6 @@ import java.util.*;
 
 import org.inouelab.coopqa.Env;
 import org.inouelab.coopqa.base.*;
-import org.inouelab.coopqa.operators.comgen.MultiCombinationGenerator;
 import org.inouelab.coopqa.operators.comgen.MultiSegmentGen;
 
 /**
