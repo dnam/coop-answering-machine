@@ -25,22 +25,6 @@ class SegmentGen
     private final int[] 							lastIdxs;
 	private final Map<Integer, Integer> 			theta;
 	private final ArrayList<Map<Integer, Integer>> 	savedThetas;
-	private Env env;
-	static boolean debug;
-	
-	public static void setDebug(boolean debugVal) {
-		debug = debugVal;
-	}
-	
-	private static void print(Object str) {
-		if (debug)
-			System.out.print(str);
-	}
-	private static void println(Object obj) {
-		if (debug)
-			System.out.println(obj);
-	}
-	
 	// For mapping
 	private Map<Integer, Integer>[][]	ruleMatrix;
 
@@ -51,26 +35,19 @@ class SegmentGen
 	 * @param theta the shared theta of the job
 	 */
 	public SegmentGen(List<Literal> querySeg, List<Literal> ruleSeg, 
-    		Map<Integer, Integer> theta, Env env) {
+    		Map<Integer, Integer> theta) {
     	int r = ruleSeg.size();
         if(r < 1 || r > querySeg.size())
             throw new IllegalArgumentException("r < 1 || r > querySeg.size()");
         
         this.theta = theta;
-        this.env = env;
-        
-        int a;
-        if(theta.size() > 0)
-        	a = 0;
-        
+               
         this.savedThetas = new ArrayList<Map<Integer, Integer>>(r);
         this.querySeg = new ArrayList<Literal>(querySeg);
         this.currentIdxs = new int[r];
         this.lastIdxs = new int[r];
         
         setRuleMatrix(ruleSeg);       
-        println("Rule: " + ruleSeg);
-        println("Query: " + querySeg);
         
 		setInitialIndexes();
 	}
@@ -87,8 +64,6 @@ class SegmentGen
 				Literal qLit = querySeg.get(j);
 				Map<Integer, Integer> newTheta = rLit.getSubRule(qLit);
 				ruleMatrix[i][j] = newTheta;
-				print("[" + i + ", " + j + "]: ");
-				printMap(newTheta);
 			}
 		}
 	}
@@ -166,19 +141,6 @@ class SegmentGen
         return currentCombination;
     }
     
-    public void printMap(Map<Integer, Integer> map) {
-    	if (map == null)
-    		return;
-    	Iterator<Integer> it = map.keySet().iterator();
-    	int key, val;
-    	while(it.hasNext()) {
-    		key = it.next();
-    		val = map.get(key);
-    		print("[" + env.symTab().getSym(key) + "->" + env.symTab().getSym(val) + "] ");
-    	}
-    	println("");
-    }
-
     @Override
 	public void remove() {
         throw new UnsupportedOperationException();
@@ -251,13 +213,6 @@ class SegmentGen
                 	currentIdxs[i] = j;
                 	break;
             	}
-            	else if (newTheta != null)
-            	{
-            		println("Conflicted. Current theta: " );
-            		printMap(theta);
-            		print("new theta: ");
-            		printMap(newTheta);
-            	}
             }
             
             if (currentIdxs[i] < 0) { // fail to find a suitable index
@@ -295,10 +250,7 @@ class SegmentGen
     	System.out.println("Query: " + query);
     	System.out.println("Rule: " + rule);
     	
-    	
-    	
-    	SegmentGen.setDebug(true);
-    	SegmentGen gen = new SegmentGen(querySeg, ruleSeg, theta, env);
+       	SegmentGen gen = new SegmentGen(querySeg, ruleSeg, theta);
         
     	while(gen.hasNext()) {
     		System.out.println(gen.next());
