@@ -78,7 +78,7 @@ public class KnowledgeBase {
 		for (int i = 0; i < n; i++) {
 			str.append(formulaList.get(i));
 			if (i < n-1)
-				str.append(", ");
+				str.append(",\n");
 		}
 
 		return str.toString();
@@ -87,6 +87,10 @@ public class KnowledgeBase {
 	public void clear() {
 		formulaList.clear();
 		setSHRR.clear();
+	}
+	
+	public int size() {
+		return formulaList.size();
 	}
 	
 	/**

@@ -19,7 +19,7 @@ public class AnswerMap extends HashMap<Integer, List<List<Integer>>>{
 	private static final long serialVersionUID = -5333557672963251276L;
 	
 	private Env env;		// current environment
-	private double time; 	// time to get this answer list
+	private long time; 	// time to get this answer list in nano seconds
 	
 	/**
 	 * @param env the environment of the job 
@@ -33,14 +33,18 @@ public class AnswerMap extends HashMap<Integer, List<List<Integer>>>{
 	
 	/**
 	 * Set the time spent on SOLAR to obtain this answer
-	 * @param time the execution time as <code>double</code
+	 * @param time the execution time as <code>long</code>
 	 */
-	public void setTime(double time) {
+	public void setTime(long time) {
 		this.time = time;
 	}
 	
-	public double getTime() {
+	public long getTime() {
 		return time;
+	}
+	
+	public double getDoubleTime() {
+		return ((double) time)/1000000000;
 	}
 	
 	/**

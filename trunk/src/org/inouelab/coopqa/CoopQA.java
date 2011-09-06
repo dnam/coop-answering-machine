@@ -24,9 +24,7 @@ public class CoopQA {
 			String[] testArgs = { "-kb",
 					"C:\\Users\\Nam\\workspace\\CQA\\test\\gen_kb.txt",
 					"-q",
-					"C:\\Users\\Nam\\workspace\\CQA\\test\\gen_query.txt",
-					"-d",
-					"10"};
+					"C:\\Users\\Nam\\workspace\\CQA\\test\\gen_query.txt"};
 			options.init(testArgs);
 //			options.init(args);
 			

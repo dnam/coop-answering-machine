@@ -33,8 +33,6 @@ public class SolarConnector {
 	private Env env;
 	private long lastRunTime;
 	private File tmpDir;
-	private static double BILLION = ((double) (1000)) * ((double) (1000))
-			* (1000);
 	private static int SOLAR_DEFAULT_CODE = 902; // check with SOLAR's ExitCode
 	private static int LINUX_SOLAR_CODE = 134; // check with SOLAR's ExitCode
 	
@@ -267,8 +265,9 @@ public class SolarConnector {
 					queryAnsList = new Vector<List<Integer>>();
 					retMap.put(id, queryAnsList);
 				}
+				
 
-				String ans = line.replaceAll("[[0-9]+\\(\\)]", "");
+				String ans = line.replaceFirst("\\d+", "").replaceAll("[()]", "");
 				StringTokenizer token = new StringTokenizer(ans, " ,");
 				Vector<Integer> ansList = new Vector<Integer>();
 				while (token.hasMoreTokens()) {
@@ -277,7 +276,7 @@ public class SolarConnector {
 				queryAnsList.add(ansList);
 			}
 
-			retMap.setTime((lastRunTime) / BILLION);
+			retMap.setTime(lastRunTime);
 			return retMap;
 		} catch (Exception e) {
 			throw new Exception("Error in SolarConnector.run(): "
