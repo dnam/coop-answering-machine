@@ -4,6 +4,7 @@ package org.inouelab.coopqa;
 import java.io.File;
 
 import org.inouelab.coopqa.base.KnowledgeBase;
+import org.inouelab.coopqa.base.Query;
 import org.inouelab.coopqa.base.SymTable;
 import org.inouelab.coopqa.operators.Operator;
 import org.inouelab.coopqa.solar.SolarConnector;
@@ -36,6 +37,20 @@ public class Env {
 		depthLimit = Integer.MAX_VALUE;
 		queryLimit = Integer.MAX_VALUE;
 	}
+	
+	/**
+	 * @param kb the {@link KnowledgeBase} to work on
+	 */
+	public void setKB(KnowledgeBase kb) {
+		this.kb = kb;
+	}
+	
+	/**
+	 * @param query the {@link Query} to work on
+	 */
+	public void setQuery(Query query) {
+		this.query = query;
+	}
 
 	/**
 	 * @return the {@link SolarConnector} object
@@ -58,7 +73,7 @@ public class Env {
 	
 	/**
 	 * @return the limit of the number of the queries to generate
-	 * @see GenOp#run(Env)
+	 * @see MultithreadGenOp#run(Env)
 	 */
 	public int getLimitval() {
 		return queryLimit;
@@ -114,22 +129,49 @@ public class Env {
 		catch (Exception e) {
 			throw new Exception("Unable to parse the knowlege base file");
 		}
-		System.out.println("INIT: Knowldge Base initialized");
+		System.out.println("INIT: Knowledge Base initialized");
+		
+		if (queryFile == null)
+			throw new IllegalAccessError("No query file");
+		try {
+			query = Query.parse(queryFile, this);
+		}
+		catch (Exception e) {
+			throw new Exception("Unable to parse the query file");
+		}
+		System.out.println("INIT: QUery file parsed");
 
+		// Setting up solar
+		initNoFiles();
+	}
+	
+	/**
+	 * Initializes the environment. This method must be called
+	 * after setting the two objects: Knowledgebase {@link #setKB(KnowledgeBase)}
+	 * and Query {@link #setQuery(Query)}
+	 * @throws Exception if the environment cannot be initialized
+	 * @see KnowledgeBase#parse(String, Env)
+	 * @see SolarConnector#SolarConnector(Env, String, File)
+	 * @see SolarWorker#SolarWorker(SolarConnector, int)
+	 */
+	public void initNoFiles() throws Exception {
+		if (kb == null || query == null)
+			throw new IllegalAccessError("There is no query or knowledge base");
+		
 		// Setting up solar
 		File tmpDirFile = null;
 		if (tmpDir != null)
 			tmpDirFile = new File(tmpDir);
-		
+
 		connector = new SolarConnector(this, solarPath, tmpDirFile);
 		worker = new SolarWorker(connector, cycleSize);
-		
+
 		if (!connector.checkSOLAR()) {
-			throw new IllegalAccessError("Cannot execute SOLAR. Please check the path again");
-		}
-		else
+			throw new IllegalAccessError(
+					"Cannot execute SOLAR. Please check the path again");
+		} else
 			System.out.println("INIT: SOlAR CONNECTED");
-		
+
 		initialized = true;
 	}
 	
@@ -142,6 +184,17 @@ public class Env {
 			throw new IllegalAccessError("Unitialized Environment");
 		
 		return kb;
+	}
+	
+	/**
+	 * @return the {@link Query} object of the environtment
+	 * @throws IllegalAccessError if this {@link Env} object is not initialized
+	 */
+	public Query query() {
+		if (!initialized)
+			throw new IllegalAccessError("Unitialized Environment");
+		
+		return query;
 	}
 	
 	/**
@@ -213,6 +266,7 @@ public class Env {
 	// Primary attribute
 	private boolean initialized; // is this object initialized or not?
 	private KnowledgeBase kb; // knowledge base
+	private Query query; // query
 	private int queryLimit; // limiting number of queries
 	private SymTable symTab; // symbol table
 	private int depthLimit;

@@ -6,7 +6,6 @@ import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -242,9 +241,8 @@ public class Query {
 	 * Removes an entry from the cache
 	 * @param otherID the id of the other query
 	 */
-	private void removeCache(int otherID) {
+	private void removeFromOtherCache(int otherID) {
 		Query other = querySet.get(otherID);
-		this.equalCache.remove(otherID);
 		other.equalCache.remove(this.id);
 	}
 	
@@ -542,7 +540,8 @@ public class Query {
 		// Clear the cache map
 		Iterator<Integer> keyIt = equalCache.keySet().iterator();
 		while (keyIt.hasNext()) {
-			removeCache(keyIt.next());
+			removeFromOtherCache(keyIt.next());
+			keyIt.remove();
 		}
 		
 		segVector = new Vector<Integer>();

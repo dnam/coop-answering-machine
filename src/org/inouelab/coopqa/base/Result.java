@@ -19,7 +19,7 @@ import org.inouelab.coopqa.web.shared.WebResult;
 public class Result {
 	private QuerySet root;	
 	private AnswerMap answerMap;
-	private double solarTime;
+	private long solarTime;
 	
 	/**
 	 * Constructor. Creates an empty result
@@ -34,7 +34,7 @@ public class Result {
 	 * @see AnswerMap#getTime()
 	 */
 	public double getSolarTime() {
-		return solarTime;
+		return ((double)solarTime)/1000000000;
 	}
 
 	/**
@@ -43,8 +43,12 @@ public class Result {
 	 * @see SolarConnector
 	 * @see AnswerMap#getTime()
 	 */
-	public void setSolarTime(double solarTime) {
+	public void setSolarTime(long solarTime) {
 		this.solarTime = solarTime;
+	}
+	
+	public long getNanoTime() {
+		return solarTime;
 	}
 
 	/**
