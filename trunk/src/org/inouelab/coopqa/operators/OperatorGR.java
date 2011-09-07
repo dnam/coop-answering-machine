@@ -26,7 +26,12 @@ final class OperatorGR extends Operator {
 
 		Iterator<Rule> itRule = env.kb().iteratorSHRR();
 		while(itRule.hasNext()) {
-			QuerySet set = doGR(query, itRule.next());
+			Rule rule = itRule.next();
+			// skip if the rule is too long
+			if (rule.extractLeft().size() > query.size())
+				continue;
+			
+			QuerySet set = doGR(query, rule);
 			if (set != null)
 				retSet.addAll(set);
 		}
