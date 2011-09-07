@@ -23,6 +23,12 @@ public class BenchmarkSuite {
 	private Env env;
 	private KnowledgeBase kb;
 	private Query query;
+	
+	private class BenchmarkResult {
+		public int kbSize;
+		public int querySize;
+		public int ruleSize;
+	}
 
 	public BenchmarkSuite() {		
 		this.kb = null;
@@ -77,7 +83,7 @@ public class BenchmarkSuite {
 				Clause clause = new Clause();
 				clause.add(lit);
 				
-				kb.add(clause);
+//				kb.add(clause);
 			}
 		}
 		
@@ -111,7 +117,7 @@ public class BenchmarkSuite {
 		int queryVar = env.symTab().addSymbol("X", SymType.VARIABLE);
 		HashSet<Integer> diseaseSet = new HashSet<Integer>();
 		query = new Query(env);
-		for (int i = 0; i < queryLength; i++) {
+		for (int i = 0; i < queryLength;) {
 			int disease_id = diseases[disease_rand.nextInt(diseases.length)];
 			if (diseaseSet.contains(disease_id))
 				continue;
@@ -121,10 +127,8 @@ public class BenchmarkSuite {
 			lit.setPred(illPredID);
 			
 			query.add(lit);
+			i++;
 		}
-		
-		System.out.println("Knowledge base size: " + kb.size());
-		System.out.println("Query size: " + query.size());
 		
 		// Setting the environment
 		env.setKB(kb);
@@ -135,44 +139,47 @@ public class BenchmarkSuite {
 	 * Launch the test
 	 * @return the SOLAR time
 	 */
-	public double launch() {
+	public BenchmarkResult launch() {
+		BenchmarkResult ret = new BenchmarkResult();
 		if (query == null || kb == null) {
 			throw new IllegalAccessError("Please initialize first");
 		}
 		
+		ret.kbSize = kb.sizeSHRR();
+		ret.querySize = query.size();
+		
+		// Read the rule size: by reading the first SHRR rule
+		ret.ruleSize = kb.iteratorSHRR().next().extractLeft().size();
+		
 		try {
-			env.initNoFiles();
+			env.initNoFilesNoSOLAR();
 			
 			// The root of the tree
-			Result ret = GenOp.runNoSOLAR(env);
-			
-			return ret.getSolarTime();
+			GenOp.runNoSOLAR(env);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		return -1;
+		return ret;
 	}
 	
 	public static void main(String args[]) {
 		BenchmarkSuite benchmark = new BenchmarkSuite();
 		
-		int patientSize = 20;
-		int diseaseSize = 10;
-		int medSize = 10;
-		int ruleLength = 5;
-		int queryLength = 10;
+		int patientSize = 30;
+		int diseaseSize = 40;
+		int medSize = 30;
+		int ruleLength = 3;
+		int queryLength = 7;
 		
-		long before = System.nanoTime();
+		long before = System.currentTimeMillis();
 		
 		benchmark.init(patientSize, diseaseSize, medSize, ruleLength, queryLength);
-		double solarTime = benchmark.launch();
+		BenchmarkResult ret = benchmark.launch();
 		
-		long execTime = System.nanoTime() - before;
+		double execTime = ((double) (System.currentTimeMillis() - before))/1000D;
 		
-		double time = execTime / 1000000000D;
-		System.out.println("Total exec time: " + time);
-		System.out.println("SOLAR time: " + solarTime);
+		System.out.println(ret.querySize + "\t" + ret.ruleSize + "\t" + ret.kbSize + "\t" + execTime);
 	}
 }
