@@ -29,9 +29,10 @@ public class CoopQA {
 //			options.init(args);
 			
 			// The root of the tree
-			Result ret = GenOp.run(env);
+//			Result ret = GenOp.run(env);
+			Result ret = MultithreadGenOp.run(env);
 			
-			System.out.println(ret.printAll());
+			System.out.print(ret.printAll());
 			System.out.println("Total SOLAR time: " + ret.getSolarTime() + "s");
 		}
 		catch (IllegalArgumentException e) {

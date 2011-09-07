@@ -176,6 +176,24 @@ public class Env {
 	}
 	
 	/**
+	 * For BENCHMARKING only
+	 * Does not use SOLAR and files
+	 * Initializes the environment. This method must be called
+	 * after setting the two objects: Knowledgebase {@link #setKB(KnowledgeBase)}
+	 * and Query {@link #setQuery(Query)}
+	 * @throws Exception if the environment cannot be initialized
+	 * @see KnowledgeBase#parse(String, Env)
+	 * @see SolarConnector#SolarConnector(Env, String, File)
+	 * @see SolarWorker#SolarWorker(SolarConnector, int)
+	 */
+	public void initNoFilesNoSOLAR() throws Exception {
+		if (kb == null || query == null)
+			throw new IllegalAccessError("There is no query or knowledge base");
+		initialized = true;
+		System.out.println("Initialized");
+	}
+	
+	/**
 	 * @return the {@link KnowledgeBase} object of the environtment
 	 * @throws IllegalAccessError if this {@link Env} object is not initialized
 	 */

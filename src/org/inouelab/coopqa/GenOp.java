@@ -191,6 +191,7 @@ public class GenOp {
 			if (queryLimit <= 0)
 				break;
 		}
+		System.out.println();
 		
 		result.setAnswerMap(ansMap);
 		result.setSolarTime(ansMap.getTime());

@@ -93,6 +93,10 @@ public class KnowledgeBase {
 		return formulaList.size();
 	}
 	
+	public int sizeSHRR() {
+		return setSHRR.size();
+	}
+	
 	/**
 	 * Converts the current knowledge base into TPTP format
 	 * for execution in SOLAR.
