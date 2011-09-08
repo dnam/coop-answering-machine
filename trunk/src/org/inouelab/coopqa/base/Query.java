@@ -85,6 +85,13 @@ public class Query {
 		return q;
 	}
 	
+	/**
+	 * 
+	 * @param inputString query input string
+	 * @param env execution enviornment
+	 * @return the query ojbect
+	 * @throws Exception if parsing error occurs
+	 */
 	public static Query parseString(String inputString, Env env) throws Exception {
 		Query q = new Query(env);
 
@@ -272,7 +279,7 @@ public class Query {
 		
 		// First they are of the same size?
 		if (this.litVector.size() != other.litVector.size())
-			return false;
+			return cacheEqualsResult(false, other);
 		
 		// Checking predicate fingerprint
 		for (int i = 0; i < litVector.size(); i++) {
@@ -374,7 +381,7 @@ public class Query {
 			}
 			
 			if (i < 0)
-				return cacheEqualsResult(false, other);; // TOTAL FAILURE
+				return cacheEqualsResult(false, other); // TOTAL FAILURE
 			
 			if (i < begin) // fall back to the previous segment
 				segIdx--;
