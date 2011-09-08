@@ -26,18 +26,22 @@ public class MultiSegmentGen
 	private List<Literal> 				nextResult;
 	private ArrayList<List<Literal>> 	lastResults;
 	
+	private Map<Integer, Integer> theta;
+	private Map<Integer, Integer> lastTheta;
+	
 	public MultiSegmentGen (List<List<Literal>> querySegs, List<List<Literal>> ruleSegs) {
 		if (querySegs.size() != ruleSegs.size())
 			throw new IllegalArgumentException("Query and Rule must be of the same segments");
 	
 		seggenList = new ArrayList<SegmentGen>();
+		lastTheta = null;
 	
 		// Generate a list of combination generator
 		// and generate the first combination
 		this.nextResult = new ArrayList<Literal>();
 		this.lastResults = new ArrayList<List<Literal>>();
 		
-		Map<Integer, Integer> theta = new HashMap<Integer, Integer>();
+		theta = new HashMap<Integer, Integer>();
 		for (int i = 0; i < querySegs.size(); i++) {
 			SegmentGen comb = new SegmentGen(querySegs.get(i), ruleSegs.get(i), theta);
 			seggenList.add(comb);
@@ -92,10 +96,24 @@ public class MultiSegmentGen
         }
 		
 		List<Literal> toReturn = new ArrayList<Literal>(nextResult);
+
+		// Copy theta
+		lastTheta = new HashMap<Integer, Integer>(theta);
 		
+		// Generate next result
 		setNext();		
 		
 		return toReturn;
+	}
+	
+	/**
+	 * Returns the last theta of the segmentation generation
+	 * after {@link #next()} is called
+	 * @return the theta in form of a map<br/>
+	 * 			<code>null</code> if no last theta available
+	 */
+	public Map<Integer, Integer> getLastTheta() {
+		return lastTheta;
 	}
 	
 	/**
