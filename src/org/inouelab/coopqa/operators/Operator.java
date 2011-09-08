@@ -40,8 +40,11 @@ public class Operator {
 	
 	
 	// A global storage for all generated queries
-	protected QuerySet globalSet;
+	protected QuerySet 	globalSet;
 	protected Env 		env;
+	
+	// Track the time in this operator
+	private long		operatorTime;
 	
 	/**
 	 * @param env the environment object
@@ -63,6 +66,7 @@ public class Operator {
 	 */
 	protected Operator(boolean init, Env env) {
 		this.env = env;
+		operatorTime = 0;
 		
 		if (init) {
 			globalSet = new QuerySet();
@@ -89,6 +93,8 @@ public class Operator {
 	 * @see Operator#GR
 	 */
 	public final QuerySet run(QuerySet inputSet) {
+		long beforeTime = System.nanoTime();
+		
 		Iterator<Query> it = inputSet.iterator();
 		QuerySet retSet = new QuerySet();
 		
@@ -98,32 +104,43 @@ public class Operator {
 				retSet.addAll(set);
 		}
 		
-		if (retSet.isEmpty())
-			return null;
-		
-		// Add the children
-		inputSet.addChild(retSet);
-		
-		// Set the parents and operation
-		retSet.setParent(inputSet);
-		
-		// Set corresponding operators
-		retSet.addAllOps(inputSet);
-		int type = getType(); // get the type of the operator
-		switch(type) {
-		case DC_t:
-			retSet.addOperator(DC_t);
-			break;
-		case AI_t:
-			retSet.addOperator(AI_t);
-			break;
-		case GR_t:
-			retSet.addOperator(GR_t);
-			break;
+		if (!retSet.isEmpty()) {
+			// Add the children
+			inputSet.addChild(retSet);
+			
+			// Set the parents and operation
+			retSet.setParent(inputSet);
+			
+			// Set corresponding operators
+			retSet.addAllOps(inputSet);
+			int type = getType(); // get the type of the operator
+			switch(type) {
+			case DC_t:
+				retSet.addOperator(DC_t);
+				break;
+			case AI_t:
+				retSet.addOperator(AI_t);
+				break;
+			case GR_t:
+				retSet.addOperator(GR_t);
+				break;
+			}
 		}
+		else
+			retSet = null;
+		
+		// Record time
+		operatorTime += (System.nanoTime() - beforeTime);
 		
 		return retSet;
-	}	
+	}
+	
+	/**
+	 * @return the time spent in this operator
+	 */
+	public double getTime() {
+		return ((double) operatorTime) * (1.0e-9);
+	}
 	
 	/**
 	 * Reset the operator to run generalization
@@ -131,6 +148,7 @@ public class Operator {
 	 */
 	 public final void reset() {
 		 globalSet.clear();
+		 operatorTime = 0;
 	 }
 	 
 	/**

@@ -34,6 +34,9 @@ public class CoopQA {
 			
 			System.out.print(ret.printAll());
 			System.out.println("Total SOLAR time: " + ret.getSolarTime() + "s");
+			System.out.println("AI time: " + env.op().AI.getTime());
+			System.out.println("DC time: " + env.op().DC.getTime());
+			System.out.println("GR time: " + env.op().GR.getTime());
 		}
 		catch (IllegalArgumentException e) {
 			e.printStackTrace();

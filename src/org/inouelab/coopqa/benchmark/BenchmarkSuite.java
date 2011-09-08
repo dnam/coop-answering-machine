@@ -28,6 +28,10 @@ public class BenchmarkSuite {
 		public int kbSize;
 		public int querySize;
 		public int ruleSize;
+		
+		public double timeAI;
+		public double timeDC;
+		public double timeGR;
 	}
 
 	public BenchmarkSuite() {		
@@ -36,8 +40,8 @@ public class BenchmarkSuite {
 		this.env = new Env();
 		this.env.setSolarPath(SOLAR_DEFAULT);
 	
-		this.disease_rand = new Random(System.currentTimeMillis());
-		this.med_rand = new Random(System.currentTimeMillis());
+		this.disease_rand = new Random(System.nanoTime());
+		this.med_rand = new Random(System.nanoTime());
 	}
 	
 	/**
@@ -161,6 +165,10 @@ public class BenchmarkSuite {
 			e.printStackTrace();
 		}
 		
+		ret.timeAI = env.op().AI.getTime();
+		ret.timeDC = env.op().DC.getTime();
+		ret.timeGR = env.op().GR.getTime();
+		
 		return ret;
 	}
 	
@@ -168,18 +176,19 @@ public class BenchmarkSuite {
 		BenchmarkSuite benchmark = new BenchmarkSuite();
 		
 		int patientSize = 30;
-		int diseaseSize = 40;
-		int medSize = 30;
+		int diseaseSize = 10;
+		int medSize = 10;
 		int ruleLength = 3;
 		int queryLength = 7;
 		
-		long before = System.currentTimeMillis();
+		long before = System.nanoTime();
 		
 		benchmark.init(patientSize, diseaseSize, medSize, ruleLength, queryLength);
 		BenchmarkResult ret = benchmark.launch();
 		
-		double execTime = ((double) (System.currentTimeMillis() - before))/1000D;
+		double execTime = ((double) (System.nanoTime() - before)) * 1.0e-9;
 		
 		System.out.println(ret.querySize + "\t" + ret.ruleSize + "\t" + ret.kbSize + "\t" + execTime);
+		System.out.println("AI " + ret.timeAI + " DC: " + ret.timeDC + " GR: " + ret.timeGR);		
 	}
 }

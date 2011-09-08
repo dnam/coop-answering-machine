@@ -73,7 +73,7 @@ public class GenOp {
 
 			if (doAI) {
 				ret = OP.AI.run(nextSet);
-				if (ret != null) {
+				if (ret != null && !ret.isEmpty()) {
 					workingQueue.add(ret);
 					ansMap.putAll(con.run(ret));					
 					queryLimit -= ret.size();
@@ -84,7 +84,7 @@ public class GenOp {
 
 			if (doDC) {
 				ret = OP.DC.run(nextSet);
-				if (ret != null) {
+				if (ret != null && !ret.isEmpty()) {
 					workingQueue.add(ret);
 					ansMap.putAll(con.run(ret));
 					queryLimit -= ret.size();
@@ -95,7 +95,7 @@ public class GenOp {
 
 			if (doGR) {
 				ret = OP.GR.run(nextSet);
-				if (ret != null) {
+				if (ret != null && !ret.isEmpty()) {
 					workingQueue.add(ret);
 					ansMap.putAll(con.run(ret));
 					queryLimit -= ret.size();
