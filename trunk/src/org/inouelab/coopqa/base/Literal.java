@@ -182,6 +182,23 @@ public class Literal implements Comparable<Literal>, Serializable {
 		return l;
 	}
 	
+	public Literal substitute(Map<Integer, Integer> theta) {
+		int[] newParams = new int[this.params.length];
+		for (int i = 0; i < this.params.length; i++) {
+			int thisParam = this.params[i];
+			if (theta.containsKey(thisParam))
+				newParams[i] = theta.get(this.params[i]);
+			else
+				newParams[i] = thisParam;
+		}
+		
+		Literal newLit = new Literal(this.env, newParams);
+		newLit.pred = this.pred;
+		newLit.neg = this.neg;
+		
+		return newLit;		
+	}
+	
 	@Override
 	public String toString() {
 		StringBuilder str = new StringBuilder();

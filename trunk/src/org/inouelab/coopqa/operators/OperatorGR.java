@@ -141,9 +141,11 @@ final class OperatorGR extends Operator {
 		MultiSegmentGen segGen = new MultiSegmentGen(qSegments, qSegments);
 		while (segGen.hasNext()) {
 			List<Literal> lVector = segGen.next();
+			Map<Integer, Integer> theta = segGen.getLastTheta();
 
+			Literal rightSideRule = r.getFirstRight().substitute(theta);
 			// check if the query is subsumed by the left-hand side
-			Query newQuery = q.replaceLiterals(lVector, r.getFirstRight());
+			Query newQuery = q.replaceLiterals(lVector, rightSideRule);
 			if (globalSet.add(newQuery)) { // add a new query: returns true if
 											// the query is new
 				setQ.add(newQuery);
@@ -156,6 +158,8 @@ final class OperatorGR extends Operator {
 		
 		return setQ;		
 	}
+	
+	
 	
 	@Override
 	public int getType() {
