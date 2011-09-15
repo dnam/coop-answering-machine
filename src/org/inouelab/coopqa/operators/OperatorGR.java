@@ -146,13 +146,12 @@ final class OperatorGR extends Operator {
 			Literal rightSideRule = r.getFirstRight().substitute(theta);
 			// check if the query is subsumed by the left-hand side
 			Query newQuery = q.replaceLiterals(lVector, rightSideRule);
-			if (globalSet.add(newQuery)) { // add a new query: returns true if
-											// the query is new
-				setQ.add(newQuery);
-			} else { // set the query as "skipped"
-				q.setSkipped(true);
-				setQ.add(q);
+			if (!globalSet.add(newQuery))  { // set the query as "skipped" if added before
+				newQuery.setSkipped(true);
 			}
+			
+			// Add to the current set
+			setQ.add(newQuery);
 
 		}
 		

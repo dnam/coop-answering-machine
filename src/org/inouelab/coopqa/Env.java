@@ -101,12 +101,19 @@ public class Env {
 		return tmpDir;
 	}
 	
+	/**
+	 * Sets the limit of the depth of the generalization tree
+	 * @param depth the max depth of the tree
+	 */
 	public void setDepth(int depth) {
 		if (depth <= 0)
 			throw new IllegalArgumentException("depthLimit must be a positive value");
 		this.depthLimit = depth;
 	}
 	
+	/**
+	 * @return the maximum depth of the generalization tree
+	 */
 	public int getDepth() {
 		return depthLimit;
 	}
@@ -230,30 +237,51 @@ public class Env {
 		this.cycleSize = cycleSize;
 	}
 
+	/**
+	 * @param kbFile the path to the kb file
+	 */
 	public void setKbFile(String kbFile) {
 		this.kbFile = kbFile;
 	}	
 	
+	/**
+	 * @param queryLimit  the limit of # of queries to generate
+	 */
 	public void setQueryLimit(int queryLimit) {
 		this.queryLimit = queryLimit;
 	}
 
+	/** 
+	 * @param outputFile the path to the output file
+	 */
 	public void setOutputFile(String outputFile) {
 		this.outputFile = outputFile;
 	}
 
+	/**
+	 * @param queryFile the path to the query file
+	 */
 	public void setQueryFile(String queryFile) {
 		this.queryFile = queryFile;
 	}
 
+	/**
+	 * @param solarPath the path to SOLAR's jar
+	 */
 	public void setSolarPath(String solarPath) {
 		this.solarPath = solarPath;
 	}
 
+	/**
+	 * @param tmpDir path to the tmp directory
+	 */
 	public void setTmpDir(String tmpDir) {
 		this.tmpDir = tmpDir;
 	}
 
+	/**
+	 * @return the {@link SymTable} object of the job
+	 */
 	public SymTable symTab() {
 		return symTab;
 	}
@@ -277,6 +305,9 @@ public class Env {
 		this.maxTimePerCycle = maxTimePerCycle;
 	}
 
+	/**
+	 * @return the maximum time spent on each cycle of solving in SOLAR
+	 */
 	public int getMaxTimePerCycle() {
 		return maxTimePerCycle;
 	}

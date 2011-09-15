@@ -99,7 +99,12 @@ public class Operator {
 		QuerySet retSet = new QuerySet();
 		
 		while (it.hasNext()) {
-			QuerySet set = perform(it.next());
+			// skip skipped query
+			Query query = it.next();
+			if (query.isSkipped())
+				continue;
+			
+			QuerySet set = perform(query);
 			if (set != null)
 				retSet.addAll(set);
 		}

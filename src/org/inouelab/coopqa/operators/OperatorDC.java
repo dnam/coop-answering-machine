@@ -5,8 +5,6 @@
  */
 package org.inouelab.coopqa.operators;
 
-import java.util.Vector;
-
 import org.inouelab.coopqa.Env;
 import org.inouelab.coopqa.base.*;
 
@@ -38,25 +36,16 @@ final class OperatorDC extends Operator {
 		if (n <= 1)
 			return null;
 		
-		// Get the segmentation
-		Vector<Integer> segVect = query.getSegmentVect();
-		for (int i = 0; i < segVect.size(); i++) {
-			Query newQuery = query.dropAt(segVect.get(i) - 1);
-			if (!globalSet.add(newQuery)) // if not a new query, skip in the future
+		for (int i = 0; i < n; i++) {
+			Query newQuery = query.dropAt(i);
+			if (globalSet.add(newQuery)) { // new query
+				retSet.add(newQuery);
+			}
+			else {
 				newQuery.setSkipped(true);
-			retSet.add(newQuery);
+				retSet.add(newQuery);
+			}
 		}
-
-//		for (int i = 0; i < n; i++) {
-//			Query newQuery = query.dropAt(i);
-//			if (globalSet.add(newQuery)) { // new query
-//				retSet.add(newQuery);
-//			}
-//			else {
-//				newQuery.setSkipped(true);
-//				retSet.add(newQuery);
-//			}
-//		}
 		
 		return retSet;
 	}
