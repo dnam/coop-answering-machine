@@ -52,6 +52,11 @@ class SegmentGen
 		setInitialIndexes();
 	}
 
+	/**
+	 * Set the rules from literals to literals between the
+	 * rule and the query segment
+	 * @param ruleSeg the rule segment to set
+	 */
 	@SuppressWarnings(value = "unchecked")
 	private void setRuleMatrix(List<Literal> ruleSeg) {
 		int r = ruleSeg.size();
@@ -68,6 +73,9 @@ class SegmentGen
 		}
 	}
     
+	/**
+	 * Set the intial indexes
+	 */
     private void setInitialIndexes() {
     	int r = lastIdxs.length;
     	currentIdxs = new int[r];
@@ -82,7 +90,12 @@ class SegmentGen
     		currentIdxs = null;
     }
     
-    private Map<Integer, Integer> extractMap(Map<Integer, Integer> newTheta) {
+    /**
+     * Extract the new rules from the new theta
+     * @param newTheta new theta to extract rules from
+     * @return a map of new rules
+     */
+    private Map<Integer, Integer> extractNewRules(Map<Integer, Integer> newTheta) {
     	Map<Integer, Integer> copyNewTheta = new HashMap<Integer, Integer> (newTheta);
     	
     	copyNewTheta.entrySet().removeAll(theta.entrySet());
@@ -90,6 +103,12 @@ class SegmentGen
     	return copyNewTheta;
     }
     
+    /**
+     * Checks if the newTheta has any conflicting rules with
+     * the current working theta
+     * @param newTheta the theta to check against
+     * @return <code>true</code> if conflicts
+     */
     private boolean isConflicted(Map<Integer, Integer> newTheta) {
     	Iterator<Integer> it = newTheta.keySet().iterator();
     	while(it.hasNext()) {
@@ -107,6 +126,9 @@ class SegmentGen
     	return false;
     }
     
+    /**
+     * Resets the generator
+     */
     public void reset() {
     	for (int i = 0; i < savedThetas.size(); i++) {
     		removeSubTheta(savedThetas.get(i));
@@ -146,7 +168,11 @@ class SegmentGen
         throw new UnsupportedOperationException();
     }
     
-    public void removeSubTheta(Map<Integer, Integer> subTheta) {
+    /**
+     * Removes the subTheta from theta 
+     * @param subTheta
+     */
+    private void removeSubTheta(Map<Integer, Integer> subTheta) {
     	if (subTheta == null)
     		return;
     	
@@ -157,6 +183,9 @@ class SegmentGen
     	}
     }
     
+    /**
+     * Set the next indexes for the generator
+     */
     private void setNextIndexes() {
         for(int i = currentIdxs.length-1, j = querySeg.size()-1; i >= 0; i--, j--) {
             if(currentIdxs[i] != j) {          	
@@ -180,6 +209,11 @@ class SegmentGen
         currentIdxs = null;
     }
     
+    /**
+     * Sets index from a position
+     * @param startPos the starting position
+     * @return <code>true</code> if successful
+     */
     private boolean setIdxesFrom(int startPos) {
     	int i = startPos;
     	
@@ -204,7 +238,7 @@ class SegmentGen
             	Map<Integer, Integer> newTheta = ruleMatrix[i][j];
             	
             	if (newTheta != null && !isConflicted(newTheta)) {
-            		newTheta = extractMap(newTheta);
+            		newTheta = extractNewRules(newTheta);
             		
             		// Add to the history
                 	savedThetas.set(i, newTheta);
@@ -226,34 +260,5 @@ class SegmentGen
         }
         
         return true;
-    }
-    
-    public static void main(String args[]) throws Exception {
-    	Env env = new Env(); // a new environment
-		Options options = new Options(env);
-		
-		String[] testArgs = { "-kb",
-				"C:\\Users\\Nam\\workspace\\CQA\\test\\gen_kb.txt", 
-				"-q",
-				"C:\\Users\\Nam\\workspace\\CQA\\test\\gen_query.txt"};
-		options.init(testArgs);
-		
-    	
-    	Map<Integer, Integer> theta = new HashMap<Integer, Integer>();
-    	
-    	Query query = Query.parse("test/query.txt", env);
-    	Query rule = Query.parse("test/rule.txt", env);
-    	
-    	List<Literal> querySeg = query.getLitVector();
-    	List<Literal> ruleSeg = rule.getLitVector();
-    	
-    	System.out.println("Query: " + query);
-    	System.out.println("Rule: " + rule);
-    	
-       	SegmentGen gen = new SegmentGen(querySeg, ruleSeg, theta);
-        
-    	while(gen.hasNext()) {
-    		System.out.println(gen.next());
-    	}
     }
 }

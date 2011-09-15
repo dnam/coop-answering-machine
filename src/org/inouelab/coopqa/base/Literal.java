@@ -28,7 +28,7 @@ public class Literal implements Comparable<Literal>, Serializable {
 	
 	/**
 	 * An alternative comparator for {@link Collections#sort(List, Comparator)}
-	 * which only differentiates two parameters if they are both constants
+	 * to group literals by its predicate
 	 * @author Nam Dang
 	 */
 	public static class AltComp implements Comparator<Literal> {
@@ -47,35 +47,7 @@ public class Literal implements Comparable<Literal>, Serializable {
 			int pred1 = l1.getPred()* (l1.isNegative()? -1: 1);
 			int pred2 = l2.getPred()* (l2.isNegative()? -1: 1);
 			
-//			if (pred1 != pred2)
-				return (pred1 - pred2);
-//			
-//			int n = l1.size();
-//			for (int i = 0; i < n; i++) {
-//				int param1 = l1.getParamAt(i);
-//				int param2 = l2.getParamAt(i);
-//				
-//				// Get the type
-//				SymType pType = env.symTab().getTypeID(param1);
-//				SymType qType = env.symTab().getTypeID(param2);
-//				
-//				// if they are of the same type
-//				if (pType == qType) {
-//					// skip if we have a pair of variables
-//					if (pType == SymType.VARIABLE)
-//						continue;
-//
-//					// Constant
-//					if (param1 == param2)
-//						continue;
-//					
-//					return (param1 - param2);
-//				}
-//				
-//				// ignore they are of different types			
-//			}
-			
-//			return 0;
+			return (pred1 - pred2);
 		}		
 	}
 	

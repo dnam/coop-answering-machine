@@ -20,6 +20,11 @@ public class MultiCombinationGenerator<E>
 	private List<E> nextResult;
 	private Vector<List<E>> lastResults;
 	
+	/**
+	 * @param multiList list of segments
+	 * @param kList each segment takes out k-elements
+	 * @deprecated use {@link MultiSegmentGen}
+	 */
 	public MultiCombinationGenerator (List<List<E>> multiList, int[] kList) {
 		genList = new Vector<CombiGenerator<E>>();
 		
