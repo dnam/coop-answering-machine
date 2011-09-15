@@ -53,7 +53,7 @@ final class OperatorGR extends Operator {
 		Collections.sort(rVector, altComp);
 		
 		// Create segments of Rule
-		Vector<Vector<Literal>> rSegments = new Vector<Vector<Literal>>();
+		Vector<List<Literal>> rSegments = new Vector<List<Literal>>();
 		int begin = 0, end = 0;
 		Vector<Literal> segment = new Vector<Literal>();
 		while(end < rVector.size()) {
@@ -112,33 +112,9 @@ final class OperatorGR extends Operator {
 		
 		//Set of retrurned query
 		QuerySet setQ = new QuerySet();
-		
-		// TODO old code, to be removed
-		// Generate a combination
-//		int[] rSegs = new int[rSegments.size()];
-//		for (int i = 0; i < rSegs.length; i++)
-//			rSegs[i] = rSegments.get(i).size();
-//		MultiCombinationGenerator<Literal> comGen = 
-//			new MultiCombinationGenerator<Literal>(qSegments, rSegs);
-//		
-//		// Produce segments of query
-//		while (comGen.hasNext()) {
-//			List<Literal> lVector = comGen.next();
-//			
-//			// check if the query is subsumed by the left-hand side
-//			if (Query.subsume(rVector, lVector)) {
-//				Query newQuery = q.replaceLiterals(lVector, r.getFirstRight());
-//				if (globalSet.add(newQuery)) { // add a new query: returns true if the query is new
-//					setQ.add(newQuery);
-//				}
-//				else { // set the query as "skipped"
-//					q.setSkipped(true);
-//					setQ.add(q);
-//				}
-//			}
-//		}
-		
-		MultiSegmentGen segGen = new MultiSegmentGen(qSegments, qSegments);
+	
+		// Generate the matching segments from the query
+		MultiSegmentGen segGen = new MultiSegmentGen(qSegments, rSegments);
 		while (segGen.hasNext()) {
 			List<Literal> lVector = segGen.next();
 			Map<Integer, Integer> theta = segGen.getLastTheta();
