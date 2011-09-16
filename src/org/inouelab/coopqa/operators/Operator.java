@@ -43,6 +43,7 @@ public class Operator {
 	protected QuerySet 	globalSet;
 	protected Env 		env;
 	
+	private boolean		rootClass;
 	// Track the time in this operator
 	private long		operatorTime;
 	
@@ -55,20 +56,21 @@ public class Operator {
 
 	/**
 	 * A constructor for the operator class. 
-	 * <code>init</code> differentiates if this is a generalized class,
+	 * <code>rootClass</code> differentiates if this is a generalized class,
 	 * or a sub-class of <code>Operator</code>.<br />
 	 * <br/>
 	 * If you plan to extends <code>Operator</code>, make sure
 	 * to set <code>init</code> as <b>false</b> in your constructor.
-	 * @param init if <i>true</i>, we initialize the sub-operators,
+	 * @param rootClass if <i>true</i>, we initialize the sub-operators,
 	 * 			otherwise, we skip them.
 	 * @param env the {@link Env} environment object
 	 */
-	protected Operator(boolean init, Env env) {
+	protected Operator(boolean rootClass, Env env) {
 		this.env = env;
-		operatorTime = 0;
+		this.operatorTime = 0;
+		this.rootClass = rootClass;
 		
-		if (init) {
+		if (rootClass) {
 			globalSet = new QuerySet();
 			AI = new OperatorAI(env);
 			DC = new OperatorDC(env);
@@ -93,6 +95,10 @@ public class Operator {
 	 * @see Operator#GR
 	 */
 	public final QuerySet run(QuerySet inputSet) {
+		// if this is called from a non-root class
+		if (rootClass)
+			throw new UnsupportedOperationException();
+		
 		long beforeTime = System.nanoTime();
 		
 		Iterator<Query> it = inputSet.iterator();
