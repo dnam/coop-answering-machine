@@ -32,22 +32,13 @@ public class Literal implements Comparable<Literal>, Serializable {
 	 * @author Nam Dang
 	 */
 	public static class AltComp implements Comparator<Literal> {
-		private Env env;
-		
 		/**
-		 * Constructor
-		 * @param env the environment object
+		 * Compares two literal by their predicates only
 		 */
-		public AltComp(Env env) {
-			this.env = env;
-		}
-		
 		@Override
 		public int compare(Literal l1, Literal l2) {
-			int pred1 = l1.getPred()* (l1.isNegative()? -1: 1);
-			int pred2 = l2.getPred()* (l2.isNegative()? -1: 1);
-			
-			return (pred1 - pred2);
+			return (l1.getPred()* (l1.isNegative()? -1: 1) 
+					- l2.getPred()* (l2.isNegative()? -1: 1));
 		}		
 	}
 	

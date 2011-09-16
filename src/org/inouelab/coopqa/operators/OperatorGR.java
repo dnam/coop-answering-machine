@@ -41,7 +41,7 @@ final class OperatorGR extends Operator {
 	
 	QuerySet doGR(Query q, Rule r) {
 		// Literal's alternate comparator
-		Literal.AltComp altComp = new Literal.AltComp(env);
+		Literal.AltComp altComp = new Literal.AltComp();
 		// Extract two vectors of Query and Rule
 		List<Literal> qVector = new Vector<Literal>();
 		Iterator<Literal> it = q.iterator();
@@ -107,8 +107,6 @@ final class OperatorGR extends Operator {
 		// mismatching segment
 		if (rSegments.size() != qSegments.size())
 			return null;
-		
-		
 		
 		//Set of retrurned query
 		QuerySet setQ = new QuerySet();
