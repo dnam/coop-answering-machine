@@ -696,28 +696,6 @@ public class Query {
 	}
 	
 	/**
-	 * Check if the query is subsumed by the other Query
-	 * That is to say: there exists a substitution theta such
-	 * that: <code>(other Query) (theta) := thisQuery</code>
-	 * @param 	query the query in form of a List
-	 * @param	rule the left hand side of a rule
-	 * @return  <code>true</code> if the other query subsumes this query
-	 * 			<code>false</code> otherwise
-	 */
-	public static boolean subsume(List<Literal> rule, List<Literal> query) {
-		if (rule.size() != query.size())
-			return false;
-		
-		Map<Integer, Integer> theta = new HashMap<Integer, Integer>();
-		for (int i = 0; i < rule.size(); i++) {
-			if (!rule.get(i).subsume(query.get(i), theta))
-				return false;
-		}
-		
-		return true;
-	}
-	
-	/**
 	 * Converts a {@link QuerySet} to a {@link WebQuery} object.
 	 * @return a {@link WebQuery} object
 	 * @see WebQuery
