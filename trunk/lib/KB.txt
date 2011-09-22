@@ -1,7 +1,0 @@
-publish(X, Z) & specialization(Z) -> researcher(Z),   courses(X, Z) -> master(Z),
-researcher(Z) & teaches(X, Z) & works(X, U) -> professor(Z),
--ill(X, U) & ill(X, Y) -> drug(Y), treat(Y), ill(X, Y) -> drug(Y),
-treat(X) & treat(Y) -> cold(X) & cold(Y), kill(Z),
-scene(K) & tree(S) & tree(I) & tree(A) & tree(C) & tree(B) & color(Q,P)-> location(T),
-color(M,O) & color(N,L) & -color(M,B) -> color(A,red),
-ill(X,Y), cold(X) | cold(Z)

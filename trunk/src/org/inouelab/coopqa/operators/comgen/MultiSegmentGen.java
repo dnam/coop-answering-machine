@@ -1,18 +1,13 @@
 package org.inouelab.coopqa.operators.comgen;
 
-import org.inouelab.coopqa.Env;
-import org.inouelab.coopqa.Options;
 import org.inouelab.coopqa.base.Literal;
-import org.inouelab.coopqa.base.Query;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Vector;
 
 
 /**

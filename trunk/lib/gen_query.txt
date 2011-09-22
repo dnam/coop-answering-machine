@@ -1,1 +1,0 @@
-ill(X, flu) & ill(X, cough) 

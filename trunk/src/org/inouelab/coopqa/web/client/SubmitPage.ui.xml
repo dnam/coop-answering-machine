@@ -86,5 +86,8 @@
 				</g:FlowPanel>
 			</g:VerticalPanel>
 		</g:Cell>
+		<g:Cell height="56px" verticalAlignment="ALIGN_BOTTOM">
+			<g:HTML horizontalAlignment="ALIGN_CENTER">This software is for non-commercial use only</g:HTML>
+		</g:Cell>
 	</g:VerticalPanel>
 </ui:UiBinder> 
