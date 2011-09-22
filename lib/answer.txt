@@ -1,2 +1,0 @@
-conseq([+ans(pete,medi,mary,bronchitis)]).
-conseq([+ans(pete,medi,pete,sinusitis)]).

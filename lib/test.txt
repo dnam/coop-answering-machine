@@ -1,2 +1,0 @@
-ill(X) -> ill(Y) . ill(X) . cold(Y) | cold(Z) . 
-cold(X) & cold(Y)-> treat(X) & treat(Y). kill(Z)

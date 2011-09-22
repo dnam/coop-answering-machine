@@ -1,4 +1,0 @@
-ill(pete, cough),
-ill(marry, flu),
-treat(pete, medi),
-ill(X, cough) -> treat(X, medi)
