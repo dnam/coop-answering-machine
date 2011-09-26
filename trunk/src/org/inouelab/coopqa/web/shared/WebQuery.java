@@ -52,12 +52,12 @@ public class WebQuery implements Serializable {
 	 */
 	public String getAnsString(WebAnswerMap ansMap) {
 		if (skipped) {
-			return "[skipped]";			
+			return "[skipped]\n";			
 		}
 		Vector<Vector<String>> ret = ansMap.get(id);
 		
 		if (ret == null)
-			return "[no answer]";
+			return "[no answer]\n";
 		
 		String retStr = "";
 		for (int i = 0; i < ret.size(); i++) {
@@ -67,7 +67,7 @@ public class WebQuery implements Serializable {
 			
 			// For error reporting
 			if (ansVector.size() != listVar.size())
-				return "[FATAL ERROR: ansVector's size is different from listVar in WebQuery]";
+				return "[FATAL ERROR: ansVector's size is different from listVar in WebQuery]\n";
 			
 			for (int j = 0; j < ansVector.size(); j++) {
 				retStr += (listVar.get(j) + "->" + ansVector.get(j));

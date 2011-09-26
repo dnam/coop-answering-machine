@@ -55,7 +55,7 @@ public class UploadService extends UploadAction {
 				try {				
 					File file = File.createTempFile("upload-", ".cqa", tmpDir);
 					item.write(file);
-
+					
 					// / Send a customized message to the client.
 					response = file.getName();
 					

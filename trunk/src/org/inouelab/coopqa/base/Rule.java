@@ -102,10 +102,7 @@ public class Rule extends Formula {
 	 * Checks if the rule is a Single-headed Ranged-restricted
 	 * rule or not
 	 */
-	private void checkSHRR() {
-		if (trackSHRR != -1)
-			return;
-		
+	private void checkSHRR() {		
 		if (rightSide.size() != 1) {
 			trackSHRR = 0;
 			return;
@@ -139,7 +136,7 @@ public class Rule extends Formula {
 	 * 			<i>false</i> otherwise
 	 */
 	public boolean isSHRR() {
-		//if (trackSHRR == -1)
+		if (trackSHRR == -1)
 			checkSHRR();
 		
 		return (trackSHRR == 1);
