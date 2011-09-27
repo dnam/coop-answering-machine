@@ -175,11 +175,11 @@ public class BenchmarkSuite {
 	public static void main(String args[]) {
 		BenchmarkSuite benchmark = new BenchmarkSuite();
 		
-		int patientSize = 30;
-		int diseaseSize = 10;
-		int medSize = 10;
-		int ruleLength = 3;
-		int queryLength = 7;
+		 int patientSize = 30;
+			int diseaseSize = 20;
+			int medSize = 10;
+			int ruleLength = 4;
+			int queryLength = 7;
 		
 		long before = System.nanoTime();
 		
