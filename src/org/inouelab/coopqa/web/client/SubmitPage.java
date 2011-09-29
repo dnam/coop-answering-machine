@@ -40,7 +40,7 @@ import com.google.gwt.user.client.ui.Widget;
 public class SubmitPage extends Composite   {
 	/* Simple default examples */
 	private static final String sampleKB = "ill(pete, cough), \n" +
-											"ill(marry, flu),\n" +
+											"ill(mary, flu),\n" +
 											"treat(pete, medi),\n" +
 											"ill(X, cough) -> treat(X, medi)";
 	private static final String sampleQuery = "ill(X, flu) & ill(X, cough)";
@@ -89,7 +89,6 @@ public class SubmitPage extends Composite   {
 
 	interface CoopQAUiBinder extends UiBinder<Widget, SubmitPage> {
 	}
-
 	/**
 	 * Constructor of the submission page
 	 */
