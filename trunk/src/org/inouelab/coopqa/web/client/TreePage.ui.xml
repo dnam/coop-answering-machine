@@ -5,6 +5,10 @@
 		.important {
 			font-weight: bold;
 		}
+		
+		.textBox {
+			color: green;
+		}
 	</ui:style>
 	
 	<g:LayoutPanel width="100%" height="100%">
