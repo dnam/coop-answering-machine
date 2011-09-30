@@ -21,6 +21,7 @@
 			color: green;
 		}
 	</ui:style>
+	<g:ScrollPanel width="100%" height="100%">
 	<g:VerticalPanel width="100%">
 		<g:Cell verticalAlignment="ALIGN_MIDDLE" height="100"
 			horizontalAlignment="ALIGN_CENTER">
@@ -90,4 +91,5 @@
 			<g:HTML horizontalAlignment="ALIGN_CENTER">This software is for non-commercial use only</g:HTML>
 		</g:Cell>
 	</g:VerticalPanel>
+	</g:ScrollPanel>
 </ui:UiBinder> 
