@@ -56,6 +56,7 @@ public class TreePage extends Composite {
 		textResult = new TextArea();
 		textResult.setSize("80%", "300px");
 		textResult.setReadOnly(true);
+		textResult.setStyleName("textBox");
 
 		this.id = id.replace("/", "").replace("\\", "").replace(".", "");
 
