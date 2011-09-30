@@ -75,10 +75,7 @@ public class WebQuery implements Serializable {
 					retStr += ", ";
 			}
 			
-			retStr += "]";
-			
-			if (i + 1 < ret.size())
-				retStr += "\n";
+			retStr += "]\n";
 		}
 		
 		return retStr;
