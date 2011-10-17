@@ -58,19 +58,7 @@ public class UploadService extends UploadAction {
 					
 					// / Send a customized message to the client.
 					response = file.getName();
-					
-					// Store the file to the session information
-					HttpSession session = request.getSession(true);
-					
-					List<String> fileList = new ArrayList<String>();
-					if (!session.isNew()) {
-						List<String> tmpList = (List<String>) session.getAttribute("files");
-						if (tmpList != null)
-							fileList = tmpList;
-					}
-					fileList.add(response);
-					
-					session.setAttribute("files", fileList);
+
 				} catch (Exception e) {
 					throw new UploadActionException(e);
 				}
@@ -79,6 +67,9 @@ public class UploadService extends UploadAction {
 
 		// / Remove files from session because we have a copy of them
 		removeSessionFileItems(request);
+		
+		// Invalidate the session
+		request.getSession(true).invalidate();
 
 		// / Send your customized message to the client.
 		return response;

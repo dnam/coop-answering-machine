@@ -97,6 +97,10 @@ public class ServiceImpl extends RemoteServiceServlet
 			throw new ServerErrorException("invalid file format. Contact the administrator.");
 		}
 		
+		// Invalidate a session
+		HttpSession session = this.getThreadLocalRequest().getSession(true);
+		session.invalidate();
+		
 		return result;
 	}
 	
@@ -112,6 +116,10 @@ public class ServiceImpl extends RemoteServiceServlet
 		if (depthLimit <= 0)
 			depthLimit = Integer.MAX_VALUE;
 		
+		// Invalidate a session
+		HttpSession session = this.getThreadLocalRequest().getSession(true);
+		session.invalidate();
+				
 		// Generate a result file
 		String resultID; 
 		File mainFile, tmpFile;
@@ -131,7 +139,7 @@ public class ServiceImpl extends RemoteServiceServlet
 
 		// Submit the job
 		executor.submit(new RunnableSolver(queryFile, kbFile, resultID, tmpDir, retDir, solarPath, depthLimit));
-		
+				
 		// Return the result ID
 		return resultID;
 	}
@@ -139,6 +147,10 @@ public class ServiceImpl extends RemoteServiceServlet
 	@Override
 	public String submitTextJob(String queryString, String kbString, int depthLimit)
 			throws ServerErrorException {
+		// Invalidate a session
+		HttpSession session = this.getThreadLocalRequest().getSession(true);
+		session.invalidate();
+				
 		if (queryString == null || kbString == null)
 			throw new ServerErrorException("invalid input");
 		
@@ -165,6 +177,8 @@ public class ServiceImpl extends RemoteServiceServlet
 			e.printStackTrace();
 			throw new ServerErrorException("IOException on server's side: " + e.getMessage());
 		}
+
+		
 	}
 	
 	@Override
@@ -175,12 +189,7 @@ public class ServiceImpl extends RemoteServiceServlet
 		
 		// First checking the validity of the submission
 		HttpSession session = this.getThreadLocalRequest().getSession(true);
-		List<String> fileList = (List<String>) session.getAttribute("files");
-		if(fileList == null || !fileList.contains(queryFileName) || !fileList.contains(kbFileName))
-			throw new ServerErrorException("Invalid submission. Please upload the files first");
-		
-		// Reset the ression
-		session.removeAttribute("files");
+		session.invalidate();
 		
 		return submitJob(queryFileName, kbFileName, depthLimit);			
 	}
@@ -190,24 +199,10 @@ public class ServiceImpl extends RemoteServiceServlet
 			throws ServerErrorException {
 		// First checking the validity of the submission
 		HttpSession session = this.getThreadLocalRequest().getSession(true);
-		List<String> fileList = (List<String>) session.getAttribute("files");
-		if(fileList == null || 
-				(fileName != null && !fileList.contains(fileName)))
-			throw new ServerErrorException("Invalid request. File not submitted");
+		session.invalidate();
 		
-		if (fileName != null) {
-			// Store back to the session
-			fileList.remove(fileName);
-			session.setAttribute("files", fileList);
-			
-			try {
-				System.out.println("Trying to delete: " + (new File(tmpDir, fileName)).getCanonicalPath() );
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		if(fileName == null)	
 			(new File(tmpDir, fileName)).delete();
-		}
 	}
 	
 	/**
