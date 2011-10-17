@@ -8,11 +8,12 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -38,9 +39,35 @@ public class ServiceImpl extends RemoteServiceServlet
 	private File tmpDir;
 	private File retDir;
 	private String solarPath;
+	private BlockingQueue<RunnableSolver> threadQueue;
 
+	/**
+	 * Cleans up finished jobs to release system resources
+	 */
+	private void jobCleanUp() {
+		for (int i = 0; i < threadQueue.size(); i++) {
+			Thread thrd = threadQueue.poll();
+			if(!thrd.isAlive()) {
+				try {
+					thrd.join();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			else {
+				try {
+					thrd.join(10); // wait at most 10 miliseconds
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
 	@Override
 	public WebResult getResult(String id) throws JobNotFinishedException, ServerErrorException {
+		jobCleanUp();
+		
 		id = id.replace("/", "").replace("\\", "").replace(".", "");
 		
 		// Test if tmp file exists or not
@@ -113,6 +140,8 @@ public class ServiceImpl extends RemoteServiceServlet
 	 * @throws ServerErrorException if error occurs
 	 */
 	private String submitJob(String queryFile, String kbFile, int depthLimit) throws ServerErrorException {
+		jobCleanUp();
+		
 		if (depthLimit <= 0)
 			depthLimit = Integer.MAX_VALUE;
 		
@@ -137,8 +166,12 @@ public class ServiceImpl extends RemoteServiceServlet
 		}
 		mainFile.delete(); // delete the main file
 
-		// Submit the job
-		executor.submit(new RunnableSolver(queryFile, kbFile, resultID, tmpDir, retDir, solarPath, depthLimit));
+		// Create a new job
+		RunnableSolver thisJob = new RunnableSolver(queryFile, kbFile, resultID, tmpDir, retDir, solarPath, depthLimit);
+		threadQueue.offer(thisJob);
+		
+		// Execute the job
+		executor.submit(thisJob);
 				
 		// Return the result ID
 		return resultID;
@@ -147,6 +180,8 @@ public class ServiceImpl extends RemoteServiceServlet
 	@Override
 	public String submitTextJob(String queryString, String kbString, int depthLimit)
 			throws ServerErrorException {
+		jobCleanUp();
+		
 		// Invalidate a session
 		HttpSession session = this.getThreadLocalRequest().getSession(true);
 		session.invalidate();
@@ -184,6 +219,8 @@ public class ServiceImpl extends RemoteServiceServlet
 	@Override
 	public String submitFileJob(String queryFileName, String kbFileName, int depthLimit)
 			throws ServerErrorException {	
+		jobCleanUp();
+		
 		if (queryFileName == null || kbFileName == null)
 			throw new ServerErrorException("Please upload the files first");
 		
@@ -197,6 +234,8 @@ public class ServiceImpl extends RemoteServiceServlet
 	@Override
 	public void removeFile(String fileName)
 			throws ServerErrorException {
+		jobCleanUp();
+		
 		// First checking the validity of the submission
 		HttpSession session = this.getThreadLocalRequest().getSession(true);
 		session.invalidate();
@@ -267,6 +306,9 @@ public class ServiceImpl extends RemoteServiceServlet
 			e.printStackTrace();
 			throw new ServletException(e.getMessage());
 		}
+		
+		// Storing a list of threads
+		threadQueue = new LinkedBlockingQueue<RunnableSolver>();
 		
 	}
 }
