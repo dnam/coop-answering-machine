@@ -18,7 +18,7 @@ import org.inouelab.coopqa.web.shared.WebResult;
  * The server will spawn a thread to execute this class
  * @author Nam Dang
  */
-class RunnableSolver implements Runnable {
+class RunnableSolver extends Thread {
 	private String queryFile;
 	private String kbFile;
 	private String resultFile;
