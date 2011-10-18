@@ -6,6 +6,7 @@ import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
 
 import org.inouelab.coopqa.base.AnswerMap;
 import org.inouelab.coopqa.base.Query;
@@ -112,6 +113,7 @@ public class MultithreadGenOp {
 		AnswerMap ansMap = future.get();
 		
 		executor.shutdown();
+		while(!executor.awaitTermination(10, TimeUnit.MILLISECONDS)); // wait until finish
 		
 		result.setAnswerMap(ansMap);
 		result.setSolarTime(ansMap.getTime());

@@ -35,7 +35,6 @@ public class ServiceImpl extends RemoteServiceServlet
 				implements Service {
 	
 	private static final long serialVersionUID = -7245865837979234374L;
-	private ExecutorService executor;
 	private File tmpDir;
 	private File retDir;
 	private String solarPath;
@@ -46,7 +45,7 @@ public class ServiceImpl extends RemoteServiceServlet
 	 */
 	private void jobCleanUp() {
 		for (int i = 0; i < threadQueue.size(); i++) {
-			Thread thrd = threadQueue.poll();
+			RunnableSolver thrd = threadQueue.poll();
 			if(!thrd.isAlive()) {
 				try {
 					thrd.join();
@@ -55,11 +54,7 @@ public class ServiceImpl extends RemoteServiceServlet
 				}
 			}
 			else {
-				try {
-					thrd.join(10); // wait at most 10 miliseconds
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				threadQueue.offer(thrd);
 			}
 		}
 	}
@@ -171,7 +166,7 @@ public class ServiceImpl extends RemoteServiceServlet
 		threadQueue.offer(thisJob);
 		
 		// Execute the job
-		executor.submit(thisJob);
+		thisJob.start();
 				
 		// Return the result ID
 		return resultID;
@@ -254,7 +249,14 @@ public class ServiceImpl extends RemoteServiceServlet
 
 	@Override
 	public void destroy() {
-		executor.shutdown();
+		for (int i = 0; i < threadQueue.size(); i++) {
+			try {
+				threadQueue.poll().join();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}			
+		}
 	}
 
 	/**
@@ -269,7 +271,6 @@ public class ServiceImpl extends RemoteServiceServlet
 		
 		ServletContext context = config.getServletContext();
 		
-		executor = Executors.newFixedThreadPool(100);
 		System.out.println("Initialized thread executor with a pool of 100");
 		
 		String tmpDirPath = context.getInitParameter("tmpDir");

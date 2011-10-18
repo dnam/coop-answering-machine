@@ -168,7 +168,6 @@ public class SolarConnector {
 		
 		ProcessBuilder pb = new ProcessBuilder(cmdArgs);
 
-
 		long before = System.nanoTime();
 		Process solar = pb.start();
 		
@@ -194,6 +193,9 @@ public class SolarConnector {
 		} catch (InterruptedException e) {
 			throw new IOException("SOLAR is interrupted");
 		}
+		
+		// Destroy the process to release resources
+		solar.destroy();
 
 		lastRunTime = System.nanoTime() - before;
 
