@@ -6,6 +6,7 @@
 package org.inouelab.coopqa.operators;
 
 import org.inouelab.coopqa.Env;
+import org.inouelab.coopqa.SemanticRelThreshold;
 import org.inouelab.coopqa.base.*;
 
 /**
@@ -38,6 +39,10 @@ final class OperatorDC extends Operator {
 		
 		for (int i = 0; i < n; i++) {
 			Query newQuery = query.dropAt(i);
+			
+			if (SemanticRelThreshold.enable && newQuery.isFiltered())
+				continue;
+			
 			if (globalSet.add(newQuery)) { // new query
 				retSet.add(newQuery);
 			}
