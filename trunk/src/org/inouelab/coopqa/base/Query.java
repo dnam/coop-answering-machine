@@ -44,6 +44,11 @@ public class Query {
 	// Store the set of Queries
 	private static Map<Integer, Query> querySet = new HashMap<Integer, Query>();
 	
+	// For DC: similarity checking
+	private int pos_cnt; // counting the number of variables and constants
+	private Query parent; // the parent from which we obtained this query
+	private int opType; // the type of operator applied on the parent of this query
+	
 
 	/**
 	 * @param env The environment of this job
@@ -60,6 +65,11 @@ public class Query {
 		
 		// For AI operators
 		idCountMap = new HashMap<Integer, Integer>();
+		
+		// For semantic filtering
+		pos_cnt = 0;
+		parent = null;
+		opType = -1;
 	}
 	
 	/**
@@ -173,6 +183,9 @@ public class Query {
 			cnt = (cnt == null)? 1 : cnt + 1;
 			idCountMap.put(id, cnt);
 		}
+		
+		// Update the count of positions in the query
+		pos_cnt += literal.size();
 	}
 	
 	/**
@@ -489,6 +502,10 @@ public class Query {
 		Query q = this.clone();
 		q.remove(i);
 		
+		// Remembering the operator and the parent
+		q.opType = Operator.DC_t;
+		q.parent = this;
+		
 		return q;
 	}
 	
@@ -521,6 +538,7 @@ public class Query {
 	
 	/**
 	 * Creates a clone of this query
+	 * @return the new query with applied AI
 	 */
 	@Override
 	public Query clone() {
@@ -625,6 +643,10 @@ public class Query {
 
 					// add the modified literal
 					newQuery.add(newLiteral);
+					
+					// Update the parent
+					newQuery.parent = this;
+					newQuery.opType = Operator.AI_t;
 
 					// Add to the result set
 					retSet.add(newQuery);
@@ -658,6 +680,10 @@ public class Query {
 		// Add the replacement
 		q.add(ruleLS);
 		
+		// Update the parent
+		q.parent = this;
+		q.opType = Operator.GR_t;
+		
 		return q;
 	}
 	
@@ -686,6 +712,9 @@ public class Query {
 			if (litVector.get(mid).equals(lit)) {
 				this.remove(mid);
 				hashVal = null;
+				
+				// Update the position count
+				pos_cnt -= lit.size();
 				return;
 			}
 			mid++;
@@ -719,5 +748,27 @@ public class Query {
 	//TODO: remove
 	public Vector<Literal> getLitVector() {
 		return litVector;
+	}
+	
+	/**
+	 * @return the number of positions in the query 
+	 */
+	public int getPosNum() {
+		return pos_cnt;
+	}
+	
+	/**
+	 * Returns the similarity of this query against the original query
+	 * @param otherQuery the other query
+	 * @return the similarity of the questy against the other
+	 * 			NaN if this query has more position
+	 */
+	public double getSimAgainst(Query otherQuery) {
+		double thisNumCnt = pos_cnt;
+		double otherCnt = otherQuery.pos_cnt;
+		if (thisNumCnt > otherCnt)
+			return Double.NaN; // invalid value
+		
+		return thisNumCnt/otherCnt;
 	}
 }
