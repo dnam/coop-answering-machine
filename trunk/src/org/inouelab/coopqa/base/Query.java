@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.inouelab.coopqa.Env;
+import org.inouelab.coopqa.SemanticRelThreshold;
 import org.inouelab.coopqa.operators.Operator;
 import org.inouelab.coopqa.parser.QueryParser;
 import org.inouelab.coopqa.solar.SolarConnector;
@@ -46,9 +47,10 @@ public class Query {
 	
 	// For DC: similarity checking
 	private int pos_cnt; // counting the number of variables and constants
-	private Query parent; // the parent from which we obtained this query
+	private Vector<Integer> litPosVector; // we do a lot of swapping
+	private Query origQuery; // the original query
 	private int opType; // the type of operator applied on the parent of this query
-	
+	private boolean semRelScoreAvai; // availability of semantic score	
 
 	/**
 	 * @param env The environment of this job
@@ -68,8 +70,9 @@ public class Query {
 		
 		// For semantic filtering
 		pos_cnt = 0;
-		parent = null;
+		origQuery = null;
 		opType = -1;
+		semRelScoreAvai = true; // initially true
 	}
 	
 	/**
@@ -491,7 +494,7 @@ public class Query {
 		return litVector.size();
 	}
 
-	/***************** DR OPERTAOR ****************/
+	/***************** DR OPERATOR ****************/
 	/**
 	 * @param i   	the index to drop the literal. Assume that <code>i</code>
 	 * 				ranges from 0 to <code>(size() -1)</code>
@@ -504,7 +507,7 @@ public class Query {
 		
 		// Remembering the operator and the parent
 		q.opType = Operator.DC_t;
-		q.parent = this;
+		q.origQuery = this;
 		
 		return q;
 	}
@@ -527,9 +530,12 @@ public class Query {
 			if (cnt > 1)
 				idCountMap.put(sym, cnt-1);
 		}
-		litVector.remove(idx);
 		
+		litVector.remove(idx); //remove it
 		hashVal = null; // reset the hash code
+		
+		// Update the postion count
+		pos_cnt -= l.size(); // update position count
 		
 		return l;
 	}
@@ -548,6 +554,12 @@ public class Query {
 		}
 		q.hashVal = this.hashVal;
 		q.skipped = this.skipped;
+		
+		// Semantic filtering
+		q.opType = this.opType;
+		q.origQuery = this.origQuery;
+		q.pos_cnt = this.pos_cnt;
+		q.semRelScoreAvai = this.semRelScoreAvai;
 		
 		return q;
 	}
@@ -645,8 +657,9 @@ public class Query {
 					newQuery.add(newLiteral);
 					
 					// Update the parent
-					newQuery.parent = this;
+					newQuery.origQuery = this;
 					newQuery.opType = Operator.AI_t;
+					newQuery.semRelScoreAvai = false; //TODO: support AI
 
 					// Add to the result set
 					retSet.add(newQuery);
@@ -681,13 +694,18 @@ public class Query {
 		q.add(ruleLS);
 		
 		// Update the parent
-		q.parent = this;
+		q.origQuery = this;
 		q.opType = Operator.GR_t;
+		q.semRelScoreAvai = false; //TODO: support GR?
 		
 		return q;
 	}
 	
-	public void remove(Literal lit) {
+	/**
+	 * Remove a literal from the query
+	 * @param lit the literal to be removed
+	 */
+	private void remove(Literal lit) {
 		int begin = 0, end = litVector.size() - 1;
 		int mid = -1;
 		while (begin <= end) {
@@ -745,11 +763,6 @@ public class Query {
 		return webQuery;
 	}
 	
-	//TODO: remove
-	public Vector<Literal> getLitVector() {
-		return litVector;
-	}
-	
 	/**
 	 * @return the number of positions in the query 
 	 */
@@ -758,17 +771,31 @@ public class Query {
 	}
 	
 	/**
+	 * #TODO Implement for AI. Now only works with GR
 	 * Returns the similarity of this query against the original query
 	 * @param otherQuery the other query
 	 * @return the similarity of the questy against the other
 	 * 			NaN if this query has more position
 	 */
-	public double getSimAgainst(Query otherQuery) {
-		double thisNumCnt = pos_cnt;
-		double otherCnt = otherQuery.pos_cnt;
-		if (thisNumCnt > otherCnt)
-			return Double.NaN; // invalid value
+	public double getSimScore() {
+		if (!semRelScoreAvai)
+			return -1.0;
 		
-		return thisNumCnt/otherCnt;
+		double thisNumCnt = pos_cnt;
+		double originCnt = origQuery.pos_cnt;
+		if (thisNumCnt > originCnt)
+			return -1.0; // invalid value
+		
+		return thisNumCnt/originCnt;
+	}
+	
+	/**
+	 * @return true if this query is filtered, false otherwise
+	 */
+	public boolean isFiltered() {
+		double score = getSimScore();
+		if (score >= 0 && score < SemanticRelThreshold.value)
+			return true;
+		return false;
 	}
 }
