@@ -49,6 +49,8 @@ public class Literal implements Comparable<Literal>, Serializable {
 		
 		this.hashval = null;
 		this.env = env;
+		
+		this.origLiteral = null;
 	}
 	
 	public Literal(Env env, int[] params) {
@@ -57,6 +59,8 @@ public class Literal implements Comparable<Literal>, Serializable {
 		
 		this.hashval = null;
 		this.env = env;
+		
+		this.origLiteral = null;
 	}
 
 	/**
@@ -141,6 +145,11 @@ public class Literal implements Comparable<Literal>, Serializable {
 		l.pred = this.pred;
 		l.neg = this.neg;
 		l.hashval = this.hashval;
+		
+		// If this literal is an original (origLiteral == null), we make it as l's original
+		// otherwise, l's original is set to be this literal's original
+		l.origLiteral = (this.origLiteral == null)? this : this.origLiteral;
+		assert(l.origLiteral != null);
 		
 		return l;
 	}
@@ -469,11 +478,23 @@ public class Literal implements Comparable<Literal>, Serializable {
 		return webLit;
 	}
 	
+	/**
+	 * This literal maybe cloned from some original literal (happens in AI).
+	 * However, it doesn't mean this literal and the original are the same.
+	 * @return the original from which this literal was cloned from
+	 */
+	public Literal getOriginal() {
+		return origLiteral;
+	}
+	
 	private int 		pred;
 	private boolean 	neg;
 	private int[] 		params;
 	private Integer 	hashval;
 	private Env 		env;
+	
+	// For semantic filtering
+	private Literal		origLiteral; // original literal
 	
 	private static final long serialVersionUID = 87L;
 }

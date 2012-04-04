@@ -15,7 +15,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.inouelab.coopqa.Env;
-import org.inouelab.coopqa.SemanticRelThreshold;
+import org.inouelab.coopqa.SemanticSettings;
 import org.inouelab.coopqa.operators.Operator;
 import org.inouelab.coopqa.parser.QueryParser;
 import org.inouelab.coopqa.solar.SolarConnector;
@@ -47,7 +47,6 @@ public class Query {
 	
 	// For DC: similarity checking
 	private int pos_cnt; // counting the number of variables and constants
-	private Vector<Integer> litPosVector; // we do a lot of swapping
 	private Query origQuery; // the original query
 	private int opType; // the type of operator applied on the parent of this query
 	private boolean semRelScoreAvai; // availability of semantic score	
@@ -507,7 +506,7 @@ public class Query {
 		
 		// Remembering the operator and the parent
 		q.opType = Operator.DC_t;
-		q.origQuery = this;
+		q.origQuery = (this.origQuery == null)? this : this.origQuery;
 		
 		return q;
 	}
@@ -656,8 +655,8 @@ public class Query {
 					// add the modified literal
 					newQuery.add(newLiteral);
 					
-					// Update the parent
-					newQuery.origQuery = this;
+					// Update the root
+					newQuery.origQuery = (this.origQuery == null)? this: this.origQuery;
 					newQuery.opType = Operator.AI_t;
 					newQuery.semRelScoreAvai = false; //TODO: support AI
 
@@ -794,7 +793,7 @@ public class Query {
 	 */
 	public boolean isFiltered() {
 		double score = getSimScore();
-		if (score >= 0 && score < SemanticRelThreshold.value)
+		if (score >= 0 && score < SemanticSettings.threshold)
 			return true;
 		return false;
 	}

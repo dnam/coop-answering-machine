@@ -22,15 +22,17 @@ public class CoopQA {
 //		options.printHelp(); // if you need to see the usage
 		try {
 			String[] testArgs = { "-kb",
-					"C:\\Users\\Nam\\workspace\\CQA\\test\\gen_kb.txt",
+					"C:\\Users\\namd\\Desktop\\Eclipse-COOPQA\\Test\\gen_kb.txt",
 					"-q",
-					"C:\\Users\\Nam\\workspace\\CQA\\test\\gen_query.txt"};
+					"C:\\Users\\namd\\Desktop\\Eclipse-COOPQA\\Test\\gen_query.txt",
+					"-solar",
+					"C:\\Users\\namd\\Desktop\\Eclipse-COOPQA\\Test\\solar2-build310.jar"};
 			options.init(testArgs);
 //			options.init(args);
 			
 			// The root of the tree
-//			Result ret = GenOp.run(env);
-			Result ret = MultithreadGenOp.run(env);
+			Result ret = GenOp.run(env);
+			//Result ret = MultithreadGenOp.run(env);
 			
 			System.out.print(ret.printAll());
 			System.out.println("Total SOLAR time: " + ret.getSolarTime() + "s");
