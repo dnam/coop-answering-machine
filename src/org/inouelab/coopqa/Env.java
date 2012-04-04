@@ -170,6 +170,7 @@ public class Env {
 		if (tmpDir != null)
 			tmpDirFile = new File(tmpDir);
 
+		System.out.println(solarPath);
 		connector = new SolarConnector(this, solarPath, tmpDirFile);
 		worker = new SolarWorker(connector, cycleSize);
 

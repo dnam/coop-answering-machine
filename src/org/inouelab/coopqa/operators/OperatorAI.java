@@ -8,7 +8,7 @@ package org.inouelab.coopqa.operators;
 import java.util.Iterator;
 
 import org.inouelab.coopqa.Env;
-import org.inouelab.coopqa.SemanticRelThreshold;
+import org.inouelab.coopqa.SemanticSettings;
 import org.inouelab.coopqa.base.*;
 
 /**
@@ -39,7 +39,7 @@ final class OperatorAI extends Operator {
 			while (itQu.hasNext()) {
 				Query newQuery = itQu.next();
 				
-				if (SemanticRelThreshold.enable && newQuery.isFiltered())
+				if (SemanticSettings.enable && newQuery.isFiltered())
 					continue;
 				
 				if (globalSet.add(newQuery)) { // new query
