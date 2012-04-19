@@ -79,6 +79,9 @@ public class Result {
 	 */
 	public void setAnswerMap(AnswerMap answerMap) {
 		this.answerMap = answerMap;
+		
+		// Semantic filtering
+		root.filter(answerMap);
 	}
 	
 	/**

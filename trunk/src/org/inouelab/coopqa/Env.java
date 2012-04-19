@@ -10,6 +10,9 @@ import org.inouelab.coopqa.operators.Operator;
 import org.inouelab.coopqa.solar.SolarConnector;
 import org.inouelab.coopqa.solar.SolarWorker;
 
+import edu.sussex.nlp.jws.JWS;
+import edu.sussex.nlp.jws.WuAndPalmer;
+
 /**
  * Provides a container for environment information.
  * This class is used by many other classes throughout the
@@ -36,6 +39,11 @@ public class Env {
 		cycleSize = 20;
 		depthLimit = Integer.MAX_VALUE;
 		queryLimit = Integer.MAX_VALUE;
+		
+		//WordNet
+		System.out.println("Intializing WordNet");
+		JWS ws = new JWS("./Wordnet", "3.0");
+		wup = ws.getWuAndPalmer();
 	}
 	
 	/**
@@ -312,6 +320,13 @@ public class Env {
 	public int getMaxTimePerCycle() {
 		return maxTimePerCycle;
 	}
+	
+	/**
+	 * @return the wordnet handler
+	 */
+	public double getWNScore(String str1, String str2) {
+		return wup.max(str1, str2, "n");
+	}
 
 	// Primary attribute
 	private boolean initialized; // is this object initialized or not?
@@ -337,4 +352,7 @@ public class Env {
 	private String kbFile; // path to knowledge base file
 	private String outputFile; // output the result to a text file
 	private String queryFile; // the query file
+	
+	//WordNet
+	private WuAndPalmer wup;
 }
