@@ -2,6 +2,7 @@ package org.inouelab.coopqa.base;
 
 import java.util.*;
 
+import org.inouelab.coopqa.SemanticSettings;
 import org.inouelab.coopqa.web.shared.Operator;
 import org.inouelab.coopqa.web.shared.WebQuerySet;
 
@@ -235,6 +236,26 @@ public class QuerySet extends HashSet<Query> {
 		}
 		
 		return bld.toString();
+	}
+	
+	/**
+	 * Filter according to semantic setting
+	 * @param answerMap filtering
+	 */
+	public void filter(AnswerMap answerMap) {
+		if (!SemanticSettings.enable)
+			return;
+		
+		Iterator<Query> it = this.iterator();
+		while(it.hasNext()) {
+			Query q = it.next();
+			if (q.isFiltered(answerMap))
+				it.remove();
+		}
+		
+		for (QuerySet child : children) {
+			child.filter(answerMap);
+		}
 	}
 	
 	/**
