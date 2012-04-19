@@ -838,7 +838,7 @@ public class Query {
 	 * @param answerMap
 	 * @return
 	 */
-	public double scoreAIplus(AnswerMap answerMap) {
+	private double scoreAIplus(AnswerMap answerMap) {
 		// Get the answers. We first remove it from the map. Will add back later
 		List<List<Integer>> answers = answerMap.get(this.id);
 		if (answers == null) {
