@@ -863,31 +863,32 @@ public class Query {
 			double sum_ = 0; // sum for the big one
 			SymTable symTab = env.symTab();
 			for (int i = 0; i < this.litVector.size(); i++) {
+				boolean reject = false;
 				Literal lit = this.litVector.get(i);
 				Literal orgLit = (lit.getOriginal() == null)? lit : lit.getOriginal();
 				for (int k = 0; k < lit.size(); k++) {
 					// p_i(q) is of lit_j (position j in the literal)
-					int unmapped_pia = lit.getParamAt(k); // variable
-					int piq_ = orgLit.getParamAt(k);
-					String piq_Str = symTab.getSym(piq_);
-					
+					// first we find pia_ from the variable unmmaped_pia
+					int unmapped_pia = lit.getParamAt(k); // variable				
 					SymType unmapped_pia_Type = symTab.getTypeID(unmapped_pia);
-					SymType piq_Type = symTab.getTypeID(piq_);
-					
-					// Finding the mapping
 					int pia_  = -1;
 					if (unmapped_pia_Type == SymType.VARIABLE && !ansVarMap.containsKey(unmapped_pia))
 						throw new IllegalStateException("A variable must have a corresponding answer: " + symTab.getSym(unmapped_pia));
-
 					pia_ = (unmapped_pia_Type == SymType.VARIABLE)? ansVarMap.get(unmapped_pia): unmapped_pia; // get (p_i(a))
 					String pia_Str = symTab.getSym(pia_);
+
+					// then piq_
+					int piq_ = orgLit.getParamAt(k);
+					String piq_Str = symTab.getSym(piq_);					
+					SymType piq_Type = symTab.getTypeID(piq_);
 					
-					// case no. 1
+					// case no. 1 and 4
 					if (unmapped_pia == piq_) { // the variable/constant is not changed
 						sum_ += 1;
 						continue;
 					}
 					 
+					// case 2 and 3
 					if (piq_Type == SymType.VARIABLE) { // p_i(q) is a variable
 						int hori_pn_sum = 0; // for hori/pn sum
 						int occ_ = 0; // occurence count for piq
@@ -933,6 +934,7 @@ public class Query {
 						continue;
 					}
 
+					// case 5
 					if (piq_Type == SymType.CONSTANT) { // used to be a constant
 						if (isProperNoun(piq_Str)) { // proper noun was instantiated
 							sum_ += 0.5;
@@ -940,15 +942,19 @@ public class Query {
 						}
 						// The constant was instantiated
 						double simScoreC = env.getWNScore(pia_Str, piq_Str);
+						sum_ += simScoreC;
 						if (simScoreC < SemanticSettings.threshold) {
 							sum_ = 0;
+							reject = true;
 							break;
 						}
-						sum_ += simScoreC;
 					}
-
-				}
-			}
+				} // done with a literal (of a query)
+				
+				// the reject case
+				if (reject)
+					break;
+			} // done with the query
 			
 			sum_ = sum_/pos_cnt;
 			max_sum_ = (max_sum_ > sum_)? max_sum_:sum_;
@@ -962,7 +968,7 @@ public class Query {
 			}
 		}
 
-		// we still have some relevant answers left
+		// return the max value. We may have still some relevant answers
 		return max_sum_;
 	}
 
