@@ -72,6 +72,13 @@ public class SolarWorker implements Callable<AnswerMap> {
 	public synchronized boolean isFinished() {
 		return finished;
 	}
+	
+	/**
+	 * @return the cotained solar connector
+	 */
+	public SolarConnector getCon() {
+		return connector;
+	}
 
 	@Override
 	public AnswerMap call() throws Exception {
