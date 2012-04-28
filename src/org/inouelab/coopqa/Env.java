@@ -41,9 +41,11 @@ public class Env {
 		queryLimit = Integer.MAX_VALUE;
 		
 		//WordNet
-		System.out.println("Intializing WordNet");
-		JWS ws = new JWS("./Wordnet", "3.0");
-		wup = ws.getWuAndPalmer();
+		if (SemanticSettings.enable) {
+			System.out.println("Intializing WordNet");
+			JWS ws = new JWS("./Wordnet", "3.0");
+			wup = ws.getWuAndPalmer();
+		}
 	}
 	
 	/**

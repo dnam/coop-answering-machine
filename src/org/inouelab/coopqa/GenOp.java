@@ -47,6 +47,9 @@ public class GenOp {
 		// Get the limits
 		int queryLimit = env.getLimitval();
 		int depthLimit = env.getDepth();
+		
+		// Solve the root first
+		ansMap.putAll(con.run(root));
 	
 		Operator OP = env.op();
 		while (!workingQueue.isEmpty() && queryLimit > 0) {
