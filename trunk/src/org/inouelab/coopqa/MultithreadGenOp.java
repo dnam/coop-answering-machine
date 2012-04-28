@@ -46,7 +46,10 @@ public class MultithreadGenOp {
 
 		// A queue of QuerySet to process
 		Queue<QuerySet> workingQueue = new LinkedList<QuerySet>();
-		workingQueue.offer(root); // add the root
+		workingQueue.offer(root); // add the root 
+		
+		// Answer Map 
+		AnswerMap ansMap = worker.getCon().run(root); // solve the root first
 
 		// Get the limits
 		int queryLimit = env.getLimitval();
@@ -110,7 +113,7 @@ public class MultithreadGenOp {
 		}
 
 		worker.setFinished(); // Notify the worker that we're done
-		AnswerMap ansMap = future.get();
+		ansMap.putAll(future.get()); // Add more result
 		
 		executor.shutdown();
 		while(!executor.awaitTermination(10, TimeUnit.MILLISECONDS)); // wait until finish
