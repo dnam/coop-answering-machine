@@ -48,8 +48,8 @@ public class Query {
 	// For DC: similarity checking
 	private int pos_cnt; // counting the number of variables and constants
 	private Query origQuery; // the original query
-	private int semType; // Type of queries: 0 = original, 1: DC+, 2: AI+; -1:
-							// other (unable to determine score)
+	private int semType; // Type of queries: 
+	//0 = original, 1: DC+, 2: AI+; 3:DC+AI+, -1:other (unable to determine score)
 
 	/**
 	 * @param env
@@ -684,10 +684,18 @@ public class Query {
 							: this.origQuery;
 
 					// if the current query is an original, or an AI+ query.
-					if (this.semType == 0 || this.semType == 2)
+					switch(this.semType) {
+					case 0:
+					case 2:
 						newQuery.semType = 2; // AI+
-					else
-						newQuery.semType = -1; // other type
+						break;
+					case 1:
+					case 3:
+						newQuery.semType = 3; // DC+AI+
+						break;
+					default:
+						newQuery.semType = -1;
+					}
 
 					// Add to the result set
 					retSet.add(newQuery);
@@ -838,7 +846,7 @@ public class Query {
 	 * @param answerMap
 	 * @return
 	 */
-	private double scoreAIplus(AnswerMap answerMap) {
+	private double scoreDCplusAIplus(AnswerMap answerMap) {
 		// Get the answers. We first remove it from the map. Will add back later
 		List<List<Integer>> answers = answerMap.get(this.id);
 		if (answers == null) {
@@ -956,7 +964,7 @@ public class Query {
 					break;
 			} // done with the query
 			
-			sum_ = sum_/pos_cnt;
+			sum_ = (sum_*this.pos_cnt)/origQuery.pos_cnt;
 			max_sum_ = (max_sum_ > sum_)? max_sum_:sum_;
 			
 			// You can change to make the answer more readable
@@ -991,7 +999,7 @@ public class Query {
 			else
 				score = pos_cnt / origQuery.pos_cnt;
 		} else if (semType == 2) { // AI+
-			score = scoreAIplus(answerMap);
+			score = scoreDCplusAIplus(answerMap);
 		}
 
 		if (score >= 0 && score < SemanticSettings.threshold)
