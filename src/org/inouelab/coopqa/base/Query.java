@@ -964,6 +964,7 @@ public class Query {
 					break;
 			} // done with the query
 			
+			// in case of AI+, this.pos_cnt = origQuery.pos_cnt
 			sum_ = (sum_*this.pos_cnt)/origQuery.pos_cnt;
 			max_sum_ = (max_sum_ > sum_)? max_sum_:sum_;
 			
@@ -998,7 +999,7 @@ public class Query {
 				score = -1.0; // invalid value
 			else
 				score = pos_cnt / origQuery.pos_cnt;
-		} else if (semType == 2) { // AI+
+		} else if (semType == 2 || semType == 3) { // AI+ or DC+
 			score = scoreDCplusAIplus(answerMap);
 		}
 
