@@ -1,0 +1,1 @@
+Generalization of query with respect to a given KB
